@@ -494,10 +494,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Download all media files
     List<Map<String, dynamic>> downloadResults = [];
-    List<Map<String, dynamic>> mediaItems = List<Map<String, dynamic>>.from(result['mediaItems']);
+    List<String> downloadLinks = List<String>.from(result['download_links']);
     
-    for (var mediaItem in mediaItems) {
-      final downloadResult = await InstagramHandler.downloadMedia(mediaItem['url'], mediaItem['filename']);
+    for (int i = 0; i < downloadLinks.length; i++) {
+      final mediaUrl = downloadLinks[i];
+      final fileName = '${result['username']}_${DateTime.now().millisecondsSinceEpoch}_$i.mp4';
+      
+      final downloadResult = await InstagramHandler.downloadMedia(
+        mediaUrl, 
+        fileName,
+        thumbnailUrl: result['thumbnail'],
+        username: result['username'],
+        caption: result['caption'],
+      );
       downloadResults.add(downloadResult);
     }
     

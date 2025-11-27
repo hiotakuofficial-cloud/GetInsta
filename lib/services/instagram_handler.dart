@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../services/notification_service.dart';
+import '../services/download_history.dart';
 
 class InstagramHandler {
   static const String _apiBaseUrl = 'https://v1-w3sc.onrender.com/insta/api.php';
@@ -120,7 +121,11 @@ class InstagramHandler {
   }
   
   // Download single media file with progress notifications
-  static Future<Map<String, dynamic>> downloadMedia(String mediaUrl, String fileName) async {
+  static Future<Map<String, dynamic>> downloadMedia(String mediaUrl, String fileName, {
+    String? thumbnailUrl,
+    String? username,
+    String? caption,
+  }) async {
     try {
       // Show download started notification
       await NotificationService.showDownloadStarted(fileName);
@@ -163,6 +168,16 @@ class InstagramHandler {
             await sink.close();
             // Show completion notification
             await NotificationService.showDownloadComplete(fileName, true);
+            
+            // Add to download history
+            await DownloadHistory.addDownload(
+              filename: fileName,
+              thumbnailUrl: thumbnailUrl ?? '',
+              videoUrl: mediaUrl,
+              username: username ?? 'Unknown',
+              caption: caption ?? '',
+              filePath: file.path,
+            );
           },
           onError: (error) async {
             await sink.close();
