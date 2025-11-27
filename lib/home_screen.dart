@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'screens/history_screen.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
+import 'services/download_history.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -513,63 +514,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       print("Download error: $e");
     }
     
-    // Show results
+    // Show results (removed dialog, just notifications now)
     int successCount = downloadResults.where((r) => r['success'] == true).length;
     int failCount = downloadResults.length - successCount;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              successCount > 0 ? Icons.check_circle : Icons.error,
-              color: successCount > 0 ? Colors.green : Colors.red,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              successCount > 0 ? 'Download Complete!' : 'Download Failed',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (successCount > 0)
-              Text(
-                'Successfully downloaded $successCount ${successCount == 1 ? 'file' : 'files'}',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 14,
-                ),
-              ),
-            if (failCount > 0)
-              Text(
-                'Failed to download $failCount ${failCount == 1 ? 'file' : 'files'}',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                ),
-              ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'OK',
-              style: TextStyle(color: Color(0xFF6C63FF)),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -854,7 +801,119 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                         ),
                         
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                        
+                        // Recently Downloaded Section
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: DownloadHistory.getRecentDownloads(limit: 5),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Recently Downloaded',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Horizontal scrollable list
+                                  SizedBox(
+                                    height: 120,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder: (context, index) {
+                                        final download = snapshot.data![index];
+                                        return GestureDetector(
+                                          onTap: () {
+                                            // Play video
+                                            _playVideo(download['filePath']);
+                                          },
+                                          child: Container(
+                                            width: 160,
+                                            margin: const EdgeInsets.only(right: 12),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF1E1E1E),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // Thumbnail
+                                                Container(
+                                                  height: 80,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                                    color: const Color(0xFF2A2A2A),
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      if (download['thumbnailUrl'] != null && download['thumbnailUrl'].isNotEmpty)
+                                                        ClipRRect(
+                                                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                                          child: Image.network(
+                                                            download['thumbnailUrl'],
+                                                            width: double.infinity,
+                                                            height: 80,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return const Center(
+                                                                child: Icon(Icons.video_library, color: Colors.white54),
+                                                              );
+                                                            },
+                                                          ),
+                                                        )
+                                                      else
+                                                        const Center(
+                                                          child: Icon(Icons.video_library, color: Colors.white54),
+                                                        ),
+                                                      
+                                                      // Play overlay
+                                                      const Center(
+                                                        child: Icon(
+                                                          Icons.play_circle_filled,
+                                                          color: Colors.white,
+                                                          size: 32,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                
+                                                // Title
+                                                Padding(
+                                                  padding: const EdgeInsets.all(8),
+                                                  child: Text(
+                                                    download['filename'] ?? 'Unknown',
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                         
                         Center(
                           child: Text(
@@ -894,5 +953,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
     );
+  }
+  
+  void _playVideo(String? filePath) {
+    if (filePath != null) {
+      // Open video with system video player
+      launchUrl(Uri.file(filePath));
+    }
   }
 }
