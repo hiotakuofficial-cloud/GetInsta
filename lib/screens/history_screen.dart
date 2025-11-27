@@ -28,7 +28,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
-      body: RefreshIndicator(
+      body: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity! > 500) {
+            // Swipe right (positive velocity = right swipe)
+            Navigator.pop(context);
+          }
+        },
+        child: RefreshIndicator(
         onRefresh: () async {
           await Future.delayed(const Duration(seconds: 1));
         },
@@ -166,6 +173,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
