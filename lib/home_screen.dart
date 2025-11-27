@@ -513,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Map<String, dynamic>> downloadResults = [];
     
     try {
-      // Check if download_links exists
+      // Check if download_links exists (correct from actual API)
       if (result['download_links'] == null) {
         Fluttertoast.showToast(msg: "🔥 ERROR: No download_links found!");
         print("🔥 Available keys: ${result.keys.toList()}");
