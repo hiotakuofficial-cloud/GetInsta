@@ -513,23 +513,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Map<String, dynamic>> downloadResults = [];
     
     try {
-      // Check if download_links exists (correct from actual API)
-      if (result['download_links'] == null) {
-        Fluttertoast.showToast(msg: "🔥 ERROR: No download_links found!");
+      // Check if mediaItems exists (handler transforms download_links to mediaItems)
+      if (result['mediaItems'] == null) {
+        Fluttertoast.showToast(msg: "🔥 ERROR: No mediaItems found!");
         print("🔥 Available keys: ${result.keys.toList()}");
         Navigator.of(context).pop();
         return;
       }
       
-      List<String> downloadLinks = List<String>.from(result['download_links']);
+      List<dynamic> mediaItems = result['mediaItems'];
       
-      Fluttertoast.showToast(msg: "🔥 Found ${downloadLinks.length} download links");
+      Fluttertoast.showToast(msg: "🔥 Found ${mediaItems.length} media items");
       
-      for (int i = 0; i < downloadLinks.length; i++) {
-        final mediaUrl = downloadLinks[i];
-        final fileName = '${result['username']}_${DateTime.now().millisecondsSinceEpoch}_$i.mp4';
+      for (int i = 0; i < mediaItems.length; i++) {
+        final mediaItem = mediaItems[i];
+        final mediaUrl = mediaItem['url'];
+        final fileName = mediaItem['filename']; // Use pre-generated filename
         
-        Fluttertoast.showToast(msg: "🔥 Downloading file $i: $fileName");
+        Fluttertoast.showToast(msg: "🔥 Downloading: $fileName");
         
         final downloadResult = await InstagramHandler.downloadMedia(
           mediaUrl, 
