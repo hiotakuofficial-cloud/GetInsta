@@ -184,9 +184,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       // Right Follow Button
                       GestureDetector(
                         onTap: () async {
-                          final Uri url = Uri.parse('https://www.instagram.com/yourhoneydewie?igsh=eWZvdzJqdjkxdDBq');
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          try {
+                            final Uri url = Uri.parse('https://www.instagram.com/yourhoneydewie?igsh=eWZvdzJqdjkxdDBq');
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.externalApplication);
+                            } else {
+                              // Fallback to browser
+                              await launchUrl(url, mode: LaunchMode.platformDefault);
+                            }
+                          } catch (e) {
+                            // Show error message
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Could not open Instagram'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           }
                         },
                         child: Container(
