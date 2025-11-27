@@ -80,7 +80,7 @@ class NotificationService {
       presentSound: false,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
