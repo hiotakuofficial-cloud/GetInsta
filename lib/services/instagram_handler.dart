@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../services/notification_service.dart';
 import '../services/download_history.dart';
 
@@ -127,13 +128,12 @@ class InstagramHandler {
     String? caption,
   }) async {
     try {
-      print('🔥 Starting download: $fileName');
-      print('🔥 Media URL: $mediaUrl');
+      Fluttertoast.showToast(msg: "🔥 Starting download: $fileName");
       
       final request = http.Request('GET', Uri.parse(mediaUrl));
       final response = await request.send();
       
-      print('🔥 HTTP Response: ${response.statusCode}');
+      Fluttertoast.showToast(msg: "🔥 HTTP Response: ${response.statusCode}");
       
       if (response.statusCode == 200) {
         // Get public Downloads/reel directory
@@ -144,14 +144,14 @@ class InstagramHandler {
           directory = await getApplicationDocumentsDirectory();
         }
         
-        print('🔥 Directory path: ${directory.path}');
+        Fluttertoast.showToast(msg: "🔥 Directory: ${directory.path}");
         
         if (!await directory.exists()) {
-          print('🔥 Creating directory...');
+          Fluttertoast.showToast(msg: "🔥 Creating directory...");
           await directory.create(recursive: true);
-          print('🔥 Directory created successfully');
+          Fluttertoast.showToast(msg: "🔥 Directory created!");
         } else {
-          print('🔥 Directory already exists');
+          Fluttertoast.showToast(msg: "🔥 Directory exists");
         }
         
         // Handle duplicate filenames
@@ -167,7 +167,7 @@ class InstagramHandler {
           counter++;
         }
         
-        print('🔥 Final filename: $finalFileName');
+        Fluttertoast.showToast(msg: "🔥 Final filename: $finalFileName");
         
         // Show download started notification
         await NotificationService.showDownloadStarted(finalFileName);
