@@ -134,10 +134,10 @@ class InstagramHandler {
       final response = await request.send();
       
       if (response.statusCode == 200) {
-        // Get public Downloads directory
+        // Get public Downloads/reel directory
         Directory? directory;
         if (Platform.isAndroid) {
-          directory = Directory('/storage/emulated/0/Download/GetInsta');
+          directory = Directory('/storage/emulated/0/Download/reel');
         } else {
           directory = await getApplicationDocumentsDirectory();
         }
@@ -146,8 +146,18 @@ class InstagramHandler {
           await directory.create(recursive: true);
         }
         
-        // Save file with progress tracking
-        final file = File('${directory.path}/$fileName');
+        // Handle duplicate filenames
+        String finalFileName = fileName;
+        File file = File('${directory.path}/$finalFileName');
+        int counter = 1;
+        
+        while (await file.exists()) {
+          final nameWithoutExt = fileName.split('.').first;
+          final extension = fileName.split('.').last;
+          finalFileName = '${nameWithoutExt}_$counter.$extension';
+          file = File('${directory.path}/$finalFileName');
+          counter++;
+        }
         final sink = file.openWrite();
         
         int downloaded = 0;
@@ -161,17 +171,17 @@ class InstagramHandler {
             if (total > 0) {
               final progress = ((downloaded / total) * 100).round();
               // Update notification progress
-              NotificationService.updateDownloadProgress(progress, fileName);
+              NotificationService.updateDownloadProgress(progress, finalFileName);
             }
           },
           onDone: () async {
             await sink.close();
             // Show completion notification
-            await NotificationService.showDownloadComplete(fileName, true);
+            await NotificationService.showDownloadComplete(finalFileName, true);
             
             // Add to download history
             await DownloadHistory.addDownload(
-              filename: fileName,
+              filename: finalFileName,
               thumbnailUrl: thumbnailUrl ?? '',
               videoUrl: mediaUrl,
               username: username ?? 'Unknown',
@@ -181,14 +191,14 @@ class InstagramHandler {
           },
           onError: (error) async {
             await sink.close();
-            await NotificationService.showDownloadComplete(fileName, false);
+            await NotificationService.showDownloadComplete(finalFileName, false);
           },
         ).asFuture();
         
         return {
           'success': true,
           'filePath': file.path,
-          'fileName': fileName,
+          'fileName': finalFileName,
           'size': '${(downloaded / 1024 / 1024).toStringAsFixed(2)} MB',
         };
       } else {

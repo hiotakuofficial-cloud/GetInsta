@@ -79,7 +79,7 @@ class DownloadHistory {
 
   static Future<List<Map<String, dynamic>>> getDownloadsFromFolder() async {
     try {
-      final directory = Directory('/storage/emulated/0/Download/GetInsta');
+      final directory = Directory('/storage/emulated/0/Download/reel');
       if (!await directory.exists()) {
         return [];
       }
