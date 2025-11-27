@@ -472,6 +472,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     print("🔥 API Result: $result");
     Fluttertoast.showToast(msg: "🔥 API keys: ${result.keys.toList()}");
     
+    // Check each key individually
+    result.forEach((key, value) {
+      print("🔥 Key: $key, Value type: ${value.runtimeType}");
+      if (key == 'download_links') {
+        print("🔥 download_links content: $value");
+        Fluttertoast.showToast(msg: "🔥 download_links: $value");
+      }
+    });
+    
     // Show download progress dialog
     showDialog(
       context: context,
@@ -507,6 +516,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       // Check if download_links exists
       if (result['download_links'] == null) {
         Fluttertoast.showToast(msg: "🔥 ERROR: No download_links found!");
+        print("🔥 Available keys: ${result.keys.toList()}");
         Navigator.of(context).pop();
         return;
       }
