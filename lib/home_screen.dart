@@ -62,8 +62,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       Permission.notification,
     ].request();
   }
-  }
-
   @override
   void dispose() {
     _searchController.dispose();
