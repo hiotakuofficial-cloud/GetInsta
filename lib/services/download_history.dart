@@ -36,6 +36,7 @@ class DownloadHistory {
     required String filePath,
   }) async {
     try {
+      print("📝 Saving to history: $filename");
       final history = await getHistory();
       
       final downloadItem = {
@@ -57,8 +58,9 @@ class DownloadHistory {
       }
       
       await _saveHistory(history);
+      print("✅ History saved successfully. Total items: ${history.length}");
     } catch (e) {
-      print('Error adding to history: $e');
+      print('❌ Error adding to history: $e');
     }
   }
 

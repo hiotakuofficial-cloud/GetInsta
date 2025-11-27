@@ -466,22 +466,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startDownload(Map<String, dynamic> result) async {
-    // Add toast to confirm function is called
-    Fluttertoast.showToast(msg: "🔥 Download button clicked!");
-    
-    // Debug: Print the entire result structure
-    print("🔥 API Result: $result");
-    Fluttertoast.showToast(msg: "🔥 API keys: ${result.keys.toList()}");
-    
-    // Check each key individually
-    result.forEach((key, value) {
-      print("🔥 Key: $key, Value type: ${value.runtimeType}");
-      if (key == 'download_links') {
-        print("🔥 download_links content: $value");
-        Fluttertoast.showToast(msg: "🔥 download_links: $value");
-      }
-    });
-    
     // Show download progress dialog
     showDialog(
       context: context,
@@ -514,10 +498,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Map<String, dynamic>> downloadResults = [];
     
     try {
-      // Check if mediaItems exists (handler transforms download_links to mediaItems)
+      // Check if mediaItems exists
       if (result['mediaItems'] == null) {
-        Fluttertoast.showToast(msg: "🔥 ERROR: No mediaItems found!");
-        print("🔥 Available keys: ${result.keys.toList()}");
         Navigator.of(context).pop();
         return;
       }
@@ -536,19 +518,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
       
       if (indicesToDownload.isEmpty) {
-        Fluttertoast.showToast(msg: "🔥 No media selected!");
         Navigator.of(context).pop();
         return;
       }
       
-      Fluttertoast.showToast(msg: "🔥 Downloading ${indicesToDownload.length} files");
-      
       for (int index in indicesToDownload) {
         final mediaItem = mediaItems[index];
         final mediaUrl = mediaItem['url'];
-        final fileName = mediaItem['filename']; // Use pre-generated filename
-        
-        Fluttertoast.showToast(msg: "🔥 Starting: $fileName");
+        final fileName = mediaItem['filename'];
         
         final downloadResult = await InstagramHandler.downloadMedia(
           mediaUrl, 
@@ -558,14 +535,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           caption: result['caption'],
         );
         downloadResults.add(downloadResult);
-        
-        Fluttertoast.showToast(
-          msg: downloadResult['success'] ? "✅ Downloaded: $fileName" : "❌ Failed: $fileName"
-        );
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "🔥 ERROR: $e");
-      print("🔥 Download error: $e");
+      print("Download error: $e");
     }
     
     // Close progress dialog
