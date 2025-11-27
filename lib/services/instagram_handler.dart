@@ -127,11 +127,13 @@ class InstagramHandler {
     String? caption,
   }) async {
     try {
-      // Show download started notification
-      await NotificationService.showDownloadStarted(fileName);
+      print('🔥 Starting download: $fileName');
+      print('🔥 Media URL: $mediaUrl');
       
       final request = http.Request('GET', Uri.parse(mediaUrl));
       final response = await request.send();
+      
+      print('🔥 HTTP Response: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         // Get public Downloads/reel directory
@@ -142,8 +144,14 @@ class InstagramHandler {
           directory = await getApplicationDocumentsDirectory();
         }
         
+        print('🔥 Directory path: ${directory.path}');
+        
         if (!await directory.exists()) {
+          print('🔥 Creating directory...');
           await directory.create(recursive: true);
+          print('🔥 Directory created successfully');
+        } else {
+          print('🔥 Directory already exists');
         }
         
         // Handle duplicate filenames
@@ -158,6 +166,11 @@ class InstagramHandler {
           file = File('${directory.path}/$finalFileName');
           counter++;
         }
+        
+        print('🔥 Final filename: $finalFileName');
+        
+        // Show download started notification
+        await NotificationService.showDownloadStarted(finalFileName);
         final sink = file.openWrite();
         
         int downloaded = 0;
