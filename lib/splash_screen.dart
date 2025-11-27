@@ -22,10 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     
     // Properly hide status bar and navigation bar
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [],
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -251,6 +248,17 @@ class _SplashScreenState extends State<SplashScreen>
                             fontSize: 13,
                             color: Colors.white.withOpacity(0.6),
                             fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 60),
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            const Color(0xFF6C63FF),
                           ),
                         ),
                       ),
