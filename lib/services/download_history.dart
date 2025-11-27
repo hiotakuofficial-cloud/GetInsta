@@ -80,6 +80,17 @@ class DownloadHistory {
     return history.take(limit).toList();
   }
 
+  static Future<void> removeDownload(String filename) async {
+    try {
+      final history = await getHistory();
+      history.removeWhere((item) => item['filename'] == filename);
+      await _saveHistory(history);
+      Fluttertoast.showToast(msg: "Removed from history");
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Failed to remove from history");
+    }
+  }
+
   static Future<List<Map<String, dynamic>>> getDownloadsFromFolder() async {
     try {
       final directory = Directory('/storage/emulated/0/Download/reel');
