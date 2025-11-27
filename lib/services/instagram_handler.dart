@@ -165,109 +165,124 @@ class InstagramHandler {
   static void showMediaPreview(BuildContext context, Map<String, dynamic> result) {
     Navigator.of(context).pop(); // Close processing dialog
     
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              result['contentType'] == 'reel' ? Icons.play_circle : Icons.photo_library,
-              color: const Color(0xFF6C63FF),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                '@${result['username']}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Container();
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return Transform.scale(
+          scale: Curves.easeOutBack.transform(animation.value),
+          child: FadeTransition(
+            opacity: animation,
+            child: AlertDialog(
+              backgroundColor: const Color(0xFF1E1E1E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Row(
+                children: [
+                  Icon(
+                    result['contentType'] == 'reel' ? Icons.play_circle : Icons.photo_library,
+                    color: const Color(0xFF6C63FF),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '@${result['username']}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Content type info
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6C63FF).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${result['contentType'].toUpperCase()} • ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'item' : 'items'}',
+                      style: const TextStyle(
+                        color: Color(0xFF6C63FF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Media info
+                  if (result['hasVideo'] && result['hasImages'])
+                    const Text(
+                      '📹 Videos + 📷 Images',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    )
+                  else if (result['hasVideo'])
+                    const Text(
+                      '📹 Video content',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    )
+                  else
+                    const Text(
+                      '📷 Image content',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Caption preview
+                  if (result['caption'] != null && result['caption'].isNotEmpty)
+                    Text(
+                      result['caption'],
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 12,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white54),
+                  ),
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Content type info
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '${result['contentType'].toUpperCase()} • ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'item' : 'items'}',
-                style: const TextStyle(
-                  color: Color(0xFF6C63FF),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _startDownload(context, result);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C63FF),
+                  ),
+                  child: Text(
+                    'Download ${result['mediaCount'] == 1 ? '' : 'All (${result['mediaCount']})'}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            // Media info
-            if (result['hasVideo'] && result['hasImages'])
-              const Text(
-                '📹 Videos + 📷 Images',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              )
-            else if (result['hasVideo'])
-              const Text(
-                '📹 Video content',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              )
-            else
-              const Text(
-                '📷 Image content',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-            
-            const SizedBox(height: 8),
-            
-            // Caption preview
-            if (result['caption'] != null && result['caption'].isNotEmpty)
-              Text(
-                result['caption'],
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white54),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _startDownload(context, result);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6C63FF),
-            ),
-            child: Text(
-              'Download ${result['mediaCount'] == 1 ? '' : 'All (${result['mediaCount']})'}',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
   
