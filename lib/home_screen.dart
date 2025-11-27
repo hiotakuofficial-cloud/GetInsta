@@ -61,10 +61,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _requestPermissions() async {
-    await [
+    // Request storage permissions based on Android version
+    if (await Permission.manageExternalStorage.isGranted) {
+      // Already have manage external storage
+      return;
+    }
+    
+    // Request permissions
+    Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
+      Permission.manageExternalStorage,
       Permission.notification,
     ].request();
+    
+    // Check if storage permission was denied
+    if (statuses[Permission.storage] == PermissionStatus.denied ||
+        statuses[Permission.manageExternalStorage] == PermissionStatus.denied) {
+      // Show dialog to user
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E),
+            title: const Text(
+              'Storage Permission Required',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'This app needs storage permission to download Instagram media files.',
+              style: TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  openAppSettings();
+                },
+                child: const Text('Settings', style: TextStyle(color: Color(0xFF6C63FF))),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
