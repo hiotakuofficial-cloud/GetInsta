@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'screens/history_screen.dart';
 import 'services/instagram_handler.dart';
 
@@ -49,6 +50,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _searchAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _searchController2, curve: Curves.elasticOut),
     );
+
+    // Request permissions
+    _requestPermissions();
+  }
+
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.storage,
+      Permission.notification,
+    ].request();
+  }
   }
 
   @override
