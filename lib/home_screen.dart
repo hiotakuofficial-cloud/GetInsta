@@ -466,33 +466,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startDownload(Map<String, dynamic> result) async {
-    // Show download progress dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(
-              color: Color(0xFF6C63FF),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Downloading files...',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    // Show simple toast instead of dialog
+    Fluttertoast.showToast(msg: "Starting download...");
 
     // Download all media files
     List<Map<String, dynamic>> downloadResults = [];
@@ -500,7 +475,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     try {
       // Check if mediaItems exists
       if (result['mediaItems'] == null) {
-        Navigator.of(context).pop();
         return;
       }
       
@@ -518,7 +492,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
       
       if (indicesToDownload.isEmpty) {
-        Navigator.of(context).pop();
         return;
       }
       
@@ -539,9 +512,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } catch (e) {
       print("Download error: $e");
     }
-    
-    // Close progress dialog
-    Navigator.of(context).pop();
     
     // Show results
     int successCount = downloadResults.where((r) => r['success'] == true).length;
