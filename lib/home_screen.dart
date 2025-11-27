@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'services/history_service.dart';
+import 'screens/history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -260,31 +262,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   
-                  // Right Follow Button
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF6C63FF).withOpacity(0.3),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 2),
+                  // Right History Button
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HistoryScreen(),
                         ),
-                      ],
-                    ),
-                    child: const Text(
-                      'Follow',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.history,
+                        color: Color(0xFF6C63FF),
+                        size: 20,
                       ),
                     ),
                   ),
@@ -369,6 +373,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(vertical: 16),
                         ),
+                        onSubmitted: (url) {
+                          if (url.isNotEmpty) {
+                            _simulateDownload(url);
+                          }
+                        },
                       ),
                     ),
                     
@@ -436,5 +445,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  void _simulateDownload(String url) async {
+    // Simulate download and add to history
+    final historyItem = HistoryItem(
+      url: url,
+      title: 'Instagram Content',
+      type: 'photo', // You can detect type from URL
+      downloadTime: DateTime.now(),
+      filePath: '/storage/emulated/0/Android/data/com.example.getinsta/files/Downloads/content.jpg',
+    );
+    
+    await HistoryService.addToHistory(historyItem);
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Added to download history'),
+          backgroundColor: Color(0xFF6C63FF),
+        ),
+      );
+    }
   }
 }
