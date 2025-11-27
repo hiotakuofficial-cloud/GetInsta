@@ -55,7 +55,7 @@ class InstagramHandler {
               'url': link,
               'type': mediaType,
               'index': i,
-              'filename': _generateFilename(data['username'], contentType, mediaType, i),
+              'filename': _generateFilename(data['username'], contentType, mediaType, i, data['caption'] ?? ''),
             });
           }
           
@@ -86,15 +86,36 @@ class InstagramHandler {
   }
   
   // Generate filename based on content
-  static String _generateFilename(String username, String contentType, String mediaType, int index) {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
+  static String _generateFilename(String username, String contentType, String mediaType, int index, String caption) {
     final extension = mediaType == 'video' ? 'mp4' : 'jpg';
     
-    if (contentType == 'post' && index > 0) {
-      return '${username}_${contentType}_${index + 1}_$timestamp.$extension';
-    } else {
-      return '${username}_${contentType}_$timestamp.$extension';
+    // Extract first 5 words from caption
+    String filename = '';
+    if (caption.isNotEmpty) {
+      List<String> words = caption.split(' ')
+          .where((word) => word.isNotEmpty && !word.startsWith('#') && !word.startsWith('@'))
+          .take(5)
+          .toList();
+      
+      if (words.isNotEmpty) {
+        filename = words.join('_')
+            .replaceAll(RegExp(r'[^\w\s-]'), '') // Remove special characters
+            .replaceAll(RegExp(r'\s+'), '_') // Replace spaces with underscores
+            .toLowerCase();
+      }
     }
+    
+    // Fallback to username if no valid caption words
+    if (filename.isEmpty) {
+      filename = '${username}_${contentType}';
+    }
+    
+    // Add index for multiple files
+    if (contentType == 'post' && index > 0) {
+      filename += '_${index + 1}';
+    }
+    
+    return '$filename.$extension';
   }
   
   // Download single media file
