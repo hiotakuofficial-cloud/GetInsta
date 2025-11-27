@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _pasteAnimation;
   late Animation<double> _searchAnimation;
   bool _isLoading = false;
+  Set<int> _selectedMediaIndices = {}; // For multiple media selection
 
   @override
   void initState() {
@@ -523,14 +524,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       
       List<dynamic> mediaItems = result['mediaItems'];
       
-      Fluttertoast.showToast(msg: "🔥 Found ${mediaItems.length} media items");
+      // For multiple media, use selected indices, otherwise download all
+      List<int> indicesToDownload = [];
+      if (result['hasMultipleMedia'] == true && _selectedMediaIndices.isNotEmpty) {
+        indicesToDownload = _selectedMediaIndices.toList();
+      } else {
+        // Download all media
+        for (int i = 0; i < mediaItems.length; i++) {
+          indicesToDownload.add(i);
+        }
+      }
       
-      for (int i = 0; i < mediaItems.length; i++) {
-        final mediaItem = mediaItems[i];
+      if (indicesToDownload.isEmpty) {
+        Fluttertoast.showToast(msg: "🔥 No media selected!");
+        Navigator.of(context).pop();
+        return;
+      }
+      
+      Fluttertoast.showToast(msg: "🔥 Downloading ${indicesToDownload.length} files");
+      
+      for (int index in indicesToDownload) {
+        final mediaItem = mediaItems[index];
         final mediaUrl = mediaItem['url'];
         final fileName = mediaItem['filename']; // Use pre-generated filename
         
-        Fluttertoast.showToast(msg: "🔥 Downloading: $fileName");
+        Fluttertoast.showToast(msg: "🔥 Starting: $fileName");
         
         final downloadResult = await InstagramHandler.downloadMedia(
           mediaUrl, 
@@ -540,6 +558,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           caption: result['caption'],
         );
         downloadResults.add(downloadResult);
+        
+        Fluttertoast.showToast(
+          msg: downloadResult['success'] ? "✅ Downloaded: $fileName" : "❌ Failed: $fileName"
+        );
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "🔥 ERROR: $e");
