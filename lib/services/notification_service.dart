@@ -115,7 +115,6 @@ class NotificationService {
     final details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
-      payload: 'open_history',
     );
 
     await _notifications.show(
