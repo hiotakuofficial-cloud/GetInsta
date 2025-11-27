@@ -310,50 +310,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                   
                   Center(
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.swipe_left_rounded,
-                              color: Colors.white.withOpacity(0.3),
-                              size: 30,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Swipe left for history',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.4),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Icon(
-                          Icons.swipe_down_alt_rounded,
-                          color: Colors.white.withOpacity(0.3),
-                          size: 40,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Pull down to refresh',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.4),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Paste Instagram URL to start downloading',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Paste Instagram URL to start downloading',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.5),
+                      ),
                     ),
                   ),
                 ],
