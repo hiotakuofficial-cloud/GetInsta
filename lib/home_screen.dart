@@ -76,278 +76,300 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
-      body: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! < -500) {
-            // Swipe left (negative velocity = left swipe)
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HistoryScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.easeInOut;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
-                transitionDuration: const Duration(milliseconds: 300),
-              ),
-            );
-          }
-        },
-        child: RefreshIndicator(
-          onRefresh: () async {
-            await Future.delayed(const Duration(seconds: 1));
-          },
-          color: const Color(0xFF6C63FF),
-          backgroundColor: const Color(0xFF1E1E1E),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-              child: Column(
-                children: [
-                  // Header
-                  Row(
+      body: Stack(
+        children: [
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! < -500) {
+                // Swipe left (negative velocity = left swipe)
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => const HistoryScreen(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOut;
+                      
+                      var tween = Tween(begin: begin, end: end).chain(
+                        CurveTween(curve: curve),
+                      );
+                      
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(milliseconds: 300),
+                  ),
+                );
+              }
+            },
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(seconds: 1));
+              },
+              color: const Color(0xFF6C63FF),
+              backgroundColor: const Color(0xFF1E1E1E),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                  child: Column(
                     children: [
-                      // Left Logo
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            'assets/logo.png',
+                      // Header
+                      Row(
+                        children: [
+                          // Left Logo
+                          Container(
                             width: 45,
                             height: 45,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      
-                      // Center Title
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'GetInsta',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontFamily: 'Cursive',
-                              letterSpacing: 1.2,
-                              shadows: [
-                                Shadow(
-                                  color: const Color(0xFF6C63FF).withOpacity(0.3),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
                                   blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                                  spreadRadius: 0,
                                 ),
                               ],
                             ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                'assets/logo.png',
+                                width: 45,
+                                height: 45,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt_rounded,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
-                        ),
+                          
+                          // Center Title
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                'GetInsta',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  fontFamily: 'Cursive',
+                                  letterSpacing: 1.2,
+                                  shadows: [
+                                    Shadow(
+                                      color: const Color(0xFF6C63FF).withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          
+                          // Right Follow Button
+                          GestureDetector(
+                            onTap: () async {
+                              try {
+                                final Uri url = Uri.parse('https://www.instagram.com/yourhoneydewie?igsh=eWZvdzJqdjkxdDBq');
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                } else {
+                                  // Fallback to browser
+                                  await launchUrl(url, mode: LaunchMode.platformDefault);
+                                }
+                              } catch (e) {
+                                // Show error message
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Could not open Instagram'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF6C63FF).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                'Follow',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       
-                      // Right Follow Button
-                      GestureDetector(
-                        onTap: () async {
-                          try {
-                            final Uri url = Uri.parse('https://www.instagram.com/yourhoneydewie?igsh=eWZvdzJqdjkxdDBq');
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url, mode: LaunchMode.externalApplication);
-                            } else {
-                              // Fallback to browser
-                              await launchUrl(url, mode: LaunchMode.platformDefault);
-                            }
-                          } catch (e) {
-                            // Show error message
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Could not open Instagram'),
-                                  backgroundColor: Colors.red,
+                      const SizedBox(height: 40),
+                      
+                      // Search Bar
+                      AnimatedBuilder(
+                        animation: _searchAnimation,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: _searchAnimation.value,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E1E1E),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFF6C63FF).withOpacity(0.4),
+                                  width: 1,
                                 ),
-                              );
-                            }
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF6C63FF).withOpacity(0.3),
-                                blurRadius: 8,
-                                spreadRadius: 0,
-                                offset: const Offset(0, 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF6C63FF).withOpacity(0.15),
+                                    blurRadius: 25,
+                                    spreadRadius: 0,
+                                  ),
+                                  BoxShadow(
+                                    color: const Color(0xFF6C63FF).withOpacity(0.1),
+                                    blurRadius: 50,
+                                    spreadRadius: 5,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 16,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: const Text(
-                            'Follow',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              child: Row(
+                                children: [
+                                  // Left Search Icon
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16, right: 12),
+                                    child: Icon(
+                                      Icons.search_rounded,
+                                      color: const Color(0xFF6C63FF).withOpacity(0.7),
+                                      size: 24,
+                                    ),
+                                  ),
+                                  
+                                  // Search Input
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _searchController,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Paste Instagram URL here...',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.5),
+                                          fontSize: 16,
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  // Paste Button
+                                  GestureDetector(
+                                    onTap: _onPastePressed,
+                                    child: AnimatedBuilder(
+                                      animation: _pasteAnimation,
+                                      builder: (context, child) {
+                                        return Transform.scale(
+                                          scale: _pasteAnimation.value,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(right: 12),
+                                            padding: const EdgeInsets.all(12),
+                                            child: const Icon(
+                                              Icons.content_paste_rounded,
+                                              color: Color(0xFF6C63FF),
+                                              size: 20,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                          );
+                        },
+                      ),
+                      
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                      
+                      Center(
+                        child: Text(
+                          'Paste Instagram URL to start downloading',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.5),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Search Bar
-                  AnimatedBuilder(
-                    animation: _searchAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _searchAnimation.value,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: const Color(0xFF6C63FF).withOpacity(0.4),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF6C63FF).withOpacity(0.15),
-                                blurRadius: 25,
-                                spreadRadius: 0,
-                              ),
-                              BoxShadow(
-                                color: const Color(0xFF6C63FF).withOpacity(0.1),
-                                blurRadius: 50,
-                                spreadRadius: 5,
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                offset: const Offset(0, 8),
-                                blurRadius: 16,
-                                spreadRadius: 0,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              // Left Search Icon
-                              Padding(
-                                padding: const EdgeInsets.only(left: 16, right: 12),
-                                child: Icon(
-                                  Icons.search_rounded,
-                                  color: const Color(0xFF6C63FF).withOpacity(0.7),
-                                  size: 24,
-                                ),
-                              ),
-                              
-                              // Search Input
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Paste Instagram URL here...',
-                                    hintStyle: TextStyle(
-                                      color: Colors.white.withOpacity(0.5),
-                                      fontSize: 16,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                                  ),
-                                ),
-                              ),
-                              
-                              // Paste Button
-                              GestureDetector(
-                                onTap: _onPastePressed,
-                                child: AnimatedBuilder(
-                                  animation: _pasteAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _pasteAnimation.value,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(right: 12),
-                                        padding: const EdgeInsets.all(12),
-                                        child: const Icon(
-                                          Icons.content_paste_rounded,
-                                          color: Color(0xFF6C63FF),
-                                          size: 20,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                  
-                  Center(
-                    child: Text(
-                      'Paste Instagram URL to start downloading',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.5),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          
+          // Powered by Nehu text at bottom
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'Powered by Nehu',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.5),
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
