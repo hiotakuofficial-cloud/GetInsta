@@ -500,10 +500,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
 
+    // Download all media files
+    List<Map<String, dynamic>> downloadResults = [];
+    
     try {
-      // Download all media files
-      List<Map<String, dynamic>> downloadResults = [];
-      
       // Check if download_links exists
       if (result['download_links'] == null) {
         Fluttertoast.showToast(msg: "🔥 ERROR: No download_links found!");
