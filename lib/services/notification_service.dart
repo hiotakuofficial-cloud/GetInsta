@@ -60,7 +60,7 @@ class NotificationService {
   }
 
   static Future<void> updateDownloadProgress(int progress, String filename) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'download_channel',
       'Downloads',
       channelDescription: 'Instagram download notifications',
