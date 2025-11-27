@@ -14,8 +14,8 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late AnimationController _loadingController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
   late Animation<double> _loadingAnimation;
+  bool _homeLoaded = false;
 
   @override
   void initState() {
@@ -28,26 +28,19 @@ class _SplashScreenState extends State<SplashScreen>
     );
     
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
     
     _loadingController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
     
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
-      ),
-    );
-    
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 1.0, curve: Curves.easeOutQuart),
+        curve: Curves.easeOut,
       ),
     );
     
@@ -60,7 +53,18 @@ class _SplashScreenState extends State<SplashScreen>
     
     _controller.forward();
     _loadingController.repeat();
+    _preloadHome();
     _navigateToHome();
+  }
+
+  _preloadHome() async {
+    // Simulate home screen loading
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) {
+      setState(() {
+        _homeLoaded = true;
+      });
+    }
   }
 
   _navigateToHome() async {
@@ -73,12 +77,12 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, _) => const HomeScreen(),
-          transitionDuration: const Duration(milliseconds: 1000),
+          transitionDuration: const Duration(milliseconds: 800),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(
               opacity: CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeInOutQuart,
+                curve: Curves.easeInOut,
               ),
               child: child,
             );
@@ -121,118 +125,114 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Center(
                     child: FadeTransition(
                       opacity: _fadeAnimation,
-                      child: ScaleTransition(
-                        scale: _scaleAnimation,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.4),
-                                    blurRadius: 30,
-                                    spreadRadius: 0,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(24),
-                                child: Image.asset(
-                                  'assets/logo.png',
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(24),
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFF6C63FF),
-                                            Color(0xFF9C88FF),
-                                            Color(0xFFB794F6),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                      ),
-                                      child: const Icon(
-                                        Icons.camera_alt_rounded,
-                                        size: 60,
-                                        color: Colors.white,
-                                      ),
-                                    );
-                                  },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  blurRadius: 30,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 10),
                                 ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Image.asset(
+                                'assets/logo.png',
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(24),
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF6C63FF),
+                                          Color(0xFF9C88FF),
+                                          Color(0xFFB794F6),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt_rounded,
+                                      size: 60,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                            const SizedBox(height: 40),
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [
-                                  Color(0xFF6C63FF),
-                                  Color(0xFF9C88FF),
-                                  Color(0xFFB794F6),
-                                ],
-                              ).createShader(bounds),
-                              child: const Text(
-                                'GetInsta',
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Premium Instagram Downloader',
+                          ),
+                          const SizedBox(height: 40),
+                          ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: [
+                                Color(0xFF6C63FF),
+                                Color(0xFF9C88FF),
+                                Color(0xFFB794F6),
+                              ],
+                            ).createShader(bounds),
+                            child: const Text(
+                              'GetInsta',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white.withOpacity(0.7),
-                                fontWeight: FontWeight.w400,
-                                letterSpacing: 0.3,
+                                fontSize: 36,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: 1.5,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Premium Instagram Downloader',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.7),
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 60),
+                  padding: const EdgeInsets.only(bottom: 40),
                   child: Column(
                     children: [
                       AnimatedBuilder(
                         animation: _loadingAnimation,
                         builder: (context, child) {
                           return Container(
-                            width: 200,
-                            height: 3,
+                            width: 180,
+                            height: 2,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2),
+                              borderRadius: BorderRadius.circular(1),
                               color: Colors.white.withOpacity(0.1),
                             ),
                             child: Stack(
                               children: [
-                                Container(
-                                  width: 200 * _loadingAnimation.value,
-                                  height: 3,
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 100),
+                                  width: 180 * (_homeLoaded ? 1.0 : _loadingAnimation.value * 0.8),
+                                  height: 2,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF6C63FF),
-                                        Color(0xFF9C88FF),
-                                        Color(0xFFB794F6),
-                                      ],
+                                    borderRadius: BorderRadius.circular(1),
+                                    gradient: LinearGradient(
+                                      colors: _homeLoaded 
+                                        ? [const Color(0xFF4CAF50), const Color(0xFF8BC34A)]
+                                        : [const Color(0xFF6C63FF), const Color(0xFF9C88FF)],
                                     ),
                                   ),
                                 ),
@@ -242,12 +242,26 @@ class _SplashScreenState extends State<SplashScreen>
                         },
                       ),
                       const SizedBox(height: 16),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(
+                          _homeLoaded ? 'Ready!' : 'Loading...',
+                          key: ValueKey(_homeLoaded),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withOpacity(0.6),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       Text(
-                        'Loading...',
+                        'Powered by Nehu',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.6),
-                          fontWeight: FontWeight.w400,
+                          fontSize: 11,
+                          color: Colors.white.withOpacity(0.3),
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
