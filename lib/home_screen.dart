@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'screens/history_screen.dart';
+import 'services/instagram_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,6 +69,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _searchController2.forward().then((_) {
         _searchController2.reverse();
       });
+    }
+  }
+
+  void _processInstagramUrl(String url) async {
+    if (!InstagramHandler.isValidInstagramUrl(url)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid Instagram post or reel URL'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Show processing dialog
+    InstagramHandler.showProcessingDialog(context, url);
+
+    // Process the URL
+    final result = await InstagramHandler.processUrl(url);
+
+    if (result != null && result['success'] == true) {
+      // Show media preview
+      InstagramHandler.showMediaPreview(context, result);
+    } else {
+      // Close processing dialog and show error
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result?['error'] ?? 'Failed to process Instagram URL'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -302,6 +335,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         border: InputBorder.none,
                                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
                                       ),
+                                      onSubmitted: (url) {
+                                        if (url.isNotEmpty) {
+                                          _processInstagramUrl(url);
+                                        }
+                                      },
                                     ),
                                   ),
                                   

@@ -13,7 +13,6 @@ class InstagramHandler {
     final patterns = [
       r'https?://(?:www\.)?instagram\.com/p/[A-Za-z0-9_-]+',
       r'https?://(?:www\.)?instagram\.com/reel/[A-Za-z0-9_-]+',
-      r'https?://(?:www\.)?instagram\.com/stories/[A-Za-z0-9_.]+/[0-9]+',
     ];
     
     return patterns.any((pattern) => RegExp(pattern).hasMatch(url));
@@ -23,7 +22,6 @@ class InstagramHandler {
   static String getContentType(String url) {
     if (url.contains('/p/')) return 'post'; // Multiple images/videos possible
     if (url.contains('/reel/')) return 'reel'; // Single video only
-    if (url.contains('/stories/')) return 'story'; // Single image/video
     return 'unknown';
   }
   
