@@ -468,6 +468,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Add toast to confirm function is called
     Fluttertoast.showToast(msg: "🔥 Download button clicked!");
     
+    // Debug: Print the entire result structure
+    print("🔥 API Result: $result");
+    Fluttertoast.showToast(msg: "🔥 API keys: ${result.keys.toList()}");
+    
     // Show download progress dialog
     showDialog(
       context: context,
@@ -496,26 +500,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
 
-    // Download all media files
-    List<Map<String, dynamic>> downloadResults = [];
-    List<String> downloadLinks = List<String>.from(result['download_links']);
-    
-    Fluttertoast.showToast(msg: "🔥 Found ${downloadLinks.length} download links");
-    
-    for (int i = 0; i < downloadLinks.length; i++) {
-      final mediaUrl = downloadLinks[i];
-      final fileName = '${result['username']}_${DateTime.now().millisecondsSinceEpoch}_$i.mp4';
+    try {
+      // Download all media files
+      List<Map<String, dynamic>> downloadResults = [];
       
-      Fluttertoast.showToast(msg: "🔥 Downloading file $i: $fileName");
+      // Check if download_links exists
+      if (result['download_links'] == null) {
+        Fluttertoast.showToast(msg: "🔥 ERROR: No download_links found!");
+        Navigator.of(context).pop();
+        return;
+      }
       
-      final downloadResult = await InstagramHandler.downloadMedia(
-        mediaUrl, 
-        fileName,
-        thumbnailUrl: result['thumbnail'],
-        username: result['username'],
-        caption: result['caption'],
-      );
-      downloadResults.add(downloadResult);
+      List<String> downloadLinks = List<String>.from(result['download_links']);
+      
+      Fluttertoast.showToast(msg: "🔥 Found ${downloadLinks.length} download links");
+      
+      for (int i = 0; i < downloadLinks.length; i++) {
+        final mediaUrl = downloadLinks[i];
+        final fileName = '${result['username']}_${DateTime.now().millisecondsSinceEpoch}_$i.mp4';
+        
+        Fluttertoast.showToast(msg: "🔥 Downloading file $i: $fileName");
+        
+        final downloadResult = await InstagramHandler.downloadMedia(
+          mediaUrl, 
+          fileName,
+          thumbnailUrl: result['thumbnail'],
+          username: result['username'],
+          caption: result['caption'],
+        );
+        downloadResults.add(downloadResult);
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "🔥 ERROR: $e");
+      print("🔥 Download error: $e");
     }
     
     // Close progress dialog
