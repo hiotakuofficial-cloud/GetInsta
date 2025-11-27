@@ -378,46 +378,45 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            GestureDetector(
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity! < -500) {
-                  // Swipe left (negative velocity = left swipe)
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => const HistoryScreen(),
-                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        const begin = Offset(1.0, 0.0);
-                        const end = Offset.zero;
-                        const curve = Curves.easeInOut;
-                        
-                        var tween = Tween(begin: begin, end: end).chain(
-                          CurveTween(curve: curve),
-                        );
-                        
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
-                      transitionDuration: const Duration(milliseconds: 300),
-                    ),
-                  );
-                }
+      body: Stack(
+        children: [
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! < -500) {
+                // Swipe left (negative velocity = left swipe)
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => const HistoryScreen(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOut;
+                      
+                      var tween = Tween(begin: begin, end: end).chain(
+                        CurveTween(curve: curve),
+                      );
+                      
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(milliseconds: 300),
+                  ),
+                );
+              }
+            },
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(seconds: 1));
               },
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await Future.delayed(const Duration(seconds: 1));
-                },
-                color: const Color(0xFF6C63FF),
-                backgroundColor: const Color(0xFF1E1E1E),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
+              color: const Color(0xFF6C63FF),
+              backgroundColor: const Color(0xFF1E1E1E),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
                     child: Column(
                       children: [
                         // Header
