@@ -19,7 +19,10 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     
     // Properly hide status bar and navigation bar
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersive,
+      overlays: [],
+    );
     
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -47,14 +50,27 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, _) => const HomeScreen(),
-          transitionDuration: const Duration(milliseconds: 800),
+          transitionDuration: const Duration(milliseconds: 1200),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(
-              opacity: CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeInOut,
+              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: const Interval(0.3, 1.0, curve: Curves.easeInOutCubic),
+                ),
               ),
-              child: child,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 0.3),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: const Interval(0.0, 0.8, curve: Curves.easeOutQuart),
+                  ),
+                ),
+                child: child,
+              ),
             );
           },
         ),
