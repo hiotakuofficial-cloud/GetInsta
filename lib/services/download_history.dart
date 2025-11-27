@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DownloadHistory {
   static const String _historyFileName = 'download_history.json';
@@ -36,7 +37,7 @@ class DownloadHistory {
     required String filePath,
   }) async {
     try {
-      print("📝 Saving to history: $filename");
+      Fluttertoast.showToast(msg: "📝 Saving to history: $filename");
       final history = await getHistory();
       
       final downloadItem = {
@@ -58,9 +59,9 @@ class DownloadHistory {
       }
       
       await _saveHistory(history);
-      print("✅ History saved successfully. Total items: ${history.length}");
+      Fluttertoast.showToast(msg: "✅ History saved! Total: ${history.length}");
     } catch (e) {
-      print('❌ Error adding to history: $e');
+      Fluttertoast.showToast(msg: "❌ History error: $e");
     }
   }
 
