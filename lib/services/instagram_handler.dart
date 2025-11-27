@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import '../services/notification_service.dart';
 
 class InstagramHandler {
   static const String _apiBaseUrl = 'https://v1-w3sc.onrender.com/insta/api.php';
@@ -118,10 +119,14 @@ class InstagramHandler {
     return '$filename.$extension';
   }
   
-  // Download single media file
+  // Download single media file with progress notifications
   static Future<Map<String, dynamic>> downloadMedia(String mediaUrl, String fileName) async {
     try {
-      final response = await http.get(Uri.parse(mediaUrl));
+      // Show download started notification
+      await NotificationService.showDownloadStarted(fileName);
+      
+      final request = http.Request('GET', Uri.parse(mediaUrl));
+      final response = await request.send();
       
       if (response.statusCode == 200) {
         // Get app's download directory
@@ -132,20 +137,47 @@ class InstagramHandler {
           await downloadsDir.create(recursive: true);
         }
         
-        // Save file
+        // Save file with progress tracking
         final file = File('${downloadsDir.path}/$fileName');
-        await file.writeAsBytes(response.bodyBytes);
+        final sink = file.openWrite();
+        
+        int downloaded = 0;
+        final total = response.contentLength ?? 0;
+        
+        await response.stream.listen(
+          (chunk) {
+            sink.add(chunk);
+            downloaded += chunk.length;
+            
+            if (total > 0) {
+              final progress = ((downloaded / total) * 100).round();
+              // Update notification progress
+              NotificationService.updateDownloadProgress(progress, fileName);
+            }
+          },
+          onDone: () async {
+            await sink.close();
+            // Show completion notification
+            await NotificationService.showDownloadComplete(fileName, true);
+          },
+          onError: (error) async {
+            await sink.close();
+            await NotificationService.showDownloadComplete(fileName, false);
+          },
+        ).asFuture();
         
         return {
           'success': true,
           'filePath': file.path,
           'fileName': fileName,
-          'size': '${(response.bodyBytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
+          'size': '${(downloaded / 1024 / 1024).toStringAsFixed(2)} MB',
         };
       } else {
+        await NotificationService.showDownloadComplete(fileName, false);
         throw Exception('Download failed: ${response.statusCode}');
       }
     } catch (e) {
+      await NotificationService.showDownloadComplete(fileName, false);
       return {
         'success': false,
         'error': e.toString(),

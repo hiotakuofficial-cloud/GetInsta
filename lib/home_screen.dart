@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'screens/history_screen.dart';
 import 'services/instagram_handler.dart';
+import 'services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Request permissions
     _requestPermissions();
+    
+    // Initialize notifications
+    NotificationService.initialize();
   }
 
   Future<void> _requestPermissions() async {
