@@ -467,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _startDownload(Map<String, dynamic> result) async {
     // Show simple toast instead of dialog
-    Fluttertoast.showToast(msg: "Starting download...");
+    Fluttertoast.showToast(msg: "Downloading...");
 
     // Download all media files
     List<Map<String, dynamic>> downloadResults = [];
