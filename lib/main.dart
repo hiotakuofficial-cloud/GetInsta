@@ -12,8 +12,10 @@ class GetInstaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'GetInsta',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
+      theme: ThemeData.dark().copyWith(
+        primaryColor: const Color(0xFF1A1A1A),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        cardColor: const Color(0xFF1E1E1E),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
