@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class InstagramHandler {
   static const String _apiBaseUrl = 'https://v1-w3sc.onrender.com/insta/api.php';
@@ -102,14 +103,23 @@ class InstagramHandler {
       final response = await http.get(Uri.parse(mediaUrl));
       
       if (response.statusCode == 200) {
-        // In real implementation, save to device storage
-        // For now, simulate successful download
+        // Get app's download directory
+        final directory = await getApplicationDocumentsDirectory();
+        final downloadsDir = Directory('${directory.path}/GetInsta/Downloads');
+        
+        if (!await downloadsDir.exists()) {
+          await downloadsDir.create(recursive: true);
+        }
+        
+        // Save file
+        final file = File('${downloadsDir.path}/$fileName');
+        await file.writeAsBytes(response.bodyBytes);
         
         return {
           'success': true,
-          'filePath': '/storage/emulated/0/Download/$fileName',
+          'filePath': file.path,
           'fileName': fileName,
-          'size': '${(response.contentLength ?? 0) / 1024 / 1024} MB',
+          'size': '${(response.bodyBytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
         };
       } else {
         throw Exception('Download failed: ${response.statusCode}');
@@ -287,7 +297,7 @@ class InstagramHandler {
   }
   
   // Start download process
-  static void _startDownload(BuildContext context, Map<String, dynamic> result) {
+  static void _startDownload(BuildContext context, Map<String, dynamic> result) async {
     // Show download progress
     showDialog(
       context: context,
@@ -316,15 +326,27 @@ class InstagramHandler {
       ),
     );
     
-    // Simulate download completion
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pop();
-      _showDownloadComplete(context, result);
-    });
+    // Download all media files
+    List<Map<String, dynamic>> downloadResults = [];
+    List<Map<String, dynamic>> mediaItems = List<Map<String, dynamic>>.from(result['mediaItems']);
+    
+    for (var mediaItem in mediaItems) {
+      final downloadResult = await downloadMedia(mediaItem['url'], mediaItem['filename']);
+      downloadResults.add(downloadResult);
+    }
+    
+    // Close progress dialog
+    Navigator.of(context).pop();
+    
+    // Show results
+    _showDownloadComplete(context, result, downloadResults);
   }
   
   // Show download completion
-  static void _showDownloadComplete(BuildContext context, Map<String, dynamic> result) {
+  static void _showDownloadComplete(BuildContext context, Map<String, dynamic> result, List<Map<String, dynamic>> downloadResults) {
+    int successCount = downloadResults.where((r) => r['success'] == true).length;
+    int failCount = downloadResults.length - successCount;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -332,22 +354,48 @@ class InstagramHandler {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green),
-            SizedBox(width: 8),
+            Icon(
+              successCount > 0 ? Icons.check_circle : Icons.error,
+              color: successCount > 0 ? Colors.green : Colors.red,
+            ),
+            const SizedBox(width: 8),
             Text(
-              'Download Complete!',
-              style: TextStyle(color: Colors.white),
+              successCount > 0 ? 'Download Complete!' : 'Download Failed',
+              style: const TextStyle(color: Colors.white),
             ),
           ],
         ),
-        content: Text(
-          'Successfully downloaded ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'file' : 'files'} to Downloads folder.',
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
-            fontSize: 14,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (successCount > 0)
+              Text(
+                'Successfully downloaded $successCount ${successCount == 1 ? 'file' : 'files'}',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 14,
+                ),
+              ),
+            if (failCount > 0)
+              Text(
+                'Failed to download $failCount ${failCount == 1 ? 'file' : 'files'}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+              ),
+            const SizedBox(height: 8),
+            Text(
+              'Files saved to: /Android/data/com.example.getinsta/files/GetInsta/Downloads/',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.6),
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
