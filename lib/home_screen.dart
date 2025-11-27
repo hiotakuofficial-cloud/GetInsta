@@ -288,23 +288,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     return Transform.scale(
                                       scale: _pasteAnimation.value,
                                       child: Container(
-                                        margin: const EdgeInsets.only(right: 8),
+                                        margin: const EdgeInsets.only(right: 12),
                                         padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2A2A2A),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: const Color(0xFF6C63FF).withOpacity(0.3),
-                                            width: 1,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(0xFF6C63FF).withOpacity(0.1),
-                                              blurRadius: 15,
-                                              spreadRadius: 0,
-                                            ),
-                                          ],
-                                        ),
                                         child: const Icon(
                                           Icons.content_paste_rounded,
                                           color: Color(0xFF6C63FF),
