@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _searchController2;
   late Animation<double> _pasteAnimation;
   late Animation<double> _searchAnimation;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -103,18 +104,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
 
-    // Show processing dialog
-    InstagramHandler.showProcessingDialog(context, url);
+    // Start loading
+    setState(() {
+      _isLoading = true;
+    });
 
     // Process the URL
     final result = await InstagramHandler.processUrl(url);
 
+    // Stop loading
+    setState(() {
+      _isLoading = false;
+    });
+
     if (result != null && result['success'] == true) {
-      // Show media preview
-      InstagramHandler.showMediaPreview(context, result);
+      // Show bottom sheet instead of popup
+      _showMediaBottomSheet(result);
     } else {
-      // Close processing dialog and show error
-      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result?['error'] ?? 'Failed to process Instagram URL'),
@@ -122,6 +128,174 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       );
     }
+  }
+
+  void _showMediaBottomSheet(Map<String, dynamic> result) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            
+            // Header
+            Row(
+              children: [
+                Icon(
+                  result['contentType'] == 'reel' ? Icons.play_circle : Icons.photo_library,
+                  color: const Color(0xFF6C63FF),
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '@${result['username']}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Content info
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6C63FF).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${result['contentType'].toUpperCase()} • ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'item' : 'items'}',
+                style: const TextStyle(
+                  color: Color(0xFF6C63FF),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Media info
+            if (result['hasVideo'] && result['hasImages'])
+              const Text(
+                '📹 Videos + 📷 Images',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              )
+            else if (result['hasVideo'])
+              const Text(
+                '📹 Video content',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              )
+            else
+              const Text(
+                '📷 Image content',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+            
+            const SizedBox(height: 12),
+            
+            // Caption preview
+            if (result['caption'] != null && result['caption'].isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  result['caption'],
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            
+            const SizedBox(height: 24),
+            
+            // Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Call download function from handler
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C63FF),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Download ${result['mediaCount'] == 1 ? '' : 'All (${result['mediaCount']})'}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 20),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showNoInternetToast() {
@@ -442,7 +616,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   
                                   // Paste Button
                                   GestureDetector(
-                                    onTap: _onPastePressed,
+                                    onTap: _isLoading ? null : _onPastePressed,
                                     child: AnimatedBuilder(
                                       animation: _pasteAnimation,
                                       builder: (context, child) {
@@ -451,11 +625,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           child: Container(
                                             margin: const EdgeInsets.only(right: 12),
                                             padding: const EdgeInsets.all(12),
-                                            child: const Icon(
-                                              Icons.content_paste_rounded,
-                                              color: Color(0xFF6C63FF),
-                                              size: 20,
-                                            ),
+                                            child: _isLoading
+                                                ? const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                                        Color(0xFF6C63FF),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : const Icon(
+                                                    Icons.content_paste_rounded,
+                                                    color: Color(0xFF6C63FF),
+                                                    size: 20,
+                                                  ),
                                           ),
                                         );
                                       },
