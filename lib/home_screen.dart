@@ -39,37 +39,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6C63FF).withOpacity(0.3),
+                          color: Colors.black.withOpacity(0.2),
                           blurRadius: 8,
                           spreadRadius: 0,
                         ),
                       ],
                     ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/logo.png',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                              ),
+                    child: Image.asset(
+                      'assets/logo.png',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
                             ),
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              color: Colors.white,
-                              size: 22,
-                            ),
-                          );
-                        },
-                      ),
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 16),

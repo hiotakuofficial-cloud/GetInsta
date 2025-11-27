@@ -109,48 +109,40 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 140,
                         height: 140,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6C63FF).withOpacity(0.6),
-                              blurRadius: 40,
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
                               spreadRadius: 0,
-                            ),
-                            BoxShadow(
-                              color: const Color(0xFF9C88FF).withOpacity(0.4),
-                              blurRadius: 80,
-                              spreadRadius: 10,
                             ),
                           ],
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/logo.png',
-                            width: 140,
-                            height: 140,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color(0xFF6C63FF),
-                                      Color(0xFF9C88FF),
-                                      Color(0xFFB794F6),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFF6C63FF),
+                                    Color(0xFF9C88FF),
+                                    Color(0xFFB794F6),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                                child: const Icon(
-                                  Icons.camera_alt_rounded,
-                                  size: 70,
-                                  color: Colors.white,
-                                ),
-                              );
-                            },
-                          ),
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 70,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 50),
