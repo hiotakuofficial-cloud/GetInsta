@@ -12,6 +12,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   late AnimationController _pasteController;
   late Animation<double> _pasteAnimation;
+  static const platform = MethodChannel('com.example.getinsta/share');
 
   @override
   void initState() {
@@ -32,6 +33,137 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _pasteAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _pasteController, curve: Curves.easeInOut),
+    );
+    
+    // Listen for shared URLs
+    platform.setMethodCallHandler(_handleMethodCall);
+    _checkForSharedUrl();
+  }
+
+  Future<void> _handleMethodCall(MethodCall call) async {
+    if (call.method == 'onUrlShared') {
+      final String url = call.arguments;
+      setState(() {
+        _searchController.text = url;
+      });
+      _showDownloadDialog(url);
+    }
+  }
+
+  Future<void> _checkForSharedUrl() async {
+    try {
+      final String? sharedUrl = await platform.invokeMethod('getSharedUrl');
+      if (sharedUrl != null && sharedUrl.isNotEmpty) {
+        setState(() {
+          _searchController.text = sharedUrl;
+        });
+        _showDownloadDialog(sharedUrl);
+      }
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void _showDownloadDialog(String url) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      'assets/logo.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ready to Download',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Instagram content detected',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF6C63FF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                url,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Add download logic here
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6C63FF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Download Now',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
