@@ -8,7 +8,7 @@
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
-    <style name="AppBottomSheetTheme" parent="Theme.Material3.DayNight.BottomSheetDialog">
+    <style name="AppBottomSheetTheme" parent="@android:style/Theme.Material.Dialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackground">@android:color/transparent</item>
