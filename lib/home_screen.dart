@@ -268,7 +268,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      // Call download function from handler
+                      // Call actual download function
+                      _startDownload(result);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6C63FF),
@@ -371,6 +372,106 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
 
     overlay.insert(overlayEntry);
+  }
+
+  void _startDownload(Map<String, dynamic> result) async {
+    // Show download progress dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(
+              color: Color(0xFF6C63FF),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Downloading ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'file' : 'files'}...',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // Download all media files
+    List<Map<String, dynamic>> downloadResults = [];
+    List<Map<String, dynamic>> mediaItems = List<Map<String, dynamic>>.from(result['mediaItems']);
+    
+    for (var mediaItem in mediaItems) {
+      final downloadResult = await InstagramHandler.downloadMedia(mediaItem['url'], mediaItem['filename']);
+      downloadResults.add(downloadResult);
+    }
+    
+    // Close progress dialog
+    Navigator.of(context).pop();
+    
+    // Show results
+    int successCount = downloadResults.where((r) => r['success'] == true).length;
+    int failCount = downloadResults.length - successCount;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              successCount > 0 ? Icons.check_circle : Icons.error,
+              color: successCount > 0 ? Colors.green : Colors.red,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              successCount > 0 ? 'Download Complete!' : 'Download Failed',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (successCount > 0)
+              Text(
+                'Successfully downloaded $successCount ${successCount == 1 ? 'file' : 'files'}',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 14,
+                ),
+              ),
+            if (failCount > 0)
+              Text(
+                'Failed to download $failCount ${failCount == 1 ? 'file' : 'files'}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Color(0xFF6C63FF)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
