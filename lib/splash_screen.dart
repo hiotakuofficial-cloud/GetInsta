@@ -10,12 +10,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late AnimationController _loadingController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _loadingAnimation;
-  bool _homeLoaded = false;
 
   @override
   void initState() {
@@ -29,11 +26,6 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
     
-    _loadingController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-    
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -41,27 +33,8 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
     
-    _loadingAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _loadingController,
-        curve: Curves.easeInOut,
-      ),
-    );
-    
     _controller.forward();
-    _loadingController.repeat();
-    _preloadHome();
     _navigateToHome();
-  }
-
-  _preloadHome() async {
-    // Simulate home screen loading
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) {
-      setState(() {
-        _homeLoaded = true;
-      });
-    }
   }
 
   _navigateToHome() async {
@@ -92,7 +65,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _controller.dispose();
-    _loadingController.dispose();
     super.dispose();
   }
 
@@ -208,50 +180,6 @@ class _SplashScreenState extends State<SplashScreen>
                   padding: const EdgeInsets.only(bottom: 40),
                   child: Column(
                     children: [
-                      AnimatedBuilder(
-                        animation: _loadingAnimation,
-                        builder: (context, child) {
-                          return Container(
-                            width: 180,
-                            height: 2,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(1),
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                            child: Stack(
-                              children: [
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 100),
-                                  width: 180 * (_homeLoaded ? 1.0 : _loadingAnimation.value * 0.8),
-                                  height: 2,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(1),
-                                    gradient: LinearGradient(
-                                      colors: _homeLoaded 
-                                        ? [const Color(0xFF4CAF50), const Color(0xFF8BC34A)]
-                                        : [const Color(0xFF6C63FF), const Color(0xFF9C88FF)],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: Text(
-                          _homeLoaded ? 'Ready!' : 'Loading...',
-                          key: ValueKey(_homeLoaded),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white.withOpacity(0.6),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 60),
                       SizedBox(
                         width: 40,
                         height: 40,
