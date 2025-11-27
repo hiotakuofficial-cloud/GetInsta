@@ -605,8 +605,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               backgroundColor: const Color(0xFF1E1E1E),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
                     child: Column(
                       children: [
                         // Header
