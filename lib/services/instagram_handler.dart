@@ -129,16 +129,20 @@ class InstagramHandler {
       final response = await request.send();
       
       if (response.statusCode == 200) {
-        // Get app's download directory
-        final directory = await getApplicationDocumentsDirectory();
-        final downloadsDir = Directory('${directory.path}/GetInsta/Downloads');
+        // Get public Downloads directory
+        Directory? directory;
+        if (Platform.isAndroid) {
+          directory = Directory('/storage/emulated/0/Download/GetInsta');
+        } else {
+          directory = await getApplicationDocumentsDirectory();
+        }
         
-        if (!await downloadsDir.exists()) {
-          await downloadsDir.create(recursive: true);
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
         }
         
         // Save file with progress tracking
-        final file = File('${downloadsDir.path}/$fileName');
+        final file = File('${directory.path}/$fileName');
         final sink = file.openWrite();
         
         int downloaded = 0;
