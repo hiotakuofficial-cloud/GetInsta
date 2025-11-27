@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'screens/history_screen.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
@@ -464,6 +465,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startDownload(Map<String, dynamic> result) async {
+    // Add toast to confirm function is called
+    Fluttertoast.showToast(msg: "🔥 Download button clicked!");
+    
     // Show download progress dialog
     showDialog(
       context: context,
@@ -481,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 16),
             Text(
-              'Downloading ${result['mediaCount']} ${result['mediaCount'] == 1 ? 'file' : 'files'}...',
+              'Downloading files...',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -496,9 +500,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Map<String, dynamic>> downloadResults = [];
     List<String> downloadLinks = List<String>.from(result['download_links']);
     
+    Fluttertoast.showToast(msg: "🔥 Found ${downloadLinks.length} download links");
+    
     for (int i = 0; i < downloadLinks.length; i++) {
       final mediaUrl = downloadLinks[i];
       final fileName = '${result['username']}_${DateTime.now().millisecondsSinceEpoch}_$i.mp4';
+      
+      Fluttertoast.showToast(msg: "🔥 Downloading file $i: $fileName");
       
       final downloadResult = await InstagramHandler.downloadMedia(
         mediaUrl, 
