@@ -193,9 +193,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          GestureDetector(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            GestureDetector(
             onHorizontalDragEnd: (details) {
               if (details.primaryVelocity! < -500) {
                 // Swipe left (negative velocity = left swipe)
@@ -231,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       // Header
@@ -492,6 +493,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         ],
+      ),
       ),
     );
   }
