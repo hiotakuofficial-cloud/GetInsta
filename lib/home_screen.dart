@@ -352,9 +352,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           
-          // Powered by Nehu text at top
+          // Powered by Nehu text at bottom
           Positioned(
-            top: 30,
+            bottom: 30,
             left: 0,
             right: 0,
             child: Center(
