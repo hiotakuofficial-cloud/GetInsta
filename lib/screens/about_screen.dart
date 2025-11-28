@@ -350,8 +350,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildStep(String number, String text) {
