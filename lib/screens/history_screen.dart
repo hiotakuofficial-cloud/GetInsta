@@ -116,14 +116,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Text(
-                      'Download History',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Downloads',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 44), // Balance for back button
                   ],
                 ),
                 
