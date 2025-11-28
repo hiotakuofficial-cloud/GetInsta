@@ -311,7 +311,7 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
     final fileName = 'instagram_${DateTime.now().millisecondsSinceEpoch}.${isVideo ? 'mp4' : 'jpg'}';
     
     // Start notification
-    await NotificationService.showDownloadProgress(0, fileName);
+    await NotificationService.showDownloadStarted(fileName);
     
     // Download file (simplified version)
     final response = await http.get(Uri.parse(url));
@@ -326,10 +326,12 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
       
       // Save to history
       await DownloadHistory.addDownload(
-        url: widget.sharedUrl,
         filename: fileName,
+        thumbnailUrl: '',
+        videoUrl: widget.sharedUrl,
+        username: 'shared_user',
+        caption: 'Shared via overlay',
         filePath: file.path,
-        type: isVideo ? 'video' : 'image',
       );
     }
   }
