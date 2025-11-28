@@ -332,12 +332,35 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Widget _buildGestureLayer() {
     return GestureDetector(
-      onTap: _toggleControls,
-      onDoubleTapDown: _handleDoubleTap,
-      onScaleStart: (_) => setState(() => _isDragging = true),
-      onScaleUpdate: _handleScaleUpdate,
-      onScaleEnd: (_) => setState(() => _isDragging = false),
-      onPanUpdate: _zoomLevel > 1.0 ? _handlePan : _handleVerticalPan,
+      onTap: () {
+        print('Screen tapped - toggling controls'); // Debug
+        _toggleControls();
+      },
+      onDoubleTapDown: (details) {
+        print('Double tap detected'); // Debug
+        _handleDoubleTap(details);
+      },
+      onScaleStart: (_) {
+        print('Scale gesture started'); // Debug
+        setState(() => _isDragging = true);
+      },
+      onScaleUpdate: (details) {
+        if (details.scale != 1.0) {
+          _handleScaleUpdate(details);
+        }
+      },
+      onScaleEnd: (_) {
+        print('Scale gesture ended'); // Debug
+        setState(() => _isDragging = false);
+      },
+      onPanUpdate: (details) {
+        if (_zoomLevel > 1.0) {
+          _handlePan(details);
+        } else {
+          _handleVerticalPan(details);
+        }
+      },
+      behavior: HitTestBehavior.translucent, // Important for gesture detection
       child: Container(
         width: double.infinity,
         height: double.infinity,
@@ -734,7 +757,11 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     bool isActive = false,
   }) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: () {
+        print('Icon button tapped: $icon'); // Debug
+        onPressed();
+      },
+      behavior: HitTestBehavior.opaque, // Ensure tap detection
       child: Container(
         width: 40,
         height: 40,
@@ -785,7 +812,11 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     bool isPrimary = false,
   }) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: () {
+        print('Control button tapped: $icon, size: $size, primary: $isPrimary'); // Debug
+        onPressed();
+      },
+      behavior: HitTestBehavior.opaque, // Ensure tap detection
       child: Container(
         width: size,
         height: size,
