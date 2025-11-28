@@ -8,6 +8,7 @@ import 'screens/history_screen.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
+import 'services/instagram_cache.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _searchAnimation;
   bool _isLoading = false;
   Set<int> _selectedMediaIndices = {}; // For multiple media selection
+  List<Map<String, dynamic>> _cachedPosts = []; // Cached Instagram posts
 
   @override
   void initState() {
@@ -55,6 +57,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _searchAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _searchController2, curve: Curves.elasticOut),
     );
+    
+    // Initialize notifications
+    NotificationService.initialize();
+    
+    // Load cached posts
+    _loadCachedPosts();
 
     // Request permissions
     _requestPermissions();
@@ -167,6 +175,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     if (result != null && result['success'] == true) {
+      // Save to cache with original URL
+      final cacheData = Map<String, dynamic>.from(result);
+      cacheData['url'] = url; // Add original URL for cache identification
+      await InstagramCache.addToCache(cacheData);
+      
+      // Reload cached posts to show the new one
+      await _loadCachedPosts();
+      
       // Show bottom sheet instead of popup
       _showMediaBottomSheet(result);
     } else {
@@ -800,6 +816,126 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             );
                           },
                         ),
+                        
+                        // Cached Posts Section
+                        if (_cachedPosts.isNotEmpty) ...[
+                          const SizedBox(height: 30),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Recent Searches',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Cached posts list
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _cachedPosts.length > 5 ? 5 : _cachedPosts.length,
+                            itemBuilder: (context, index) {
+                              final post = _cachedPosts[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  _showMediaBottomSheet(post);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1E1E1E),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Thumbnail
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: const Color(0xFF2A2A2A),
+                                        ),
+                                        child: post['thumbnail'] != null
+                                            ? ClipRRect(
+                                                borderRadius: BorderRadius.circular(8),
+                                                child: Image.network(
+                                                  post['thumbnail'],
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return const Icon(
+                                                      Icons.video_library,
+                                                      color: Colors.white54,
+                                                      size: 20,
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                            : const Icon(
+                                                Icons.video_library,
+                                                color: Colors.white54,
+                                                size: 20,
+                                              ),
+                                      ),
+                                      
+                                      const SizedBox(width: 12),
+                                      
+                                      // Post info
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '@${post['username'] ?? 'Unknown'}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              post['caption'] ?? 'No caption',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.7),
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      
+                                      // Media count indicator
+                                      if (post['hasMultipleMedia'] == true)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF6C63FF),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            '${post['mediaCount'] ?? 1}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                         
                         SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                         
