@@ -1071,17 +1071,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         
                         SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                        
-                        Center(
-                          child: Text(
-                            'Paste Instagram URL to start downloading',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.5),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
