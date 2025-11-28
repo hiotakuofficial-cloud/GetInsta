@@ -179,7 +179,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   final download = downloads[index];
                                   return GestureDetector(
                                     onTap: () {
-                                      Fluttertoast.showToast(msg: "Card clicked!");
                                       // Play video directly
                                       _playVideo(download['filePath']);
                                     },
@@ -544,10 +543,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           Fluttertoast.showToast(msg: "Video file not found");
         }
       } catch (e) {
-        Fluttertoast.showToast(msg: "Error opening video");
+        // Silent error handling
       }
-    } else {
-      Fluttertoast.showToast(msg: "File path is null");
     }
   }
 }

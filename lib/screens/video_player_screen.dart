@@ -196,7 +196,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: _showControls && !isFloating ? AppBar(
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.black54,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -240,7 +240,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           // Brightness/Volume indicators
                           if (_showControls)
                             Positioned(
-                              top: 100,
+                              top: 120,
                               left: 20,
                               child: Container(
                                 padding: const EdgeInsets.all(8),
@@ -264,7 +264,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           
                           if (_showControls)
                             Positioned(
-                              top: 100,
+                              top: 120,
                               right: 20,
                               child: Container(
                                 padding: const EdgeInsets.all(8),
