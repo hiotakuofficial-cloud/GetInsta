@@ -129,21 +129,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                         )
                       : downloads.isEmpty
-                          ? const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                          ? RefreshIndicator(
+                              onRefresh: _loadDownloads,
+                              color: const Color(0xFF6C63FF),
+                              child: ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
                                 children: [
-                                  Icon(
-                                    Icons.download_outlined,
-                                    size: 64,
-                                    color: Colors.white54,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'No downloads yet',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white54,
+                                  SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                                  const Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.download_outlined,
+                                          size: 64,
+                                          color: Colors.white54,
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text(
+                                          'No downloads yet',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.white54,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Pull down to refresh',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white38,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -260,8 +278,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         ),
                                       ],
                                     ),
-                                  ),
-                                );
+                                  );
                                 },
                               ),
                             ),
