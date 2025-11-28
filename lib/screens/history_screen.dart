@@ -133,7 +133,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               onRefresh: _loadDownloads,
                               color: const Color(0xFF6C63FF),
                               child: CustomScrollView(
-                                physics: const BouncingScrollPhysics(), // iOS elastic effect
+                                physics: const AlwaysScrollableScrollPhysics(
+                                  parent: BouncingScrollPhysics(),
+                                ), // Always scrollable + elastic
                                 slivers: [
                                   SliverFillRemaining(
                                     hasScrollBody: false,
@@ -173,7 +175,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               onRefresh: _loadDownloads,
                               color: const Color(0xFF6C63FF),
                               child: ListView.builder(
-                                physics: const BouncingScrollPhysics(), // iOS elastic effect
+                                physics: const AlwaysScrollableScrollPhysics(
+                                  parent: BouncingScrollPhysics(),
+                                ), // Always scrollable + elastic
                                 itemCount: downloads.length,
                                 itemBuilder: (context, index) {
                                   final download = downloads[index];
