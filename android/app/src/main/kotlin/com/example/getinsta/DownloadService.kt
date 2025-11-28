@@ -97,11 +97,14 @@ class DownloadService : Service() {
                 val isReel = url.contains("/reel/")
                 val isPost = url.contains("/p/")
                 
+                val downloadedFiles = mutableListOf<String>()
+                
                 if (isReel) {
                     // Reel - single video
                     val downloadUrl = downloadLinks.getString(0)
                     val filename = generateFilename(caption, ".mp4")
-                    downloadFile(downloadUrl, filename)
+                    val filePath = downloadFile(downloadUrl, filename)
+                    downloadedFiles.add(filePath)
                 } else if (isPost) {
                     // Post - can have multiple images/videos
                     for (i in 0 until downloadLinks.length()) {
@@ -112,12 +115,17 @@ class DownloadService : Service() {
                         } else {
                             generateFilename(caption, extension)
                         }
-                        downloadFile(downloadUrl, filename)
+                        val filePath = downloadFile(downloadUrl, filename)
+                        downloadedFiles.add(filePath)
                     }
                 }
                 
                 // Show complete notification and toast
                 withContext(Dispatchers.Main) {
+                    // Save to history
+                    saveToHistory(url, caption, data.optString("username", "unknown"), 
+                                data.optString("thumbnail", ""), downloadedFiles)
+                    
                     showNotification("GetInsta", "Download complete!", true)
                     Toast.makeText(this@DownloadService, "Complete...", Toast.LENGTH_SHORT).show()
                 }
@@ -149,7 +157,49 @@ class DownloadService : Service() {
         }
     }
     
-    private suspend fun downloadFile(downloadUrl: String, filename: String) {
+    private fun saveToHistory(url: String, caption: String, username: String, thumbnail: String, filePaths: List<String>) {
+        try {
+            // Save to app's internal storage (same as Flutter's getApplicationDocumentsDirectory)
+            val historyFile = File(filesDir, "download_history.json")
+            
+            val historyArray = if (historyFile.exists()) {
+                org.json.JSONArray(historyFile.readText())
+            } else {
+                org.json.JSONArray()
+            }
+            
+            // Add each downloaded file to history
+            filePaths.forEach { filePath ->
+                val filename = File(filePath).name
+                
+                val downloadItem = JSONObject().apply {
+                    put("filename", filename)
+                    put("thumbnailUrl", thumbnail)
+                    put("videoUrl", url)
+                    put("username", username)
+                    put("caption", caption)
+                    put("filePath", filePath)
+                    put("downloadTime", java.time.Instant.now().toString())
+                }
+                
+                // Add to beginning (most recent first)
+                val newArray = org.json.JSONArray()
+                newArray.put(downloadItem)
+                for (i in 0 until historyArray.length()) {
+                    if (i < 49) { // Keep only last 50
+                        newArray.put(historyArray.get(i))
+                    }
+                }
+                historyArray = newArray
+            }
+            
+            historyFile.writeText(historyArray.toString())
+        } catch (e: Exception) {
+            // Ignore history save errors
+        }
+    }
+    
+    private suspend fun downloadFile(downloadUrl: String, filename: String): String {
         // Create Downloads/reel directory
         val downloadDir = File("/storage/emulated/0/Download/reel")
         if (!downloadDir.exists()) {
@@ -166,6 +216,8 @@ class DownloadService : Service() {
         inputStream.copyTo(outputStream)
         inputStream.close()
         outputStream.close()
+        
+        return finalFile.absolutePath
     }
     
     private fun generateFilename(caption: String, extension: String, index: Int? = null): String {
