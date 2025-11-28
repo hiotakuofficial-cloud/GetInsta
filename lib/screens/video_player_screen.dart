@@ -289,6 +289,24 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     });
   }
 
+  void _previousVideo() {
+    // Seek to beginning if more than 3 seconds played
+    if (_currentPosition.inSeconds > 3) {
+      _videoPlayerController.seekTo(Duration.zero);
+      showSeekFeedbackUI('Beginning');
+    } else {
+      // TODO: Implement playlist previous video
+      showSeekFeedbackUI('Previous Video');
+    }
+  }
+
+  void _nextVideo() {
+    // Seek to end (will trigger video end)
+    _videoPlayerController.seekTo(_totalDuration);
+    showSeekFeedbackUI('Next Video');
+    // TODO: Implement playlist next video
+  }
+
   Widget _buildLoadingWidget() {
     return Container(
       color: Colors.black,
@@ -982,7 +1000,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             
             const Spacer(),
             
-            // Center play/pause with premium design
+            // Center play controls with next/previous
             if (_isBuffering)
               Container(
                 width: 80,
@@ -1019,39 +1037,121 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                 ),
               )
             else
-              GestureDetector(
-                onTap: _togglePlayPause,
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.15),
-                        Colors.white.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Previous button
+                  GestureDetector(
+                    onTap: _previousVideo,
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.1),
+                            Colors.white.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Icon(
+                        Icons.skip_previous_rounded,
+                        color: Colors.white.withOpacity(0.9),
+                        size: 30,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 40,
+                  
+                  const SizedBox(width: 20),
+                  
+                  // Play/Pause button
+                  GestureDetector(
+                    onTap: _togglePlayPause,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.15),
+                            Colors.white.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
                   ),
-                ),
+                  
+                  const SizedBox(width: 20),
+                  
+                  // Next button
+                  GestureDetector(
+                    onTap: _nextVideo,
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.1),
+                            Colors.white.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.skip_next_rounded,
+                        color: Colors.white.withOpacity(0.9),
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             
             const Spacer(),
