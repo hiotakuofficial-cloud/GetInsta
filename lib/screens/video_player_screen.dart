@@ -41,7 +41,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Future<void> _initializeSystemControls() async {
     try {
       _currentBrightness = await ScreenBrightness().current;
-      _currentVolume = await VolumeController().getVolume();
+      VolumeController().getVolume().then((volume) {
+        _currentVolume = volume;
+      });
     } catch (e) {
       // Handle error silently
     }
@@ -166,7 +168,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // Volume control
       _currentVolume = (_currentVolume - delta / 300).clamp(0.0, 1.0);
       try {
-        await VolumeController().setVolume(_currentVolume);
+        VolumeController().setVolume(_currentVolume);
       } catch (e) {
         // Handle error silently
       }
