@@ -403,7 +403,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     });
   }
 
-  void _showControls() {
+  void showControlsUI() {
     setState(() {
       _showControls = true;
     });
@@ -425,7 +425,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     if (_showControls) {
       _hideControls();
     } else {
-      _showControls();
+      showControlsUI();
     }
   }
 
@@ -446,7 +446,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     final seekTo = newPosition > Duration.zero ? newPosition : Duration.zero;
     
     _videoPlayerController.seekTo(seekTo);
-    _showSeekFeedback('-10s');
+    showSeekFeedbackUI('-10s');
   }
 
   void _seekForward() {
@@ -456,10 +456,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     final seekTo = newPosition < duration ? newPosition : duration;
     
     _videoPlayerController.seekTo(seekTo);
-    _showSeekFeedback('+10s');
+    showSeekFeedbackUI('+10s');
   }
 
-  void _showSeekFeedback(String feedback) {
+  void showSeekFeedbackUI(String feedback) {
     setState(() {
       _seekFeedback = feedback;
       _showSeekFeedback = true;
