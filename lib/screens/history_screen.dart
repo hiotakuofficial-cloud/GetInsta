@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import '../services/download_history.dart';
 import '../services/instagram_handler.dart';
@@ -156,7 +157,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 itemCount: downloads.length,
                                 itemBuilder: (context, index) {
                                   final download = downloads[index];
-                                  return Container(
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Play video directly
+                                      _playVideo(download['filePath']);
+                                    },
+                                    child: Container(
                                     margin: const EdgeInsets.only(bottom: 16),
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
@@ -493,6 +499,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       Fluttertoast.showToast(msg: "Video deleted successfully");
     } catch (e) {
       Fluttertoast.showToast(msg: "Failed to delete video");
+    }
+  }
+
+  void _playVideo(String? filePath) {
+    if (filePath != null) {
+      // Open video with system video player
+      launchUrl(Uri.file(filePath));
     }
   }
 }
