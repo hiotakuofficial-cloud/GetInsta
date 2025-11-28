@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../services/notification_service.dart';
 import '../services/download_history.dart';
 
@@ -128,12 +127,10 @@ class InstagramHandler {
     String? caption,
   }) async {
     try {
-      Fluttertoast.showToast(msg: "🔥 Starting download: $fileName");
       
       final request = http.Request('GET', Uri.parse(mediaUrl));
       final response = await request.send();
       
-      Fluttertoast.showToast(msg: "🔥 HTTP Response: ${response.statusCode}");
       
       if (response.statusCode == 200) {
         // Get public Downloads/reel directory
@@ -144,14 +141,10 @@ class InstagramHandler {
           directory = await getApplicationDocumentsDirectory();
         }
         
-        Fluttertoast.showToast(msg: "🔥 Directory: ${directory.path}");
         
         if (!await directory.exists()) {
-          Fluttertoast.showToast(msg: "🔥 Creating directory...");
           await directory.create(recursive: true);
-          Fluttertoast.showToast(msg: "🔥 Directory created!");
         } else {
-          Fluttertoast.showToast(msg: "🔥 Directory exists");
         }
         
         // Handle duplicate filenames
@@ -167,7 +160,6 @@ class InstagramHandler {
           counter++;
         }
         
-        Fluttertoast.showToast(msg: "🔥 Final filename: $finalFileName");
         
         // Show download started notification
         await NotificationService.showDownloadStarted(finalFileName);

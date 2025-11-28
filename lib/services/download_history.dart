@@ -37,7 +37,6 @@ class DownloadHistory {
     required String filePath,
   }) async {
     try {
-      Fluttertoast.showToast(msg: "📝 Saving to history: $filename");
       final history = await getHistory();
       
       final downloadItem = {
@@ -59,9 +58,7 @@ class DownloadHistory {
       }
       
       await _saveHistory(history);
-      Fluttertoast.showToast(msg: "✅ History saved! Total: ${history.length}");
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ History error: $e");
     }
   }
 
