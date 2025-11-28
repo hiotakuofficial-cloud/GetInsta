@@ -824,6 +824,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                         ),
                         
+                        // Conditional text - show only when no cached posts
+                        if (_cachedPosts.isEmpty) ...[
+                          const SizedBox(height: 40),
+                          Text(
+                            'Paste Instagram URL to start downloading',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.6),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                        
                         // Cached Posts Section
                         if (_cachedPosts.isNotEmpty) ...[
                           const SizedBox(height: 30),
@@ -974,8 +988,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         final download = snapshot.data![index];
                                         return GestureDetector(
                                           onTap: () {
-                                            // Play video
-                                            _playVideo(download['filePath']);
+                                            // Show options: Play or Download Again
+                                            _showHistoryVideoOptions(download);
                                           },
                                           child: Container(
                                             width: 160,
@@ -1103,5 +1117,154 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       // Open video with system video player
       launchUrl(Uri.file(filePath));
     }
+  }
+
+  void _showHistoryVideoOptions(Map<String, dynamic> download) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white54,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            
+            // Video info
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  // Thumbnail
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFF2A2A2A),
+                    ),
+                    child: download['thumbnailUrl'] != null && download['thumbnailUrl'].isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              download['thumbnailUrl'],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(Icons.video_library, color: Colors.white54);
+                              },
+                            ),
+                          )
+                        : const Icon(Icons.video_library, color: Colors.white54),
+                  ),
+                  
+                  const SizedBox(width: 16),
+                  
+                  // File info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          download['filename'] ?? 'Unknown',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (download['username'] != null)
+                          Text(
+                            '@${download['username']}',
+                            style: const TextStyle(
+                              color: Color(0xFF6C63FF),
+                              fontSize: 14,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Action buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  // Play button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _playVideo(download['filePath']);
+                      },
+                      icon: const Icon(Icons.play_arrow, color: Colors.white),
+                      label: const Text('Play Video', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6C63FF),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Download Again button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Fluttertoast.showToast(msg: "Downloading...");
+                        // Re-download the video
+                        if (download['videoUrl'] != null) {
+                          InstagramHandler.downloadMedia(
+                            download['videoUrl'],
+                            download['filename'],
+                            thumbnailUrl: download['thumbnailUrl'],
+                            username: download['username'],
+                            caption: download['caption'],
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.download, color: Colors.white70),
+                      label: const Text('Download Again', style: TextStyle(color: Colors.white70)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2A2A2A),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
   }
 }
