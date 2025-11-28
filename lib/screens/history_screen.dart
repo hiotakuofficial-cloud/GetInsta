@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_file/open_file.dart';
 import 'dart:io';
 import '../services/download_history.dart';
 import '../services/instagram_handler.dart';
@@ -132,35 +132,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ? RefreshIndicator(
                               onRefresh: _loadDownloads,
                               color: const Color(0xFF6C63FF),
-                              child: ListView(
+                              child: CustomScrollView(
                                 physics: const BouncingScrollPhysics(), // iOS elastic effect
-                                children: [
-                                  SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                                  const Center(
+                                slivers: [
+                                  SliverFillRemaining(
+                                    hasScrollBody: false,
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Spacer(),
+                                        const Icon(
                                           Icons.download_outlined,
                                           size: 64,
                                           color: Colors.white54,
                                         ),
-                                        SizedBox(height: 16),
-                                        Text(
+                                        const SizedBox(height: 16),
+                                        const Text(
                                           'No downloads yet',
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: Colors.white54,
                                           ),
                                         ),
-                                        SizedBox(height: 8),
-                                        Text(
+                                        const SizedBox(height: 8),
+                                        const Text(
                                           'Pull down to refresh',
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: Colors.white38,
                                           ),
                                         ),
+                                        const Spacer(),
                                       ],
                                     ),
                                   ),
@@ -527,27 +529,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       try {
         Fluttertoast.showToast(msg: "Opening video...");
         
-        // Use content URI for Android file access
-        final uri = Uri.parse('content://media/external/video/media');
+        // Use open_file package for better file handling
+        final result = await OpenFile.open(filePath);
         
-        // Try to launch with file URI directly
-        await launchUrl(
-          Uri.file(filePath),
-          mode: LaunchMode.externalApplication,
-        );
-        
-        Fluttertoast.showToast(msg: "Video opened!");
-      } catch (e) {
-        // Fallback: try with different approach
-        try {
-          await launchUrl(
-            Uri.parse('file://$filePath'),
-            mode: LaunchMode.externalApplication,
-          );
-          Fluttertoast.showToast(msg: "Video opened with fallback!");
-        } catch (e2) {
-          Fluttertoast.showToast(msg: "No video player available");
+        if (result.type == ResultType.done) {
+          Fluttertoast.showToast(msg: "Video opened!");
+        } else if (result.type == ResultType.noAppToOpen) {
+          Fluttertoast.showToast(msg: "No video player found");
+        } else {
+          Fluttertoast.showToast(msg: "Failed to open video");
         }
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error opening video");
       }
     } else {
       Fluttertoast.showToast(msg: "File path is null");
