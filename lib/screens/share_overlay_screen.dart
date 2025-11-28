@@ -283,6 +283,19 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
         }
       }
 
+      // Check manage external storage permission (Android 11+)
+      var manageStorageStatus = await Permission.manageExternalStorage.status;
+      if (!manageStorageStatus.isGranted) {
+        manageStorageStatus = await Permission.manageExternalStorage.request();
+        if (!manageStorageStatus.isGranted) {
+          Fluttertoast.showToast(msg: "File access permission required");
+          setState(() {
+            _checkingPermissions = false;
+          });
+          return false;
+        }
+      }
+
       // Check notification permission
       var notificationStatus = await Permission.notification.status;
       if (!notificationStatus.isGranted) {
