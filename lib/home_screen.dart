@@ -129,6 +129,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _loadCachedPosts() async {
+    final cached = await InstagramCache.getCache();
+    setState(() {
+      _cachedPosts = cached;
+    });
+  }
+
   void _onPastePressed() async {
     _pasteController.forward().then((_) {
       _pasteController.reverse();
