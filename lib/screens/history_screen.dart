@@ -83,20 +83,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
-      body: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          // Swipe right to go back
-          if (details.primaryVelocity! > 500) {
-            Navigator.of(context).pop();
-          }
-        },
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-            child: Column(
+      body: Stack(
+        children: [
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              // Swipe right to go back
+              if (details.primaryVelocity! > 500) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 60, 20, 100), // Added bottom padding for overlay
+                child: Column(
               children: [
                 // Header (removed refresh button)
                 Row(
@@ -573,6 +575,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
     } catch (e) {
       Fluttertoast.showToast(msg: "Failed to delete video");
     }
+  }
+
+          // Bottom Overlay - Powered by Nehu
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xFF121212).withOpacity(0.0),
+                    const Color(0xFF121212).withOpacity(0.8),
+                    const Color(0xFF121212),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Text(
+                  'Powered by Nehu',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.6),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _playVideo(String? filePath) async {

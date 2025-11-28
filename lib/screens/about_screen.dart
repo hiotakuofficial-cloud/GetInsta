@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -8,139 +9,106 @@ class AboutScreen extends StatefulWidget {
   State<AboutScreen> createState() => _AboutScreenState();
 }
 
-class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
-    ));
-    
-    _fadeController.forward();
-    _slideController.forward();
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
+class _AboutScreenState extends State<AboutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Transparent status bar
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ));
+    
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Back Button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.back,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // App Logo & Title
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                            color: const Color(0xFF1A1A1A),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.1),
+                              width: 1,
                             ),
                           ),
                           child: const Icon(
-                            CupertinoIcons.cloud_download,
+                            CupertinoIcons.back,
                             color: Colors.white,
-                            size: 40,
+                            size: 20,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'GetInsta',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Instagram Downloader',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.6),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                   
                   const SizedBox(height: 40),
                   
-                  // Made for Nehu
+                  // App Logo & Title - Centered
+                  Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF6C63FF).withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'GetInsta',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Instagram Downloader',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // Made for Nehu - Centered
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -170,6 +138,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         const SizedBox(height: 16),
                         const Text(
                           'Made with love for Nehu Singh',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -177,12 +146,13 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                        const Text(
                           '@yourhoneydewie',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF6C63FF),
+                            color: Color(0xFF6C63FF),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -202,7 +172,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                   
                   const SizedBox(height: 24),
                   
-                  // Credits
+                  // Credits - Centered
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -214,7 +184,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         width: 1,
                       ),
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
                         Container(
                           width: 48,
@@ -229,30 +199,25 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                             size: 24,
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Idea & Inspiration',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Nehu Singh gave me the brilliant idea to create this app',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white.withOpacity(0.6),
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Idea & Inspiration',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Nehu Singh gave me the brilliant idea to create this app',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(0.6),
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -261,7 +226,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                   
                   const SizedBox(height: 24),
                   
-                  // Features
+                  // Features - Centered
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -274,33 +239,29 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                       ),
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF6C63FF).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                CupertinoIcons.rocket,
-                                color: Color(0xFF6C63FF),
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            const Text(
-                              'How to Use',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6C63FF).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            CupertinoIcons.rocket,
+                            color: Color(0xFF6C63FF),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'How to Use',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         _buildStep('1', 'Open Instagram app'),
@@ -316,12 +277,13 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                             color: const Color(0xFF6C63FF).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Files saved in Downloads/reel/ with smart names',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF6C63FF),
+                              color: Color(0xFF6C63FF),
                             ),
                           ),
                         ),
@@ -331,7 +293,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                   
                   const SizedBox(height: 40),
                   
-                  // Developer & Version
+                  // Developer & Version - Centered
                   Column(
                     children: [
                       Container(
@@ -340,12 +302,13 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                           color: const Color(0xFF1A1A1A),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Developed by PIHU SINGH',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF6C63FF),
+                            color: Color(0xFF6C63FF),
                           ),
                         ),
                       ),
@@ -358,6 +321,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         ),
                         child: Text(
                           'Version 1.0.0',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -368,12 +332,45 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                     ],
                   ),
                   
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 100), // Space for overlay
                 ],
               ),
             ),
           ),
-        ),
+          
+          // Bottom Overlay - Powered by Nehu
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xFF121212).withOpacity(0.0),
+                    const Color(0xFF121212).withOpacity(0.8),
+                    const Color(0xFF121212),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Text(
+                  'Powered by Nehu',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.6),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
