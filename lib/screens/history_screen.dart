@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io';
 import '../services/download_history.dart';
 import '../services/instagram_handler.dart';
-import 'video_player_screen.dart';
+import 'professional_video_player.dart';
 import 'about_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -585,7 +585,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VideoPlayerScreen(
+              builder: (context) => ProfessionalVideoPlayer(
                 videoPath: filePath,
                 title: 'Downloaded Video',
               ),
