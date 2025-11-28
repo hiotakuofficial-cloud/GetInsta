@@ -1016,6 +1016,38 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     return '$minutes:$seconds';
   }
 
+  Widget _buildSmallButton(String text, VoidCallback onPressed, {bool isActive = false}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: isActive
+              ? const Color(0xFF007AFF).withOpacity(0.3)
+              : Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive
+                ? const Color(0xFF007AFF)
+                : Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isActive ? const Color(0xFF007AFF) : Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _startOverlayTimer() {
     _overlayTimer?.cancel();
     _overlayTimer = Timer(const Duration(seconds: 2), () {

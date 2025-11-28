@@ -5,7 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'screens/history_screen.dart';
-import 'screens/video_player_screen.dart';
+import 'screens/professional_video_player.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
@@ -1141,7 +1141,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VideoPlayerScreen(
+              builder: (context) => ProfessionalVideoPlayer(
                 videoPath: filePath,
                 title: download['filename'] ?? 'Downloaded Video',
               ),
