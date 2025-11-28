@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'screens/history_screen.dart';
 import 'screens/video_player_screen.dart';
+import 'screens/about_screen.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
