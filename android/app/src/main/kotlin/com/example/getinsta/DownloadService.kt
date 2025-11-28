@@ -84,10 +84,20 @@ class DownloadService : Service() {
     
     private suspend fun downloadInstagramMedia(url: String) {
         try {
+            // Show processing notification
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Processing URL...", false)
+            }
+            
             // Fetch Instagram data
             val apiUrl = "https://v1-w3sc.onrender.com/insta/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
             val response = URL(apiUrl).readText()
             val data = JSONObject(response)
+            
+            // Debug log
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@DownloadService, "API Response: ${data.toString()}", Toast.LENGTH_LONG).show()
+            }
             
             if (data.getBoolean("success") && data.has("download_links")) {
                 val downloadLinks = data.getJSONArray("download_links")

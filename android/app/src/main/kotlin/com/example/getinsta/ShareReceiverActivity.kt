@@ -3,12 +3,19 @@ package com.example.getinsta
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 
 class ShareReceiverActivity : Activity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Set window flags to prevent small window error
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        )
         
         // Handle share intent immediately
         handleShareIntent(intent)
