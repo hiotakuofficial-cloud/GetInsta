@@ -534,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         downloadResults.add(downloadResult);
       }
     } catch (e) {
-      print("Download error: $e");
+      // Download error - silent fail
     }
     
     // Show results (removed dialog, just notifications now)

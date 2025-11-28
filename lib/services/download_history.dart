@@ -68,7 +68,7 @@ class DownloadHistory {
       final file = File(path);
       await file.writeAsString(json.encode(history));
     } catch (e) {
-      print('Error saving history: $e');
+      // Error saving history - silent fail
     }
   }
 

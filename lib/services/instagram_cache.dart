@@ -49,7 +49,7 @@ class InstagramCache {
       
       await _saveCache(cache);
     } catch (e) {
-      print('Error adding to cache: $e');
+      // Error adding to cache - silent fail
     }
   }
 
@@ -59,7 +59,7 @@ class InstagramCache {
       final file = File(path);
       await file.writeAsString(json.encode(cache));
     } catch (e) {
-      print('Error saving cache: $e');
+      // Error saving cache - silent fail
     }
   }
 
@@ -69,7 +69,7 @@ class InstagramCache {
       cache.removeWhere((item) => item['url'] == url);
       await _saveCache(cache);
     } catch (e) {
-      print('Error removing from cache: $e');
+      // Error removing from cache - silent fail
     }
   }
 }
