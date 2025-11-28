@@ -246,221 +246,219 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
                           ),
                         ],
                       ),
-                          child: SafeArea(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Handle bar
-                                Container(
-                                  margin: const EdgeInsets.only(top: 12, bottom: 20),
-                                  width: 40,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(2),
+                      child: SafeArea(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Handle bar
+                            Container(
+                              margin: const EdgeInsets.only(top: 12, bottom: 20),
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            
+                            // Header
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.download_rounded,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
                                   ),
-                                ),
-                                
-                                // Header
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 48,
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
+                                  const SizedBox(width: 16),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Quick Download',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
                                           ),
-                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Icon(
-                                          Icons.download_rounded,
-                                          color: Colors.white,
-                                          size: 24,
+                                        Text(
+                                          'GetInsta',
+                                          style: TextStyle(
+                                            color: Colors.white60,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      const Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Quick Download',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                            Text(
-                                              'GetInsta',
-                                              style: TextStyle(
-                                                color: Colors.white60,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                
-                                const SizedBox(height: 24),
-                                
-                                // Content
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      // Thumbnail
-                                      Container(
-                                        width: 80,
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2A2A2A),
-                                          borderRadius: BorderRadius.circular(12),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // Content
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                children: [
+                                  // Thumbnail
+                                  Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2A2A2A),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: _thumbnailUrl.isNotEmpty
+                                        ? ClipRRect(
+                                            borderRadius: BorderRadius.circular(12),
+                                            child: Image.network(
+                                              _thumbnailUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return const Icon(
+                                                  Icons.image,
+                                                  color: Color(0xFF6C63FF),
+                                                  size: 32,
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.image,
+                                            color: Color(0xFF6C63FF),
+                                            size: 32,
+                                          ),
+                                  ),
+                                  
+                                  const SizedBox(width: 16),
+                                  
+                                  // Title
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _isLoading ? 'Loading...' : _title,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        child: _thumbnailUrl.isNotEmpty
-                                            ? ClipRRect(
-                                                borderRadius: BorderRadius.circular(12),
-                                                child: Image.network(
-                                                  _thumbnailUrl,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    return const Icon(
-                                                      Icons.image,
-                                                      color: Color(0xFF6C63FF),
-                                                      size: 32,
-                                                    );
-                                                  },
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Instagram Media',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.6),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 32),
+                            
+                            // Buttons
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                children: [
+                                  // Cancel button
+                                  Expanded(
+                                    child: Container(
+                                      height: 52,
+                                      child: ElevatedButton(
+                                        onPressed: _closeOverlay,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF2A2A2A),
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(width: 12),
+                                  
+                                  // Download button
+                                  Expanded(
+                                    child: Container(
+                                      height: 52,
+                                      child: ElevatedButton(
+                                        onPressed: _isDownloading ? null : _startDownload,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF6C63FF),
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                        ),
+                                        child: _isDownloading
+                                            ? const SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                                 ),
                                               )
-                                            : const Icon(
-                                                Icons.image,
-                                                color: Color(0xFF6C63FF),
-                                                size: 32,
+                                            : const Text(
+                                                'Download',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                       ),
-                                      
-                                      const SizedBox(width: 16),
-                                      
-                                      // Title
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              _isLoading ? 'Loading...' : _title,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Instagram Media',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.6),
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                
-                                const SizedBox(height: 32),
-                                
-                                // Buttons
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      // Cancel button
-                                      Expanded(
-                                        child: Container(
-                                          height: 52,
-                                          child: ElevatedButton(
-                                            onPressed: _closeOverlay,
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xFF2A2A2A),
-                                              foregroundColor: Colors.white,
-                                              elevation: 0,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(16),
-                                              ),
-                                            ),
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      
-                                      const SizedBox(width: 12),
-                                      
-                                      // Download button
-                                      Expanded(
-                                        child: Container(
-                                          height: 52,
-                                          child: ElevatedButton(
-                                            onPressed: _isDownloading ? null : _startDownload,
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xFF6C63FF),
-                                              foregroundColor: Colors.white,
-                                              elevation: 0,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(16),
-                                              ),
-                                            ),
-                                            child: _isDownloading
-                                                ? const SizedBox(
-                                                    width: 20,
-                                                    height: 20,
-                                                    child: CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                                    ),
-                                                  )
-                                                : const Text(
-                                                    'Download',
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                
-                                const SizedBox(height: 20),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+                            
+                            const SizedBox(height: 20),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
