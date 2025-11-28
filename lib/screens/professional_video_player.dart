@@ -348,65 +348,69 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Widget _buildBrightnessOverlay() {
     return Positioned(
-      left: 50,
+      left: 40,
       top: 0,
       bottom: 0,
       child: Center(
-        child: AnimatedBuilder(
-          animation: _fadeAnimation,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _fadeAnimation.value,
-              child: Container(
-                width: 80,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
-                  ),
+        child: AnimatedOpacity(
+          opacity: _showBrightnessOverlay ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: Container(
+            width: 70,
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(35),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _brightness > 0.7
+                      ? Icons.brightness_high_rounded
+                      : _brightness > 0.3
+                          ? Icons.brightness_medium_rounded
+                          : Icons.brightness_low_rounded,
+                  color: Colors.white,
+                  size: 24,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _brightness > 0.7
-                          ? Icons.brightness_high
-                          : _brightness > 0.3
-                              ? Icons.brightness_medium
-                              : Icons.brightness_low,
-                      color: Colors.white,
-                      size: 24,
+                const SizedBox(height: 12),
+                Expanded(
+                  child: Container(
+                    width: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      color: Colors.white24,
                     ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: RotatedBox(
-                        quarterTurns: -1,
-                        child: LinearProgressIndicator(
-                          value: _brightness,
-                          backgroundColor: Colors.white24,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            const Color(0xFF007AFF),
-                          ),
+                    child: FractionallySizedBox(
+                      alignment: Alignment.bottomCenter,
+                      heightFactor: _brightness,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: const Color(0xFF007AFF),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '${(_brightness * 100).round()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: 12),
+                Text(
+                  '${(_brightness * 100).round()}%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -414,65 +418,69 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Widget _buildVolumeOverlay() {
     return Positioned(
-      right: 50,
+      right: 40,
       top: 0,
       bottom: 0,
       child: Center(
-        child: AnimatedBuilder(
-          animation: _fadeAnimation,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _fadeAnimation.value,
-              child: Container(
-                width: 80,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
-                  ),
+        child: AnimatedOpacity(
+          opacity: _showVolumeOverlay ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: Container(
+            width: 70,
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(35),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _volume > 0.5
+                      ? Icons.volume_up_rounded
+                      : _volume > 0
+                          ? Icons.volume_down_rounded
+                          : Icons.volume_off_rounded,
+                  color: Colors.white,
+                  size: 24,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _volume > 0.5
-                          ? Icons.volume_up
-                          : _volume > 0
-                              ? Icons.volume_down
-                              : Icons.volume_off,
-                      color: Colors.white,
-                      size: 24,
+                const SizedBox(height: 12),
+                Expanded(
+                  child: Container(
+                    width: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      color: Colors.white24,
                     ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: RotatedBox(
-                        quarterTurns: -1,
-                        child: LinearProgressIndicator(
-                          value: _volume,
-                          backgroundColor: Colors.white24,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            const Color(0xFF007AFF),
-                          ),
+                    child: FractionallySizedBox(
+                      alignment: Alignment.bottomCenter,
+                      heightFactor: _volume,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: const Color(0xFF007AFF),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '${(_volume * 100).round()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: 12),
+                Text(
+                  '${(_volume * 100).round()}%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -521,7 +529,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   void _handleVerticalPan(DragUpdateDetails details) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isLeftSide = details.globalPosition.dx < screenWidth / 2;
-    final delta = details.delta.dy / 300;
+    final delta = details.delta.dy / 200; // More sensitive
     
     if (isLeftSide) {
       // Brightness control
@@ -533,12 +541,13 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       _fadeAnimationController.forward();
       _startOverlayTimer();
     } else {
-      // Volume control
+      // Volume control - prevent system UI
       setState(() {
         _volume = (_volume - delta).clamp(0.0, 1.0);
         _showVolumeOverlay = true;
       });
-      VolumeController().setVolume(_volume);
+      // Use setVolume with showSystemUI: false to prevent system overlay
+      VolumeController().setVolume(_volume, showSystemUI: false);
       _fadeAnimationController.forward();
       _startOverlayTimer();
     }
@@ -600,7 +609,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       child: Row(
         children: [
           _buildIconButton(
-            icon: Icons.arrow_back_ios,
+            icon: Icons.arrow_back_ios_new_rounded,
             onPressed: _exitPlayer,
           ),
           const SizedBox(width: 16),
@@ -617,19 +626,19 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
             ),
           ),
           _buildIconButton(
-            icon: Icons.aspect_ratio,
+            icon: Icons.aspect_ratio_rounded,
             onPressed: _toggleAspectRatio,
             badge: _getAspectRatioText(),
           ),
           const SizedBox(width: 8),
           _buildIconButton(
-            icon: Icons.speed,
+            icon: Icons.speed_rounded,
             onPressed: _changePlaybackSpeed,
             badge: '${_playbackSpeed}x',
           ),
           const SizedBox(width: 8),
           _buildIconButton(
-            icon: Icons.repeat,
+            icon: Icons.repeat_rounded,
             onPressed: _toggleLoop,
             isActive: _isLooping,
           ),
@@ -643,21 +652,21 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildControlButton(
-          icon: Icons.skip_previous,
-          size: 56,
+          icon: Icons.skip_previous_rounded,
+          size: 64,
           onPressed: _previousVideo,
         ),
-        const SizedBox(width: 32),
+        const SizedBox(width: 40),
         _buildControlButton(
-          icon: _isPlaying ? Icons.pause : Icons.play_arrow,
-          size: 72,
+          icon: _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+          size: 80,
           onPressed: _togglePlayPause,
           isPrimary: true,
         ),
-        const SizedBox(width: 32),
+        const SizedBox(width: 40),
         _buildControlButton(
-          icon: Icons.skip_next,
-          size: 56,
+          icon: Icons.skip_next_rounded,
+          size: 64,
           onPressed: _nextVideo,
         ),
       ],
@@ -678,11 +687,17 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
               _buildSmallButton('B', _setPointB, isActive: _pointB != null),
               const SizedBox(width: 8),
               if (_pointA != null || _pointB != null)
-                _buildSmallButton('×', _clearABLoop),
+                _buildSmallButton('✕', _clearABLoop),
               const Spacer(),
-              _buildSmallButton('⏮', () => _stepFrame(false)),
+              _buildIconButton(
+                icon: Icons.skip_previous_rounded,
+                onPressed: () => _stepFrame(false),
+              ),
               const SizedBox(width: 8),
-              _buildSmallButton('⏭', () => _stepFrame(true)),
+              _buildIconButton(
+                icon: Icons.skip_next_rounded,
+                onPressed: () => _stepFrame(true),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -1050,13 +1065,12 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   void _startOverlayTimer() {
     _overlayTimer?.cancel();
-    _overlayTimer = Timer(const Duration(seconds: 2), () {
+    _overlayTimer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
           _showBrightnessOverlay = false;
           _showVolumeOverlay = false;
         });
-        _fadeAnimationController.reverse();
       }
     });
   }
