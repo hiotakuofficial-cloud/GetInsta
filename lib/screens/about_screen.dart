@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -9,16 +8,23 @@ class AboutScreen extends StatefulWidget {
   State<AboutScreen> createState() => _AboutScreenState();
 }
 
-class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     
@@ -26,109 +32,115 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut, // iOS-style smooth curve
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
     ));
     
-    _controller.forward();
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.elasticOut,
+    ));
+    
+    _fadeController.forward();
+    _slideController.forward();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Transparent status bar
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
-    
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(), // iOS bouncy physics kept
-                padding: const EdgeInsets.all(20),
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Back Button
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          width: 44,
-                          height: 44,
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.back,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // App Logo & Title
+                  Center(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A1A1A),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
                           ),
                           child: const Icon(
-                            CupertinoIcons.back,
+                            CupertinoIcons.cloud_download,
                             color: Colors.white,
-                            size: 20,
+                            size: 40,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        const Text(
+                          'GetInsta',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Instagram Downloader',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   
                   const SizedBox(height: 40),
                   
-                  // App Logo & Title - Centered
-                  Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/logo.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'GetInsta',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Instagram Downloader',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Made for Nehu - Centered
+                  // Made for Nehu
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -158,7 +170,6 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         const SizedBox(height: 16),
                         const Text(
                           'Made with love for Nehu Singh',
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -166,13 +177,12 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           '@yourhoneydewie',
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF6C63FF),
+                            color: const Color(0xFF6C63FF),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -192,7 +202,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                   
                   const SizedBox(height: 24),
                   
-                  // Credits - Centered
+                  // Credits
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -204,7 +214,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         width: 1,
                       ),
                     ),
-                    child: Column(
+                    child: Row(
                       children: [
                         Container(
                           width: 48,
@@ -219,25 +229,30 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                             size: 24,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Idea & Inspiration',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Nehu Singh gave me the brilliant idea to create this app',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(0.6),
-                            height: 1.4,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Idea & Inspiration',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Nehu Singh gave me the brilliant idea to create this app',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white.withOpacity(0.6),
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -246,7 +261,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                   
                   const SizedBox(height: 24),
                   
-                  // Features - Centered
+                  // Features
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -259,29 +274,33 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                       ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6C63FF).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.rocket,
-                            color: Color(0xFF6C63FF),
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'How to Use',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6C63FF).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                CupertinoIcons.rocket,
+                                color: Color(0xFF6C63FF),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            const Text(
+                              'How to Use',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                         _buildStep('1', 'Open Instagram app'),
@@ -297,13 +316,12 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                             color: const Color(0xFF6C63FF).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Files saved in Downloads/reel/ with smart names',
-                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF6C63FF),
+                              color: const Color(0xFF6C63FF),
                             ),
                           ),
                         ),
@@ -313,7 +331,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                   
                   const SizedBox(height: 40),
                   
-                  // Developer & Version - Centered
+                  // Developer & Version
                   Column(
                     children: [
                       Container(
@@ -322,13 +340,12 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                           color: const Color(0xFF1A1A1A),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Developed by PIHU SINGH',
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF6C63FF),
+                            color: const Color(0xFF6C63FF),
                           ),
                         ),
                       ),
@@ -341,7 +358,6 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         ),
                         child: Text(
                           'Version 1.0.0',
-                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -352,45 +368,12 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                     ],
                   ),
                   
-                  const SizedBox(height: 100), // Space for overlay
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
           ),
-          
-          // Bottom Overlay - Powered by Nehu
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    const Color(0xFF121212).withOpacity(0.0),
-                    const Color(0xFF121212).withOpacity(0.8),
-                    const Color(0xFF121212),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Text(
-                  'Powered by Nehu',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.6),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
