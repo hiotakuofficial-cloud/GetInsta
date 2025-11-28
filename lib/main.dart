@@ -75,4 +75,3 @@ class _GetInstaAppState extends State<GetInstaApp> {
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-}
