@@ -108,7 +108,7 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
     
     try {
       final response = await http.get(
-        Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?url=${Uri.encodeComponent(urlToUse)}'),
+        Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?action=url&url=${Uri.encodeComponent(urlToUse)}'),
         headers: {'User-Agent': 'Mozilla/5.0 (compatible; InstagramDownloader/1.0)'},
       );
 
@@ -116,32 +116,23 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        Fluttertoast.showToast(msg: "API Status: ${data['status']}", gravity: ToastGravity.TOP);
+        Fluttertoast.showToast(msg: "API Response: ${data.toString()}", gravity: ToastGravity.TOP);
         
-        if (data['status'] == 'success' && data['data'] != null) {
+        if (data['success'] == true && data['data'] != null) {
           final mediaData = data['data'];
           
-          if (mediaData is List && mediaData.isNotEmpty) {
-            final mediaItem = mediaData[0];
-            
-            setState(() {
-              _thumbnailUrl = mediaItem['thumbnail'] ?? '';
-              _title = mediaItem['caption'] ?? 'Instagram Media';
-              _isLoading = false;
-            });
-            
-            Fluttertoast.showToast(msg: "Data loaded successfully", gravity: ToastGravity.TOP);
-          } else {
-            Fluttertoast.showToast(msg: "Empty media data", gravity: ToastGravity.TOP);
-            setState(() {
-              _title = 'Empty media data';
-              _isLoading = false;
-            });
-          }
-        } else {
-          Fluttertoast.showToast(msg: "API Error: ${data['message'] ?? 'Unknown'}", gravity: ToastGravity.TOP);
           setState(() {
-            _title = 'API Error: ${data['message'] ?? 'Failed to load media'}';
+            _thumbnailUrl = mediaData['thumbnail'] ?? '';
+            _title = mediaData['caption'] ?? 'Instagram Media';
+            _isLoading = false;
+          });
+          
+          Fluttertoast.showToast(msg: "Data loaded successfully", gravity: ToastGravity.TOP);
+        } else {
+          final errorMsg = data['error'] ?? 'Unknown API error';
+          Fluttertoast.showToast(msg: "API Error: $errorMsg", gravity: ToastGravity.TOP);
+          setState(() {
+            _title = 'API Error: $errorMsg';
             _isLoading = false;
           });
         }
