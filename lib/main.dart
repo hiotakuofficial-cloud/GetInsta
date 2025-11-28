@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/share_overlay_screen.dart';
+import 'screens/system_overlay_screen.dart';
 
 void main() {
   runApp(const GetInstaApp());
@@ -68,6 +69,16 @@ class _GetInstaAppState extends State<GetInstaApp> {
       home: const SplashScreen(),
       routes: {
         '/history': (context) => const HistoryScreen(),
+        '/system_overlay': (context) => const SystemOverlayScreen(sharedUrl: ''),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/system_overlay') {
+          final args = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (context) => SystemOverlayScreen(sharedUrl: args ?? ''),
+          );
+        }
+        return null;
       },
       debugShowCheckedModeBanner: false,
     );
