@@ -1,13 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'screens/history_screen.dart';
+import 'screens/share_overlay_screen.dart';
 
 void main() {
   runApp(const GetInstaApp());
 }
 
-class GetInstaApp extends StatelessWidget {
+class GetInstaApp extends StatefulWidget {
   const GetInstaApp({super.key});
+
+  @override
+  State<GetInstaApp> createState() => _GetInstaAppState();
+}
+
+class _GetInstaAppState extends State<GetInstaApp> {
+  static const platform = MethodChannel('com.example.getinsta/share');
+  
+  @override
+  void initState() {
+    super.initState();
+    _setupShareReceiver();
+  }
+  
+  void _setupShareReceiver() {
+    platform.setMethodCallHandler((call) async {
+      if (call.method == 'receiveShare') {
+        final String sharedUrl = call.arguments;
+        // Navigate to overlay screen
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, _) => ShareOverlayScreen(sharedUrl: sharedUrl),
+            transitionDuration: const Duration(milliseconds: 300),
+            transitionsBuilder: (context, animation, _, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 1.0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          ),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
