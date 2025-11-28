@@ -168,37 +168,38 @@ class InstagramHandler {
         int downloaded = 0;
         final total = response.contentLength ?? 0;
         
-        await response.stream.listen(
-          (chunk) {
+        try {
+          await for (final chunk in response.stream) {
             sink.add(chunk);
             downloaded += chunk.length;
             
             if (total > 0) {
               final progress = ((downloaded / total) * 100).round();
               // Update notification progress
-              NotificationService.updateDownloadProgress(progress, finalFileName);
+              await NotificationService.updateDownloadProgress(progress, finalFileName);
             }
-          },
-          onDone: () async {
-            await sink.close();
-            // Show completion notification
-            await NotificationService.showDownloadComplete(finalFileName, true);
-            
-            // Add to download history
-            await DownloadHistory.addDownload(
-              filename: finalFileName,
-              thumbnailUrl: thumbnailUrl ?? '',
-              videoUrl: mediaUrl,
-              username: username ?? 'Unknown',
-              caption: caption ?? '',
-              filePath: file.path,
-            );
-          },
-          onError: (error) async {
-            await sink.close();
-            await NotificationService.showDownloadComplete(finalFileName, false);
-          },
-        ).asFuture();
+          }
+          
+          // Ensure 100% progress and completion
+          await NotificationService.updateDownloadProgress(100, finalFileName);
+          await sink.close();
+          
+          // Show completion notification
+          await NotificationService.showDownloadComplete(finalFileName, true);
+          
+          // Add to download history
+          await DownloadHistory.addDownload(
+            filename: finalFileName,
+            thumbnailUrl: thumbnailUrl ?? '',
+            videoUrl: mediaUrl,
+            username: username ?? 'Unknown',
+            caption: caption ?? '',
+            filePath: file.path,
+          );
+        } catch (error) {
+          await sink.close();
+          await NotificationService.showDownloadComplete(finalFileName, false);
+        }
         
         return {
           'success': true,
