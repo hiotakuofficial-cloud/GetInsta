@@ -730,59 +730,103 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   Widget _buildVolumeSlider() {
     return Positioned(
-      right: 30,
+      right: 20,
       top: 0,
       bottom: 0,
       child: Center(
-        child: Container(
-          height: 200,
-          width: 60,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.volume_up_rounded,
-                color: Colors.white,
-                size: 24,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(35),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              height: 220,
+              width: 70,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(35),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: RotatedBox(
-                  quarterTurns: -1,
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white.withOpacity(0.3),
-                      thumbColor: Colors.white,
-                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                      trackHeight: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Slider(
-                      value: _currentVolume,
-                      onChanged: (value) {
-                        setState(() {
-                          _currentVolume = value;
-                        });
-                        VolumeController().setVolume(value);
-                      },
+                    child: Icon(
+                      _currentVolume > 0.5
+                          ? Icons.volume_up_rounded
+                          : _currentVolume > 0
+                              ? Icons.volume_down_rounded
+                              : Icons.volume_off_rounded,
+                      color: Colors.white,
+                      size: 28,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 15),
+                  Expanded(
+                    child: RotatedBox(
+                      quarterTurns: -1,
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: Colors.white,
+                          inactiveTrackColor: Colors.white.withOpacity(0.3),
+                          thumbColor: Colors.white,
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                          trackHeight: 6,
+                        ),
+                        child: Slider(
+                          value: _currentVolume,
+                          onChanged: (value) {
+                            setState(() {
+                              _currentVolume = value;
+                            });
+                            VolumeController().setVolume(value);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${(_currentVolume * 100).round()}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              Text(
-                '${(_currentVolume * 100).round()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -791,59 +835,103 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   Widget _buildBrightnessSlider() {
     return Positioned(
-      left: 30,
+      left: 20,
       top: 0,
       bottom: 0,
       child: Center(
-        child: Container(
-          height: 200,
-          width: 60,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.brightness_6_rounded,
-                color: Colors.white,
-                size: 24,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(35),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              height: 220,
+              width: 70,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(35),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: RotatedBox(
-                  quarterTurns: -1,
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white.withOpacity(0.3),
-                      thumbColor: Colors.white,
-                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                      trackHeight: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Slider(
-                      value: _currentBrightness,
-                      onChanged: (value) {
-                        setState(() {
-                          _currentBrightness = value;
-                        });
-                        ScreenBrightness().setScreenBrightness(value);
-                      },
+                    child: Icon(
+                      _currentBrightness > 0.7
+                          ? Icons.brightness_high_rounded
+                          : _currentBrightness > 0.3
+                              ? Icons.brightness_medium_rounded
+                              : Icons.brightness_low_rounded,
+                      color: Colors.white,
+                      size: 28,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 15),
+                  Expanded(
+                    child: RotatedBox(
+                      quarterTurns: -1,
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: Colors.white,
+                          inactiveTrackColor: Colors.white.withOpacity(0.3),
+                          thumbColor: Colors.white,
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                          trackHeight: 6,
+                        ),
+                        child: Slider(
+                          value: _currentBrightness,
+                          onChanged: (value) {
+                            setState(() {
+                              _currentBrightness = value;
+                            });
+                            ScreenBrightness().setScreenBrightness(value);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${(_currentBrightness * 100).round()}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              Text(
-                '${(_currentBrightness * 100).round()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -984,181 +1072,163 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.7),
+            Colors.black.withOpacity(0.8),
             Colors.transparent,
             Colors.transparent,
-            Colors.black.withOpacity(0.7),
+            Colors.black.withOpacity(0.8),
           ],
-          stops: const [0.0, 0.3, 0.7, 1.0],
+          stops: const [0.0, 0.25, 0.75, 1.0],
         ),
       ),
       child: SafeArea(
         child: Column(
           children: [
-            // Top controls
-            _buildTopControls(),
+            // Top controls with blur effect
+            ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: _buildTopControls(),
+                ),
+              ),
+            ),
             
             const Spacer(),
             
-            // Center play controls with next/previous
-            if (_isBuffering)
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          strokeCap: StrokeCap.round,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            else
-              Row(
+            // Center controls with glow effect
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Previous button
-                  GestureDetector(
+                  // Previous with glow
+                  _buildGlowButton(
+                    icon: Icons.skip_previous_rounded,
+                    size: 60,
+                    iconSize: 30,
                     onTap: _previousVideo,
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.1),
-                            Colors.white.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.skip_previous_rounded,
-                        color: Colors.white.withOpacity(0.9),
-                        size: 30,
-                      ),
-                    ),
+                    glowColor: Colors.blue,
                   ),
                   
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 30),
                   
-                  // Play/Pause button
-                  GestureDetector(
+                  // Play/Pause with enhanced glow
+                  _buildGlowButton(
+                    icon: _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    size: 90,
+                    iconSize: 45,
                     onTap: _togglePlayPause,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.15),
-                            Colors.white.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(40),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                    ),
+                    glowColor: Colors.white,
+                    isMain: true,
                   ),
                   
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 30),
                   
-                  // Next button
-                  GestureDetector(
+                  // Next with glow
+                  _buildGlowButton(
+                    icon: Icons.skip_next_rounded,
+                    size: 60,
+                    iconSize: 30,
                     onTap: _nextVideo,
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.1),
-                            Colors.white.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.skip_next_rounded,
-                        color: Colors.white.withOpacity(0.9),
-                        size: 30,
-                      ),
-                    ),
+                    glowColor: Colors.blue,
                   ),
                 ],
               ),
+            ),
             
             const Spacer(),
             
-            // Bottom controls
-            _buildBottomControls(),
+            // Bottom controls with blur effect
+            ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: _buildBottomControls(),
+                ),
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlowButton({
+    required IconData icon,
+    required double size,
+    required double iconSize,
+    required VoidCallback onTap,
+    required Color glowColor,
+    bool isMain = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size / 2),
+          boxShadow: [
+            // Outer glow
+            BoxShadow(
+              color: glowColor.withOpacity(0.3),
+              blurRadius: 20,
+              spreadRadius: isMain ? 8 : 4,
+            ),
+            // Inner shadow
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(size / 2),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isMain
+                  ? [
+                      Colors.white.withOpacity(0.25),
+                      Colors.white.withOpacity(0.1),
+                      Colors.white.withOpacity(0.05),
+                    ]
+                  : [
+                      Colors.white.withOpacity(0.15),
+                      Colors.white.withOpacity(0.08),
+                      Colors.white.withOpacity(0.03),
+                    ],
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(isMain ? 0.4 : 0.25),
+              width: isMain ? 2 : 1,
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: iconSize,
+          ),
         ),
       ),
     );
