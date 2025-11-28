@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'dart:io';
 import '../services/instagram_handler.dart';
+import '../services/notification_service.dart';
+import '../services/download_history.dart';
 
 class ShareOverlayScreen extends StatefulWidget {
   final String sharedUrl;
@@ -237,8 +243,13 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
     });
 
     try {
-      // Start background download
-      await InstagramHandler.downloadFromUrl(widget.sharedUrl);
+      // Validate Instagram URL
+      if (!InstagramHandler.isValidInstagramUrl(widget.sharedUrl)) {
+        throw Exception("Invalid Instagram URL");
+      }
+
+      // Process Instagram URL (same logic as home screen)
+      await _processInstagramUrl(widget.sharedUrl);
       
       // Show toast
       Fluttertoast.showToast(
@@ -257,9 +268,68 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
       });
       
       Fluttertoast.showToast(
-        msg: "Download failed",
+        msg: "Download failed: ${e.toString()}",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _processInstagramUrl(String url) async {
+    // Same logic as home screen _processInstagramUrl
+    final response = await http.get(
+      Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?url=${Uri.encodeComponent(url)}'),
+      headers: {'User-Agent': 'Mozilla/5.0 (compatible; InstagramDownloader/1.0)'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      
+      if (data['status'] == 'success' && data['data'] != null) {
+        final mediaData = data['data'];
+        
+        if (mediaData is List && mediaData.isNotEmpty) {
+          // Download first media item
+          final mediaItem = mediaData[0];
+          final downloadUrl = mediaItem['url'];
+          final isVideo = mediaItem['type'] == 'video';
+          
+          if (downloadUrl != null) {
+            await _downloadMedia(downloadUrl, isVideo);
+          }
+        }
+      } else {
+        throw Exception(data['message'] ?? 'Failed to fetch media');
+      }
+    } else {
+      throw Exception('API request failed');
+    }
+  }
+
+  Future<void> _downloadMedia(String url, bool isVideo) async {
+    // Background download with notification
+    final fileName = 'instagram_${DateTime.now().millisecondsSinceEpoch}.${isVideo ? 'mp4' : 'jpg'}';
+    
+    // Start notification
+    await NotificationService.showDownloadProgress(0, fileName);
+    
+    // Download file (simplified version)
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final directory = await getExternalStorageDirectory();
+      final file = File('${directory!.path}/Download/$fileName');
+      await file.create(recursive: true);
+      await file.writeAsBytes(response.bodyBytes);
+      
+      // Complete notification
+      await NotificationService.showDownloadComplete(fileName, true);
+      
+      // Save to history
+      await DownloadHistory.addDownload(
+        url: widget.sharedUrl,
+        filename: fileName,
+        filePath: file.path,
+        type: isVideo ? 'video' : 'image',
       );
     }
   }
