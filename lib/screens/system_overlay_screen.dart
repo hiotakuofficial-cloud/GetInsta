@@ -464,5 +464,4 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
       ),
     );
   }
-  }
 }
