@@ -62,15 +62,8 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
     _fadeController.forward();
     _slideController.forward();
     
-    // Fetch Instagram data
-    _fetchInstagramData();
-    
-    // Listen for method calls
-    platform.setMethodCallHandler((call) async {
-      if (call.method == 'showOverlay') {
-        // Already showing
-      }
-    });
+    // Get shared URL from native
+    _getSharedUrl();
   }
 
   @override
@@ -80,10 +73,36 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
     super.dispose();
   }
 
-  Future<void> _fetchInstagramData() async {
+  Future<void> _getSharedUrl() async {
+    try {
+      final String? url = await platform.invokeMethod('getSharedUrl');
+      if (url != null && url.isNotEmpty) {
+        // Update widget's sharedUrl and fetch data
+        setState(() {
+          // Use the received URL instead of widget.sharedUrl
+        });
+        _fetchInstagramData(url);
+      } else {
+        setState(() {
+          _title = 'No URL received';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _title = 'Error getting URL';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchInstagramData([String? url]) async {
+    final urlToUse = url ?? widget.sharedUrl;
+    if (urlToUse.isEmpty) return;
+    
     try {
       final response = await http.get(
-        Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?url=${Uri.encodeComponent(widget.sharedUrl)}'),
+        Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?url=${Uri.encodeComponent(urlToUse)}'),
         headers: {'User-Agent': 'Mozilla/5.0 (compatible; InstagramDownloader/1.0)'},
       );
 
@@ -102,11 +121,21 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
               _isLoading = false;
             });
           }
+        } else {
+          setState(() {
+            _title = 'Failed to load media';
+            _isLoading = false;
+          });
         }
+      } else {
+        setState(() {
+          _title = 'API request failed';
+          _isLoading = false;
+        });
       }
     } catch (e) {
       setState(() {
-        _title = 'Instagram Media';
+        _title = 'Network error: ${e.toString()}';
         _isLoading = false;
       });
     }

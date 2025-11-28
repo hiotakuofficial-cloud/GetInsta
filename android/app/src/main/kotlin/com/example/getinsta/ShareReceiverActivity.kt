@@ -1,6 +1,5 @@
 package com.example.getinsta
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +10,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class ShareReceiverActivity : FlutterActivity() {
     private val CHANNEL = "com.example.getinsta/share"
+    private var sharedUrl: String? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,19 +23,19 @@ class ShareReceiverActivity : FlutterActivity() {
             return
         }
         
-        handleShareIntent(intent)
+        // Extract shared URL immediately
+        sharedUrl = extractSharedUrl(intent)
     }
     
-    private fun handleShareIntent(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
-            val sharedUrl = intent.getStringExtra(Intent.EXTRA_TEXT)
-            if (sharedUrl != null) {
-                // Send URL to Flutter overlay
-                flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-                    MethodChannel(messenger, CHANNEL).invokeMethod("showOverlay", sharedUrl)
-                }
-            }
-        }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        sharedUrl = extractSharedUrl(intent)
+    }
+    
+    private fun extractSharedUrl(intent: Intent?): String? {
+        return if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            intent.getStringExtra(Intent.EXTRA_TEXT)
+        } else null
     }
     
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -43,6 +43,9 @@ class ShareReceiverActivity : FlutterActivity() {
         
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
+                "getSharedUrl" -> {
+                    result.success(sharedUrl)
+                }
                 "closeOverlay" -> {
                     finish()
                     result.success(null)
