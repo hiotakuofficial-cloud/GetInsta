@@ -8,23 +8,16 @@ class AboutScreen extends StatefulWidget {
   State<AboutScreen> createState() => _AboutScreenState();
 }
 
-class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin {
+class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
-  late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     
@@ -33,25 +26,15 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
+      curve: Curves.easeOut, // Smooth iOS-style
     ));
     
     _fadeController.forward();
-    _slideController.forward();
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
-    _slideController.dispose();
     super.dispose();
   }
 
@@ -62,14 +45,11 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
                   // Back Button
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
@@ -101,18 +81,12 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         Container(
                           width: 80,
                           height: 80,
-                          decoration: BoxDecoration(
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF6C63FF), Color(0xFF9C88FF)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                            child: Image.asset(
+                              'assets/logo.png',
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.cloud_download,
-                            color: Colors.white,
-                            size: 40,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -342,6 +316,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         ),
                         child: Text(
                           'Developed by PIHU SINGH',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -358,6 +333,7 @@ class _AboutScreenState extends State<AboutScreen> with TickerProviderStateMixin
                         ),
                         child: Text(
                           'Version 1.0.0',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
