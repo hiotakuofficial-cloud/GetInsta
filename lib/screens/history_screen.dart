@@ -526,19 +526,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (filePath != null) {
       try {
         Fluttertoast.showToast(msg: "Opening video...");
-        // Open video with system video player chooser
-        final uri = Uri.file(filePath);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication, // Shows app suggestions
-          );
-          Fluttertoast.showToast(msg: "Video opened!");
-        } else {
-          Fluttertoast.showToast(msg: "No video player found");
-        }
+        
+        // Use content URI for Android file access
+        final uri = Uri.parse('content://media/external/video/media');
+        
+        // Try to launch with file URI directly
+        await launchUrl(
+          Uri.file(filePath),
+          mode: LaunchMode.externalApplication,
+        );
+        
+        Fluttertoast.showToast(msg: "Video opened!");
       } catch (e) {
-        Fluttertoast.showToast(msg: "Failed to open video: $e");
+        // Fallback: try with different approach
+        try {
+          await launchUrl(
+            Uri.parse('file://$filePath'),
+            mode: LaunchMode.externalApplication,
+          );
+          Fluttertoast.showToast(msg: "Video opened with fallback!");
+        } catch (e2) {
+          Fluttertoast.showToast(msg: "No video player available");
+        }
       }
     } else {
       Fluttertoast.showToast(msg: "File path is null");
