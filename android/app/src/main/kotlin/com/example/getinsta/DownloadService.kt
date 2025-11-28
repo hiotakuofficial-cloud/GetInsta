@@ -1,9 +1,14 @@
 package com.example.getinsta
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.io.File
@@ -12,12 +17,24 @@ import java.net.URL
 
 class DownloadService : Service() {
     
+    private lateinit var notificationManager: NotificationManager
+    private val CHANNEL_ID = "download_channel"
+    private val NOTIFICATION_ID = 1001
+    
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+    
     override fun onBind(intent: Intent?): IBinder? = null
     
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedUrl = intent?.getStringExtra("SHARED_URL")
         
         if (sharedUrl != null) {
+            // Show download started notification
+            showNotification("GetInsta", "Download started...", false)
+            
             // Start download in background
             CoroutineScope(Dispatchers.IO).launch {
                 downloadInstagramMedia(sharedUrl)
@@ -26,6 +43,43 @@ class DownloadService : Service() {
         }
         
         return START_NOT_STICKY
+    }
+    
+    private fun createNotificationChannel() {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Download Notifications",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Instagram download notifications"
+                setSound(null, null)
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+    
+    private fun showNotification(title: String, content: String, isComplete: Boolean) {
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(isComplete)
+            .setOngoing(!isComplete)
+            .build()
+        
+        notificationManager.notify(NOTIFICATION_ID, notification)
+        
+        if (isComplete) {
+            // Auto dismiss after 3 seconds
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+                notificationManager.cancel(NOTIFICATION_ID)
+            }
+        }
     }
     
     private suspend fun downloadInstagramMedia(url: String) {
@@ -62,17 +116,20 @@ class DownloadService : Service() {
                     }
                 }
                 
-                // Show complete toast on main thread
+                // Show complete notification and toast
                 withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "Download complete!", true)
                     Toast.makeText(this@DownloadService, "Complete...", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "Download failed", true)
                     Toast.makeText(this@DownloadService, "Download failed", Toast.LENGTH_SHORT).show()
                 }
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Download failed", true)
                 Toast.makeText(this@DownloadService, "Download failed", Toast.LENGTH_SHORT).show()
             }
         }
