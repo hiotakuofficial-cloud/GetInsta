@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _pasteAnimation;
   late Animation<double> _searchAnimation;
   bool _isLoading = false;
+  bool _hasText = false; // Track if input has text
   Set<int> _selectedMediaIndices = {}; // For multiple media selection
   List<Map<String, dynamic>> _cachedPosts = []; // Cached Instagram posts
 
@@ -62,6 +63,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _searchAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _searchController2, curve: Curves.elasticOut),
     );
+    
+    // Listen to text changes
+    _searchController.addListener(() {
+      setState(() {
+        _hasText = _searchController.text.isNotEmpty;
+      });
+    });
     
     // Initialize notifications
     NotificationService.initialize();
@@ -142,16 +150,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _onPastePressed() async {
-    _pasteController.forward().then((_) {
-      _pasteController.reverse();
-    });
-    
-    ClipboardData? data = await Clipboard.getData('text/plain');
-    if (data != null && data.text != null) {
-      _searchController.text = data.text!;
-      _searchController2.forward().then((_) {
-        _searchController2.reverse();
+    if (_hasText) {
+      // If text exists, treat as download action
+      final url = _searchController.text;
+      if (url.isNotEmpty) {
+        _processInstagramUrl(url);
+      }
+    } else {
+      // If no text, paste from clipboard
+      _pasteController.forward().then((_) {
+        _pasteController.reverse();
       });
+      
+      ClipboardData? data = await Clipboard.getData('text/plain');
+      if (data != null && data.text != null) {
+        _searchController.text = data.text!;
+        _searchController2.forward().then((_) {
+          _searchController2.reverse();
+        });
+      }
     }
   }
 
@@ -790,7 +807,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       ),
                                     ),
                                     
-                                    // Paste Button
+                                    // Dynamic Right Icon (Paste/Download)
                                     GestureDetector(
                                       onTap: _isLoading ? null : _onPastePressed,
                                       child: AnimatedBuilder(
@@ -812,9 +829,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         ),
                                                       ),
                                                     )
-                                                  : const Icon(
-                                                      Icons.content_paste_rounded,
-                                                      color: Color(0xFF6C63FF),
+                                                  : Icon(
+                                                      _hasText ? Icons.download : Icons.content_paste,
+                                                      color: Colors.white,
                                                       size: 20,
                                                     ),
                                             ),
