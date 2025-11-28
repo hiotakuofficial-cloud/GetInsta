@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
+import 'screens/history_screen.dart';
 
 void main() {
   runApp(const GetInstaApp());
@@ -19,6 +20,9 @@ class GetInstaApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(),
+      routes: {
+        '/history': (context) => const HistoryScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }

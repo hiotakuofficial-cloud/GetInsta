@@ -1,8 +1,14 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/material.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
+  static BuildContext? _context;
+
+  static void setContext(BuildContext context) {
+    _context = context;
+  }
 
   static Future<void> initialize() async {
     if (_initialized) return;
@@ -19,8 +25,18 @@ class NotificationService {
       iOS: iosSettings,
     );
 
-    await _notifications.initialize(settings);
+    await _notifications.initialize(
+      settings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+    );
     _initialized = true;
+  }
+
+  static void _onNotificationTap(NotificationResponse response) {
+    if (response.payload == 'open_history' && _context != null) {
+      // Navigate to history page
+      Navigator.pushNamed(_context!, '/history');
+    }
   }
 
   static Future<void> showDownloadStarted(String filename) async {
@@ -120,8 +136,9 @@ class NotificationService {
     await _notifications.show(
       2,
       success ? 'Download Complete!' : 'Download Failed',
-      success ? 'Successfully saved: $filename' : 'Failed to download: $filename',
+      success ? 'Tap to view downloads: $filename' : 'Failed to download: $filename',
       details,
+      payload: success ? 'open_history' : null, // Add payload for click action
     );
   }
 

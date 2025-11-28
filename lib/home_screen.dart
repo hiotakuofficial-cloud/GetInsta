@@ -5,10 +5,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'screens/history_screen.dart';
+import 'screens/video_player_screen.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
 import 'services/instagram_cache.dart';
+import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +32,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    
+    // Set notification context for click handling
+    NotificationService.setContext(context);
     
     // Transparent status bar
     SystemChrome.setSystemUIOverlayStyle(
@@ -988,8 +993,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         final download = snapshot.data![index];
                                         return GestureDetector(
                                           onTap: () {
-                                            // Show options: Play or Download Again
-                                            _showHistoryVideoOptions(download);
+                                            // Play video directly in custom player
+                                            _playVideoFromRecent(download);
                                           },
                                           child: Container(
                                             width: 160,
@@ -1105,6 +1110,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (filePath != null) {
       // Open video with system video player
       launchUrl(Uri.file(filePath));
+    }
+  }
+
+  void _playVideoFromRecent(Map<String, dynamic> download) async {
+    final filePath = download['filePath'];
+    if (filePath != null) {
+      try {
+        // Check if file exists
+        final file = File(filePath);
+        if (await file.exists()) {
+          // Navigate to custom video player
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VideoPlayerScreen(
+                videoPath: filePath,
+                title: download['filename'] ?? 'Downloaded Video',
+              ),
+            ),
+          );
+        } else {
+          Fluttertoast.showToast(msg: "Video file not found");
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error opening video");
+      }
+    } else {
+      Fluttertoast.showToast(msg: "File path is null");
     }
   }
 
