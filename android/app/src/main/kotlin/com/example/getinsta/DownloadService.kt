@@ -32,17 +32,28 @@ class DownloadService : Service() {
         val sharedUrl = intent?.getStringExtra("SHARED_URL")
         
         if (sharedUrl != null) {
-            // Show download started notification
-            showNotification("GetInsta", "Download started...", false)
+            // Start as foreground service for Android 15
+            startForeground(NOTIFICATION_ID, createInitialNotification())
             
             // Start download in background
             CoroutineScope(Dispatchers.IO).launch {
                 downloadInstagramMedia(sharedUrl)
+                stopForeground(true) // Remove foreground notification
                 stopSelf() // Stop service when done
             }
         }
         
         return START_NOT_STICKY
+    }
+    
+    private fun createInitialNotification(): android.app.Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle("GetInsta")
+            .setContentText("Download started...")
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .build()
     }
     
     private fun createNotificationChannel() {

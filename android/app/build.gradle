@@ -43,6 +43,8 @@ android {
     defaultConfig {
         applicationId "com.example.getinsta"
         minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 35  // Android 15 support
+        compileSdk 35        // Android 15 compile
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

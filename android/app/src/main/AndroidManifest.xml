@@ -14,6 +14,12 @@
     <!-- System overlay permission for share receiver -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     
+    <!-- Android 15 specific permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    
     <application
         android:label="GetInsta"
         android:name="${applicationName}"
@@ -43,7 +49,8 @@
         <service
             android:name=".DownloadService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <!-- Share Intent Receiver Activity -->
         <activity
