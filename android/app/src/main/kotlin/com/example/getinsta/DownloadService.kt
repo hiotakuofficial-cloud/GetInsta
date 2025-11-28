@@ -9,7 +9,6 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
-import java.util.regex.Pattern
 
 class DownloadService : Service() {
     
@@ -37,28 +36,31 @@ class DownloadService : Service() {
             val data = JSONObject(response)
             
             if (data.getBoolean("success") && data.has("download_links")) {
-                val downloadUrl = data.getJSONArray("download_links").getString(0)
+                val downloadLinks = data.getJSONArray("download_links")
                 val caption = data.optString("caption", "instagram media")
                 
-                // Generate filename from caption
-                val filename = generateFilename(caption, downloadUrl)
+                // Determine if it's a reel or post
+                val isReel = url.contains("/reel/")
+                val isPost = url.contains("/p/")
                 
-                // Create Downloads/reel directory
-                val downloadDir = File("/storage/emulated/0/Download/reel")
-                if (!downloadDir.exists()) {
-                    downloadDir.mkdirs()
+                if (isReel) {
+                    // Reel - single video
+                    val downloadUrl = downloadLinks.getString(0)
+                    val filename = generateFilename(caption, ".mp4")
+                    downloadFile(downloadUrl, filename)
+                } else if (isPost) {
+                    // Post - can have multiple images/videos
+                    for (i in 0 until downloadLinks.length()) {
+                        val downloadUrl = downloadLinks.getString(i)
+                        val extension = detectMediaType(downloadUrl)
+                        val filename = if (downloadLinks.length() > 1) {
+                            generateFilename(caption, extension, i + 1)
+                        } else {
+                            generateFilename(caption, extension)
+                        }
+                        downloadFile(downloadUrl, filename)
+                    }
                 }
-                
-                // Handle duplicate files
-                val finalFile = getUniqueFile(downloadDir, filename)
-                
-                // Download file
-                val inputStream = URL(downloadUrl).openStream()
-                val outputStream = FileOutputStream(finalFile)
-                
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.close()
                 
                 // Show complete toast on main thread
                 withContext(Dispatchers.Main) {
@@ -76,7 +78,40 @@ class DownloadService : Service() {
         }
     }
     
-    private fun generateFilename(caption: String, downloadUrl: String): String {
+    private fun detectMediaType(downloadUrl: String): String {
+        return when {
+            downloadUrl.contains(".mp4") || downloadUrl.contains("video") -> ".mp4"
+            downloadUrl.contains(".jpg") || downloadUrl.contains(".jpeg") -> ".jpg"
+            downloadUrl.contains(".png") -> ".png"
+            downloadUrl.contains(".webp") -> ".jpg" // Convert webp to jpg
+            // Check by content type patterns
+            downloadUrl.contains("t51.2885") -> ".jpg" // Instagram image CDN
+            downloadUrl.contains("scontent") && downloadUrl.contains("mp4") -> ".mp4"
+            downloadUrl.contains("scontent") -> ".jpg" // Default Instagram image
+            else -> ".jpg" // Default to image
+        }
+    }
+    
+    private suspend fun downloadFile(downloadUrl: String, filename: String) {
+        // Create Downloads/reel directory
+        val downloadDir = File("/storage/emulated/0/Download/reel")
+        if (!downloadDir.exists()) {
+            downloadDir.mkdirs()
+        }
+        
+        // Handle duplicate files
+        val finalFile = getUniqueFile(downloadDir, filename)
+        
+        // Download file
+        val inputStream = URL(downloadUrl).openStream()
+        val outputStream = FileOutputStream(finalFile)
+        
+        inputStream.copyTo(outputStream)
+        inputStream.close()
+        outputStream.close()
+    }
+    
+    private fun generateFilename(caption: String, extension: String, index: Int? = null): String {
         // Clean caption and get first 5 words
         val cleanCaption = caption.replace(Regex("[^a-zA-Z0-9\\s]"), "")
             .replace(Regex("\\s+"), " ")
@@ -85,16 +120,13 @@ class DownloadService : Service() {
         val words = cleanCaption.split(" ").take(5)
         val name = words.joinToString(" ").lowercase().replace(" ", "_")
         
-        // Determine extension from URL
-        val extension = when {
-            downloadUrl.contains(".mp4") -> ".mp4"
-            downloadUrl.contains(".jpg") -> ".jpg"
-            downloadUrl.contains(".png") -> ".png"
-            downloadUrl.contains(".jpeg") -> ".jpeg"
-            else -> ".mp4" // default for reels
-        }
+        val baseName = if (name.isNotEmpty()) name else "instagram_media"
         
-        return if (name.isNotEmpty()) "${name}${extension}" else "instagram_media${extension}"
+        return if (index != null) {
+            "${baseName}_${index}${extension}"
+        } else {
+            "${baseName}${extension}"
+        }
     }
     
     private fun getUniqueFile(directory: File, filename: String): File {
