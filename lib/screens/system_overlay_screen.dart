@@ -116,14 +116,11 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        Fluttertoast.showToast(msg: "API Response: ${data.toString()}", gravity: ToastGravity.TOP);
         
-        if (data['success'] == true && data['data'] != null) {
-          final mediaData = data['data'];
-          
+        if (data['success'] == true) {
           setState(() {
-            _thumbnailUrl = mediaData['thumbnail'] ?? '';
-            _title = mediaData['caption'] ?? 'Instagram Media';
+            _thumbnailUrl = data['thumbnail'] ?? '';
+            _title = data['caption'] ?? 'Instagram Media by @${data['username'] ?? 'unknown'}';
             _isLoading = false;
           });
           
