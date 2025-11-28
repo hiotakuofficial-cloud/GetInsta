@@ -18,10 +18,20 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     
-    // Properly hide status bar and navigation bar
+    // True full-screen without black space
     SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersive,
-      overlays: [],
+      SystemUiMode.immersiveSticky,
+    );
+    
+    // Also set transparent status bar
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
     );
     
     _controller = AnimationController(
