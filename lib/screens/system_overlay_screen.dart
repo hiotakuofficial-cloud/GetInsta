@@ -76,6 +76,8 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
   Future<void> _getSharedUrl() async {
     try {
       final String? url = await platform.invokeMethod('getSharedUrl');
+      Fluttertoast.showToast(msg: "Received URL: ${url ?? 'NULL'}", gravity: ToastGravity.TOP);
+      
       if (url != null && url.isNotEmpty) {
         // Update widget's sharedUrl and fetch data
         setState(() {
@@ -83,12 +85,14 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
         });
         _fetchInstagramData(url);
       } else {
+        Fluttertoast.showToast(msg: "No URL received from share", gravity: ToastGravity.TOP);
         setState(() {
           _title = 'No URL received';
           _isLoading = false;
         });
       }
     } catch (e) {
+      Fluttertoast.showToast(msg: "Error getting URL: $e", gravity: ToastGravity.TOP);
       setState(() {
         _title = 'Error getting URL';
         _isLoading = false;
@@ -100,14 +104,19 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
     final urlToUse = url ?? widget.sharedUrl;
     if (urlToUse.isEmpty) return;
     
+    Fluttertoast.showToast(msg: "Fetching data for: $urlToUse", gravity: ToastGravity.TOP);
+    
     try {
       final response = await http.get(
         Uri.parse('https://v1-w3sc.onrender.com/insta/api.php?url=${Uri.encodeComponent(urlToUse)}'),
         headers: {'User-Agent': 'Mozilla/5.0 (compatible; InstagramDownloader/1.0)'},
       );
 
+      Fluttertoast.showToast(msg: "API Response: ${response.statusCode}", gravity: ToastGravity.TOP);
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        Fluttertoast.showToast(msg: "API Status: ${data['status']}", gravity: ToastGravity.TOP);
         
         if (data['status'] == 'success' && data['data'] != null) {
           final mediaData = data['data'];
@@ -120,20 +129,31 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
               _title = mediaItem['caption'] ?? 'Instagram Media';
               _isLoading = false;
             });
+            
+            Fluttertoast.showToast(msg: "Data loaded successfully", gravity: ToastGravity.TOP);
+          } else {
+            Fluttertoast.showToast(msg: "Empty media data", gravity: ToastGravity.TOP);
+            setState(() {
+              _title = 'Empty media data';
+              _isLoading = false;
+            });
           }
         } else {
+          Fluttertoast.showToast(msg: "API Error: ${data['message'] ?? 'Unknown'}", gravity: ToastGravity.TOP);
           setState(() {
-            _title = 'Failed to load media';
+            _title = 'API Error: ${data['message'] ?? 'Failed to load media'}';
             _isLoading = false;
           });
         }
       } else {
+        Fluttertoast.showToast(msg: "HTTP Error: ${response.statusCode}", gravity: ToastGravity.TOP);
         setState(() {
-          _title = 'API request failed';
+          _title = 'HTTP Error: ${response.statusCode}';
           _isLoading = false;
         });
       }
     } catch (e) {
+      Fluttertoast.showToast(msg: "Network error: $e", gravity: ToastGravity.TOP);
       setState(() {
         _title = 'Network error: ${e.toString()}';
         _isLoading = false;
@@ -181,47 +201,51 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
       body: AnimatedBuilder(
         animation: _fadeAnimation,
         builder: (context, child) {
-          return Container(
-            color: Colors.black.withOpacity(0.5 * _fadeAnimation.value),
-            child: GestureDetector(
-              onTap: _closeOverlay,
-              child: Stack(
-                children: [
-                  // Blur effect
-                  BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 10.0 * _fadeAnimation.value,
-                      sigmaY: 10.0 * _fadeAnimation.value,
-                    ),
+          return Stack(
+            children: [
+              // Semi-transparent background
+              GestureDetector(
+                onTap: _closeOverlay,
+                child: Container(
+                  color: Colors.black.withOpacity(0.4 * _fadeAnimation.value),
+                ),
+              ),
+              
+              // Blur effect
+              BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 8.0 * _fadeAnimation.value,
+                  sigmaY: 8.0 * _fadeAnimation.value,
+                ),
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+              
+              // Bottom sheet
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: GestureDetector(
+                    onTap: () {}, // Prevent closing when tapping sheet
                     child: Container(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  
-                  // Bottom sheet
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: GestureDetector(
-                        onTap: () {}, // Prevent closing when tapping sheet
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF1E1E1E),
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(24),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 20,
-                                spreadRadius: 0,
-                                offset: Offset(0, -5),
-                              ),
-                            ],
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(24),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            offset: Offset(0, -5),
                           ),
+                        ],
+                      ),
                           child: SafeArea(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -432,12 +456,13 @@ class _SystemOverlayScreenState extends State<SystemOverlayScreen>
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          );
-        },
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
+  }
   }
 }
