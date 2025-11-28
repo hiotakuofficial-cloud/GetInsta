@@ -10,8 +10,11 @@ class ShareReceiverActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        // Handle share intent immediately
         handleShareIntent(intent)
-        finish() // Close immediately
+        
+        // Finish immediately - no UI shown
+        finish()
     }
     
     private fun handleShareIntent(intent: Intent?) {
@@ -21,7 +24,7 @@ class ShareReceiverActivity : Activity() {
                 // Show waiting toast
                 Toast.makeText(this, "Waiting...", Toast.LENGTH_SHORT).show()
                 
-                // Start background service instead of main activity
+                // Start background service - NO activity launch
                 val serviceIntent = Intent(this, DownloadService::class.java).apply {
                     putExtra("SHARED_URL", sharedUrl)
                 }

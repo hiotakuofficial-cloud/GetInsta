@@ -46,9 +46,10 @@
         <activity
             android:name=".ShareReceiverActivity"
             android:exported="true"
-            android:theme="@style/Theme.Transparent"
+            android:theme="@android:style/Theme.NoDisplay"
             android:launchMode="singleTask"
             android:excludeFromRecents="true"
+            android:noHistory="true"
             android:label="Quick Download">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
