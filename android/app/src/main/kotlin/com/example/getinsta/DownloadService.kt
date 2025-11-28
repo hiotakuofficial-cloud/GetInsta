@@ -105,11 +105,6 @@ class DownloadService : Service() {
             val response = URL(apiUrl).readText()
             val data = JSONObject(response)
             
-            // Debug log
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@DownloadService, "API Response: ${data.toString()}", Toast.LENGTH_LONG).show()
-            }
-            
             if (data.getBoolean("success") && data.has("download_links")) {
                 val downloadLinks = data.getJSONArray("download_links")
                 val caption = data.optString("caption", "instagram media")
