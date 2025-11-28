@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:open_file/open_file.dart';
 import 'dart:io';
 import '../services/download_history.dart';
 import '../services/instagram_handler.dart';
+import 'video_player_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -527,17 +527,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _playVideo(String? filePath) async {
     if (filePath != null) {
       try {
-        Fluttertoast.showToast(msg: "Opening video...");
-        
-        // Use open_file package for better file handling
-        final result = await OpenFile.open(filePath);
-        
-        if (result.type == ResultType.done) {
-          Fluttertoast.showToast(msg: "Video opened!");
-        } else if (result.type == ResultType.noAppToOpen) {
-          Fluttertoast.showToast(msg: "No video player found");
+        // Check if file exists
+        final file = File(filePath);
+        if (await file.exists()) {
+          // Navigate to custom video player
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VideoPlayerScreen(
+                videoPath: filePath,
+                title: 'Downloaded Video',
+              ),
+            ),
+          );
         } else {
-          Fluttertoast.showToast(msg: "Failed to open video");
+          Fluttertoast.showToast(msg: "Video file not found");
         }
       } catch (e) {
         Fluttertoast.showToast(msg: "Error opening video");
