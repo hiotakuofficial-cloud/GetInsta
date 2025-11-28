@@ -158,7 +158,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                         child: const Icon(
                           Icons.info_outline,
-                          color: Color(0xFF6C63FF),
+                          color: Colors.white,
                           size: 20,
                         ),
                       ),
