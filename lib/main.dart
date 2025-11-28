@@ -28,29 +28,36 @@ class _GetInstaAppState extends State<GetInstaApp> {
     platform.setMethodCallHandler((call) async {
       if (call.method == 'receiveShare') {
         final String sharedUrl = call.arguments;
-        // Navigate to overlay screen
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, _) => ShareOverlayScreen(sharedUrl: sharedUrl),
-            transitionDuration: const Duration(milliseconds: 300),
-            transitionsBuilder: (context, animation, _, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0.0, 1.0),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              );
-            },
-          ),
-        );
+        // Show bottom sheet instead of full screen
+        _showShareBottomSheet(sharedUrl);
       }
     });
+  }
+  
+  void _showShareBottomSheet(String sharedUrl) {
+    // Get current context
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: const BoxDecoration(
+            color: Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: ShareOverlayScreen(sharedUrl: sharedUrl),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'GetInsta',
       theme: ThemeData.dark().copyWith(
         primaryColor: const Color(0xFF1A1A1A),
@@ -61,19 +68,11 @@ class _GetInstaAppState extends State<GetInstaApp> {
       home: const SplashScreen(),
       routes: {
         '/history': (context) => const HistoryScreen(),
-        '/share_overlay': (context) => const ShareOverlayScreen(sharedUrl: ''),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/share_overlay') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          final sharedUrl = args?['sharedUrl'] ?? '';
-          return MaterialPageRoute(
-            builder: (context) => ShareOverlayScreen(sharedUrl: sharedUrl),
-          );
-        }
-        return null;
       },
       debugShowCheckedModeBanner: false,
     );
   }
+}
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 }

@@ -3,52 +3,43 @@ package com.example.getinsta
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import io.flutter.embedding.android.FlutterActivity
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodChannel
+import android.view.WindowManager
 
-class ShareReceiverActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.getinsta/share"
+class ShareReceiverActivity : Activity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Handle share intent immediately
+        // Make it look like a bottom sheet
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_DIM_BEHIND,
+            WindowManager.LayoutParams.FLAG_DIM_BEHIND
+        )
+        
+        // Handle share intent
         handleShareIntent(intent)
-    }
-    
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleShareIntent(intent)
+        
+        // Show bottom sheet overlay
+        showBottomSheetOverlay()
     }
     
     private fun handleShareIntent(intent: Intent?) {
         if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
             if (sharedText != null) {
-                // Send to Flutter overlay
-                flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-                    MethodChannel(messenger, CHANNEL).invokeMethod("receiveShare", sharedText)
+                // Start main app with bottom sheet
+                val mainIntent = Intent(this, MainActivity::class.java).apply {
+                    putExtra("SHARED_URL", sharedText)
+                    putExtra("SHOW_BOTTOM_SHEET", true)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
+                startActivity(mainIntent)
+                finish()
             }
         }
     }
     
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
-            when (call.method) {
-                "closeOverlay" -> {
-                    finish()
-                    result.success(null)
-                }
-                else -> result.notImplemented()
-            }
-        }
-    }
-    
-    override fun getInitialRoute(): String {
-        return "/share_overlay"
+    private fun showBottomSheetOverlay() {
+        // This will be handled by MainActivity
     }
 }
