@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="20dp">
+
+    <!-- Handle bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#4DFFFFFF"
+        android:radius="2dp" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginEnd="12dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quick Download"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GetInsta"
+                android:textColor="#B3FFFFFF"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <!-- Thumbnail -->
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="12dp"
+            android:background="#2A2A2A"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Loading..."
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/cancelBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Cancel"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/cancel_button_bg"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/downloadBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Download"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/download_button_bg"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</LinearLayout>
