@@ -177,22 +177,62 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // iOS-style loading animation
+            // Premium iOS-style loading animation
             Container(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.8)),
+              width: 80,
+              height: 80,
+              child: Stack(
+                children: [
+                  // Outer ring
+                  SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 6,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withOpacity(0.3),
+                      ),
+                      value: 1.0,
+                    ),
+                  ),
+                  // Inner animated ring
+                  SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 6,
+                      strokeCap: StrokeCap.round,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            // Animated dots
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                return AnimatedContainer(
+                  duration: Duration(milliseconds: 600 + (index * 200)),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 16),
             Text(
               'Loading video...',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
-                fontSize: 16,
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 17,
                 fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
               ),
             ),
           ],
@@ -208,41 +248,114 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Premium error icon with glow effect
             Container(
-              width: 80,
-              height: 80,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(40),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
-              child: Icon(
-                Icons.error_outline_rounded,
-                color: Colors.red.withOpacity(0.8),
-                size: 40,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    color: Colors.red.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  Icons.play_disabled_rounded,
+                  color: Colors.red.withOpacity(0.9),
+                  size: 50,
+                ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 32),
             Text(
               'Unable to play video',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 18,
+                color: Colors.white.withOpacity(0.95),
+                fontSize: 22,
                 fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              errorMessage,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 14,
+            const SizedBox(height: 12),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(
+                errorMessage.length > 100 
+                    ? '${errorMessage.substring(0, 100)}...'
+                    : errorMessage,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 15,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
-            _buildIOSButton(
-              'Try Again',
-              onPressed: () => _initializePlayer(),
+            const SizedBox(height: 40),
+            // Premium glass button
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                  ],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () => _initializePlayer(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.refresh_rounded,
+                          color: Colors.white.withOpacity(0.9),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Try Again',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -570,36 +683,74 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             
             const Spacer(),
             
-            // Center play/pause
+            // Center play/pause with premium design
             if (_isBuffering)
               Container(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.white.withOpacity(0.8),
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 2,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          strokeCap: StrokeCap.round,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )
             else
               GestureDetector(
                 onTap: _togglePlayPause,
                 child: Container(
-                  width: 70,
-                  height: 70,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(35),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.15),
+                        Colors.white.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(40),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.3),
                       width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
                   child: Icon(
                     _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                     color: Colors.white,
-                    size: 35,
+                    size: 40,
                   ),
                 ),
               ),
@@ -619,15 +770,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // Back button
+          // Back button with premium glass effect
           GestureDetector(
             onTap: _exitPlayer,
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -653,21 +820,38 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             ),
           ),
           
-          // Speed control
+          // Speed control with premium design
           GestureDetector(
             onTap: _changePlaybackSpeed,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(15),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Text(
                 '${_playbackSpeed}x',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
@@ -675,22 +859,45 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           
           const SizedBox(width: 12),
           
-          // Loop toggle
+          // Loop toggle with premium design
           GestureDetector(
             onTap: _toggleLoop,
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: _isLooping 
-                    ? Colors.white.withOpacity(0.2)
-                    : Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(20),
+                gradient: _isLooping 
+                    ? LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.3),
+                          Colors.white.withOpacity(0.2),
+                        ],
+                      )
+                    : LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.15),
+                          Colors.white.withOpacity(0.05),
+                        ],
+                      ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: _isLooping 
+                      ? Colors.white.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Icon(
                 Icons.repeat_rounded,
-                color: _isLooping ? Colors.white : Colors.white.withOpacity(0.7),
-                size: 20,
+                color: _isLooping ? Colors.white : Colors.white.withOpacity(0.8),
+                size: 22,
               ),
             ),
           ),
@@ -704,26 +911,32 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Progress bar
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.white,
-              inactiveTrackColor: Colors.white.withOpacity(0.3),
-              thumbColor: Colors.white,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-              trackHeight: 3,
-            ),
-            child: Slider(
-              value: _totalDuration.inMilliseconds > 0
-                  ? _currentPosition.inMilliseconds / _totalDuration.inMilliseconds
-                  : 0.0,
-              onChanged: (value) {
-                final position = Duration(
-                  milliseconds: (value * _totalDuration.inMilliseconds).round(),
-                );
-                _videoPlayerController.seekTo(position);
-              },
+          // Progress bar with premium iOS design
+          Container(
+            height: 40,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: Colors.white,
+                inactiveTrackColor: Colors.white.withOpacity(0.25),
+                thumbColor: Colors.white,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                overlayColor: Colors.white.withOpacity(0.2),
+                trackHeight: 4,
+                activeTickMarkColor: Colors.transparent,
+                inactiveTickMarkColor: Colors.transparent,
+              ),
+              child: Slider(
+                value: _totalDuration.inMilliseconds > 0
+                    ? _currentPosition.inMilliseconds / _totalDuration.inMilliseconds
+                    : 0.0,
+                onChanged: (value) {
+                  final position = Duration(
+                    milliseconds: (value * _totalDuration.inMilliseconds).round(),
+                  );
+                  _videoPlayerController.seekTo(position);
+                },
+              ),
             ),
           ),
           
