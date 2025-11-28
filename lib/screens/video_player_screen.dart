@@ -482,37 +482,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
-  Widget _buildIOSButton(String text, {required VoidCallback onPressed}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(25),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   void _startHideTimer() {
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 4), () {
@@ -598,12 +567,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   void _handleVerticalDrag(DragUpdateDetails details) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLeftSide = details.globalPosition.dx < screenWidth / 2;
+    // Get current orientation
+    final orientation = MediaQuery.of(context).orientation;
+    final screenSize = MediaQuery.of(context).size;
+    
+    // Adjust coordinates based on orientation
+    double leftBoundary, rightBoundary;
+    if (orientation == Orientation.landscape) {
+      leftBoundary = screenSize.width / 2;
+      rightBoundary = screenSize.width / 2;
+    } else {
+      leftBoundary = screenSize.width / 2;
+      rightBoundary = screenSize.width / 2;
+    }
+    
+    final isLeftSide = details.globalPosition.dx < leftBoundary;
     final delta = details.delta.dy;
     
     if (isLeftSide) {
-      // Brightness control
+      // Brightness control (left side)
       _currentBrightness = (_currentBrightness - delta / 300).clamp(0.0, 1.0);
       ScreenBrightness().setScreenBrightness(_currentBrightness);
       setState(() {
@@ -611,7 +593,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       });
       _hideSlidersAfterDelay();
     } else {
-      // Volume control
+      // Volume control (right side)
       _currentVolume = (_currentVolume - delta / 300).clamp(0.0, 1.0);
       VolumeController().setVolume(_currentVolume);
       setState(() {
@@ -870,6 +852,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _videoPlayerController.removeListener(_videoListener);
     _videoPlayerController.dispose();
     _chewieController?.dispose();
+    
+    // Remove lifecycle observer
+    WidgetsBinding.instance.removeObserver(_AppLifecycleObserver(
+      onPaused: () {},
+      onResumed: () {},
+    ));
+    
+    // Save final position
+    _savePlaybackHistory();
     
     // Reset orientation
     SystemChrome.setPreferredOrientations([
@@ -1266,6 +1257,144 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // A-B Loop and Frame Step Controls
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // A Point
+              GestureDetector(
+                onTap: _setAPoint,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _aPoint != null 
+                        ? Colors.green.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: _aPoint != null 
+                          ? Colors.green.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'A',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 8),
+              
+              // B Point
+              GestureDetector(
+                onTap: _setBPoint,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _bPoint != null 
+                        ? Colors.red.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: _bPoint != null 
+                          ? Colors.red.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'B',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 8),
+              
+              // Clear A-B
+              if (_aPoint != null || _bPoint != null)
+                GestureDetector(
+                  onTap: _clearABLoop,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.clear_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ),
+                ),
+              
+              const Spacer(),
+              
+              // Frame Step Backward
+              GestureDetector(
+                onTap: () => _stepFrame(false),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.skip_previous_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 8),
+              
+              // Frame Step Forward
+              GestureDetector(
+                onTap: () => _stepFrame(true),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.skip_next_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
           // Progress bar with premium iOS design
           Container(
             height: 40,
@@ -1309,6 +1438,27 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              // A-B Loop indicator
+              if (_isABLooping)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.orange.withOpacity(0.5),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'A-B LOOP',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               Text(
                 _formatDuration(_totalDuration),
                 style: TextStyle(
