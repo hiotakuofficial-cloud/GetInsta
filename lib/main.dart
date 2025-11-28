@@ -61,6 +61,17 @@ class _GetInstaAppState extends State<GetInstaApp> {
       home: const SplashScreen(),
       routes: {
         '/history': (context) => const HistoryScreen(),
+        '/share_overlay': (context) => const ShareOverlayScreen(sharedUrl: ''),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/share_overlay') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          final sharedUrl = args?['sharedUrl'] ?? '';
+          return MaterialPageRoute(
+            builder: (context) => ShareOverlayScreen(sharedUrl: sharedUrl),
+          );
+        }
+        return null;
       },
       debugShowCheckedModeBanner: false,
     );
