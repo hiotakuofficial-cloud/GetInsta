@@ -567,7 +567,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        // Swipe left to right for About screen
+        if (details.primaryVelocity! > 300) {
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, _) => const AboutScreen(),
+              transitionDuration: const Duration(milliseconds: 400),
+              transitionsBuilder: (context, animation, _, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(-1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: child,
+                );
+              },
+            ),
+          );
+        }
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF121212),
       extendBodyBehindAppBar: true,
       body: Stack(
@@ -1305,6 +1329,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
       ),
+    ),
     );
   }
 }
