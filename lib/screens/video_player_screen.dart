@@ -219,7 +219,74 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         _isBuffering = _videoPlayerController.value.isBuffering;
         _currentPosition = _videoPlayerController.value.position;
       });
+      
+      // Save progress every 5 seconds
+      if (_currentPosition.inSeconds % 5 == 0) {
+        _savePlaybackHistory();
+      }
+      
+      // Handle A-B loop
+      if (_isABLooping && _bPoint != null && _currentPosition >= _bPoint!) {
+        if (_aPoint != null) {
+          _videoPlayerController.seekTo(_aPoint!);
+        }
+      }
     }
+  }
+
+  // Enhanced controls
+  void _toggleAspectRatio() {
+    setState(() {
+      _aspectRatio = (_aspectRatio + 1) % 4;
+    });
+  }
+
+  void _setAPoint() {
+    setState(() {
+      _aPoint = _currentPosition;
+    });
+    showSeekFeedbackUI('A Point Set');
+  }
+
+  void _setBPoint() {
+    setState(() {
+      _bPoint = _currentPosition;
+      if (_aPoint != null) {
+        _isABLooping = true;
+        showSeekFeedbackUI('A-B Loop Active');
+      }
+    });
+  }
+
+  void _clearABLoop() {
+    setState(() {
+      _aPoint = null;
+      _bPoint = null;
+      _isABLooping = false;
+    });
+    showSeekFeedbackUI('A-B Loop Cleared');
+  }
+
+  void _stepFrame(bool forward) {
+    if (_videoPlayerController.value.isPlaying) {
+      _videoPlayerController.pause();
+    }
+    
+    final currentMs = _currentPosition.inMilliseconds;
+    final frameMs = (1000 / 30).round(); // Assuming 30fps
+    final newPosition = Duration(
+      milliseconds: forward ? currentMs + frameMs : currentMs - frameMs,
+    );
+    
+    if (newPosition >= Duration.zero && newPosition <= _totalDuration) {
+      _videoPlayerController.seekTo(newPosition);
+    }
+  }
+
+  void _toggleMiniPlayer() {
+    setState(() {
+      _isMiniPlayer = !_isMiniPlayer;
+    });
   }
 
   Widget _buildLoadingWidget() {
@@ -539,13 +606,51 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       // Brightness control
       _currentBrightness = (_currentBrightness - delta / 300).clamp(0.0, 1.0);
       ScreenBrightness().setScreenBrightness(_currentBrightness);
+      setState(() {
+        _showBrightnessSlider = true;
+      });
+      _hideSlidersAfterDelay();
     } else {
       // Volume control
       _currentVolume = (_currentVolume - delta / 300).clamp(0.0, 1.0);
       VolumeController().setVolume(_currentVolume);
+      setState(() {
+        _showVolumeSlider = true;
+      });
+      _hideSlidersAfterDelay();
     }
-    
-    setState(() {});
+  }
+
+  void _hideSlidersAfterDelay() {
+    Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showBrightnessSlider = false;
+          _showVolumeSlider = false;
+        });
+      }
+    });
+  }
+
+  void _handleZoom(ScaleUpdateDetails details) {
+    setState(() {
+      _zoomLevel = (_zoomLevel * details.scale).clamp(1.0, 4.0);
+    });
+  }
+
+  void _handlePan(DragUpdateDetails details) {
+    if (_zoomLevel > 1.0) {
+      setState(() {
+        _panOffset += details.delta;
+      });
+    }
+  }
+
+  void _resetZoomPan() {
+    setState(() {
+      _zoomLevel = 1.0;
+      _panOffset = Offset.zero;
+    });
   }
 
   void _togglePlayPause() {
@@ -592,11 +697,157 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$minutes:$seconds';
+  Widget _buildSeekFeedback() {
+    return Center(
+      child: AnimatedBuilder(
+        animation: _seekAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _seekAnimation.value,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Text(
+                _seekFeedback,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildVolumeSlider() {
+    return Positioned(
+      right: 30,
+      top: 0,
+      bottom: 0,
+      child: Center(
+        child: Container(
+          height: 200,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.volume_up_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: RotatedBox(
+                  quarterTurns: -1,
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white.withOpacity(0.3),
+                      thumbColor: Colors.white,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                      trackHeight: 4,
+                    ),
+                    child: Slider(
+                      value: _currentVolume,
+                      onChanged: (value) {
+                        setState(() {
+                          _currentVolume = value;
+                        });
+                        VolumeController().setVolume(value);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${(_currentVolume * 100).round()}%',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBrightnessSlider() {
+    return Positioned(
+      left: 30,
+      top: 0,
+      bottom: 0,
+      child: Center(
+        child: Container(
+          height: 200,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.brightness_6_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: RotatedBox(
+                  quarterTurns: -1,
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white.withOpacity(0.3),
+                      thumbColor: Colors.white,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                      trackHeight: 4,
+                    ),
+                    child: Slider(
+                      value: _currentBrightness,
+                      onChanged: (value) {
+                        setState(() {
+                          _currentBrightness = value;
+                        });
+                        ScreenBrightness().setScreenBrightness(value);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${(_currentBrightness * 100).round()}%',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _exitPlayer() async {
@@ -648,51 +899,47 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     return GestureDetector(
       onTap: _toggleControls,
       onDoubleTapDown: _handleDoubleTap,
-      onPanUpdate: _handleVerticalDrag,
+      onPanUpdate: _zoomLevel > 1.0 ? _handlePan : _handleVerticalDrag,
       onVerticalDragEnd: (_) {
-        // Swipe down to close
-        _exitPlayer();
+        // Swipe down to close only if not zoomed
+        if (_zoomLevel <= 1.0) {
+          _exitPlayer();
+        }
       },
       child: Stack(
         children: [
-          // Video player
+          // Video player with zoom/pan
           Center(
-            child: AspectRatio(
-              aspectRatio: _videoPlayerController.value.aspectRatio,
-              child: Chewie(controller: _chewieController!),
+            child: GestureDetector(
+              onScaleUpdate: _handleZoom,
+              onDoubleTap: () {
+                if (_zoomLevel > 1.0) {
+                  _resetZoomPan();
+                } else {
+                  setState(() {
+                    _zoomLevel = 2.0;
+                  });
+                }
+              },
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..scale(_zoomLevel)
+                  ..translate(_panOffset.dx / _zoomLevel, _panOffset.dy / _zoomLevel),
+                child: AspectRatio(
+                  aspectRatio: _getAspectRatio(),
+                  child: Chewie(controller: _chewieController!),
+                ),
+              ),
             ),
           ),
           
+          // Volume/Brightness Sliders
+          if (_showVolumeSlider) _buildVolumeSlider(),
+          if (_showBrightnessSlider) _buildBrightnessSlider(),
+          
           // Seek feedback overlay
-          if (_showSeekFeedback)
-            Center(
-              child: AnimatedBuilder(
-                animation: _seekAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _seekAnimation.value,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Text(
-                        _seekFeedback,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          if (_showSeekFeedback) _buildSeekFeedback(),
           
           // Controls overlay
           AnimatedBuilder(
@@ -710,6 +957,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         ],
       ),
     );
+  }
+
+  double _getAspectRatio() {
+    switch (_aspectRatio.toInt()) {
+      case 1: return 16/9;  // 16:9
+      case 2: return 4/3;   // 4:3
+      case 3: return MediaQuery.of(context).size.aspectRatio; // Fill
+      default: return _videoPlayerController.value.aspectRatio; // Original
+    }
   }
 
   Widget _buildControls() {
@@ -822,7 +1078,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // Back button with premium glass effect
+          // Back button
           GestureDetector(
             onTap: _exitPlayer,
             child: Container(
@@ -872,6 +1128,37 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             ),
           ),
           
+          // Aspect ratio toggle
+          GestureDetector(
+            onTap: _toggleAspectRatio,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                _getAspectRatioText(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(width: 8),
+          
           // Speed control with premium design
           GestureDetector(
             onTap: _changePlaybackSpeed,
@@ -909,7 +1196,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             ),
           ),
           
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           
           // Loop toggle with premium design
           GestureDetector(
@@ -956,6 +1243,22 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         ],
       ),
     );
+  }
+
+  String _getAspectRatioText() {
+    switch (_aspectRatio.toInt()) {
+      case 1: return '16:9';
+      case 2: return '4:3';
+      case 3: return 'FILL';
+      default: return 'AUTO';
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
   }
 
   Widget _buildBottomControls() {
