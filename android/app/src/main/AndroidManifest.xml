@@ -43,6 +43,28 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
+            <!-- Video Player Intent Filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- For all video types -->
+                <data android:mimeType="video/*" />
+
+                <!-- For all audio types -->
+                <data android:mimeType="audio/*" />
+
+                <!-- Common formats -->
+                <data android:mimeType="application/mp4" />
+                <data android:mimeType="application/x-mpegURL" />
+                <data android:mimeType="application/vnd.apple.mpegurl" />
+
+                <!-- If user opens a file path -->
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+            </intent-filter>
         </activity>
         
         <!-- Background Download Service -->
