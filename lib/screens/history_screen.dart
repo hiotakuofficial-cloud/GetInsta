@@ -187,8 +187,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         color: const Color(0xFF1E1E1E),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                    ),
-                                    child: Row(
+                                      child: Row(
                                       children: [
                                         // Video thumbnail
                                         Container(
