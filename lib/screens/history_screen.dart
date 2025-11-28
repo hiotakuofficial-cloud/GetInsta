@@ -177,7 +177,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   final download = downloads[index];
                                   return GestureDetector(
                                     onTap: () {
-                                      print('Card tapped: ${download['filePath']}');
+                                      Fluttertoast.showToast(msg: "Card clicked!");
                                       // Play video directly
                                       _playVideo(download['filePath']);
                                     },
@@ -523,28 +523,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _playVideo(String? filePath) async {
-    print('_playVideo called with: $filePath');
     if (filePath != null) {
       try {
+        Fluttertoast.showToast(msg: "Opening video...");
         // Open video with system video player chooser
         final uri = Uri.file(filePath);
-        print('Attempting to launch: $uri');
         if (await canLaunchUrl(uri)) {
           await launchUrl(
             uri,
             mode: LaunchMode.externalApplication, // Shows app suggestions
           );
-          print('Video launched successfully');
+          Fluttertoast.showToast(msg: "Video opened!");
         } else {
-          print('Cannot launch URL');
           Fluttertoast.showToast(msg: "No video player found");
         }
       } catch (e) {
-        print('Error launching video: $e');
-        Fluttertoast.showToast(msg: "Failed to open video");
+        Fluttertoast.showToast(msg: "Failed to open video: $e");
       }
     } else {
-      print('File path is null');
+      Fluttertoast.showToast(msg: "File path is null");
     }
   }
 }
