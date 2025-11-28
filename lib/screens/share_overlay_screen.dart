@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../services/instagram_handler.dart';
 
 class ShareOverlayScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class ShareOverlayScreen extends StatefulWidget {
 class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
   static const platform = MethodChannel('com.example.getinsta/share');
   bool _isDownloading = false;
+  bool _checkingPermissions = false;
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +144,7 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _isDownloading ? null : _startDownload,
+                            onPressed: (_isDownloading || _checkingPermissions) ? null : _startDownload,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6C63FF),
                               foregroundColor: Colors.white,
@@ -152,7 +154,7 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
                               ),
                               elevation: 0,
                             ),
-                            child: _isDownloading
+                            child: _checkingPermissions
                                 ? const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -166,7 +168,7 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
                                       ),
                                       SizedBox(width: 12),
                                       Text(
-                                        'Starting Download...',
+                                        'Checking Permissions...',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
@@ -174,20 +176,42 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
                                       ),
                                     ],
                                   )
-                                : const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.download_rounded),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Download Now',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                : _isDownloading
+                                    ? const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Text(
+                                            'Starting Download...',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.download_rounded),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Download Now',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
                           ),
                         ),
                       ],
@@ -203,6 +227,11 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
   }
 
   void _startDownload() async {
+    // Check permissions first
+    if (!await _checkPermissions()) {
+      return;
+    }
+
     setState(() {
       _isDownloading = true;
     });
@@ -232,6 +261,45 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
+    }
+  }
+
+  Future<bool> _checkPermissions() async {
+    setState(() {
+      _checkingPermissions = true;
+    });
+
+    try {
+      // Check storage permission
+      var storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
+        storageStatus = await Permission.storage.request();
+        if (!storageStatus.isGranted) {
+          Fluttertoast.showToast(msg: "Storage permission required");
+          setState(() {
+            _checkingPermissions = false;
+          });
+          return false;
+        }
+      }
+
+      // Check notification permission
+      var notificationStatus = await Permission.notification.status;
+      if (!notificationStatus.isGranted) {
+        notificationStatus = await Permission.notification.request();
+        // Notification permission is optional, don't block download
+      }
+
+      setState(() {
+        _checkingPermissions = false;
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        _checkingPermissions = false;
+      });
+      Fluttertoast.showToast(msg: "Permission check failed");
+      return false;
     }
   }
 
