@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.getinsta"
-    compileSdk flutter.compileSdkVersion
+    compileSdk 34  // Use available SDK 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -43,8 +43,8 @@ android {
     defaultConfig {
         applicationId "com.example.getinsta"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 35  // Android 15 support
-        compileSdk 35        // Android 15 compile
+        targetSdkVersion 34  // Use available SDK 34
+        compileSdk 34        // Use available SDK 34
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
