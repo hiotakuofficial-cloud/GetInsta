@@ -184,6 +184,9 @@ class InstagramHandler {
           await NotificationService.updateDownloadProgress(100, finalFileName);
           await sink.close();
           
+          // Cancel progress notification before showing completion
+          await NotificationService.cancelDownloadNotification();
+          
           // Show completion notification
           await NotificationService.showDownloadComplete(finalFileName, true);
           
@@ -198,6 +201,8 @@ class InstagramHandler {
           );
         } catch (error) {
           await sink.close();
+          // Cancel progress notification before showing error
+          await NotificationService.cancelDownloadNotification();
           await NotificationService.showDownloadComplete(finalFileName, false);
         }
         
