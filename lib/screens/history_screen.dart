@@ -5,6 +5,7 @@ import 'dart:io';
 import '../services/download_history.dart';
 import '../services/instagram_handler.dart';
 import 'video_player_screen.dart';
+import 'about_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -128,7 +129,40 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 44), // Balance for back button
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, _) => const AboutScreen(),
+                            transitionDuration: const Duration(milliseconds: 400),
+                            transitionsBuilder: (context, animation, _, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutCubic,
+                                )),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.info_outline,
+                          color: Color(0xFF6C63FF),
+                          size: 20,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 
