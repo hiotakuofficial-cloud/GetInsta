@@ -36,6 +36,12 @@
             </intent-filter>
         </activity>
         
+        <!-- Background Download Service -->
+        <service
+            android:name=".DownloadService"
+            android:enabled="true"
+            android:exported="false" />
+
         <!-- Share Intent Receiver Activity -->
         <activity
             android:name=".ShareReceiverActivity"

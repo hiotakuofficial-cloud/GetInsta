@@ -21,13 +21,11 @@ class ShareReceiverActivity : Activity() {
                 // Show waiting toast
                 Toast.makeText(this, "Waiting...", Toast.LENGTH_SHORT).show()
                 
-                // Start main app in background with download
-                val mainIntent = Intent(this, MainActivity::class.java).apply {
+                // Start background service instead of main activity
+                val serviceIntent = Intent(this, DownloadService::class.java).apply {
                     putExtra("SHARED_URL", sharedUrl)
-                    putExtra("AUTO_DOWNLOAD", true)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
-                startActivity(mainIntent)
+                startService(serviceIntent)
             }
         }
     }
