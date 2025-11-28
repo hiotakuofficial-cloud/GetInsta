@@ -270,6 +270,19 @@ class _ShareOverlayScreenState extends State<ShareOverlayScreen> {
     });
 
     try {
+      // Check system alert window permission (for overlay)
+      var systemAlertStatus = await Permission.systemAlertWindow.status;
+      if (!systemAlertStatus.isGranted) {
+        systemAlertStatus = await Permission.systemAlertWindow.request();
+        if (!systemAlertStatus.isGranted) {
+          Fluttertoast.showToast(msg: "Overlay permission required");
+          setState(() {
+            _checkingPermissions = false;
+          });
+          return false;
+        }
+      }
+
       // Check storage permission
       var storageStatus = await Permission.storage.status;
       if (!storageStatus.isGranted) {
