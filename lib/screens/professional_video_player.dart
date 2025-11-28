@@ -348,68 +348,35 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Widget _buildBrightnessOverlay() {
     return Positioned(
-      left: 40,
-      top: 0,
-      bottom: 0,
-      child: Center(
-        child: AnimatedOpacity(
-          opacity: _showBrightnessOverlay ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: Container(
-            width: 70,
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(35),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
-                width: 1,
+      left: 30,
+      top: 100,
+      child: AnimatedOpacity(
+        opacity: _showBrightnessOverlay ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 150),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.brightness_6_rounded,
+                color: Colors.white,
+                size: 20,
               ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _brightness > 0.7
-                      ? Icons.brightness_high_rounded
-                      : _brightness > 0.3
-                          ? Icons.brightness_medium_rounded
-                          : Icons.brightness_low_rounded,
+              const SizedBox(width: 8),
+              Text(
+                '${(_brightness * 100).round()}%',
+                style: const TextStyle(
                   color: Colors.white,
-                  size: 24,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: Container(
-                    width: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Colors.white24,
-                    ),
-                    child: FractionallySizedBox(
-                      alignment: Alignment.bottomCenter,
-                      heightFactor: _brightness,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: const Color(0xFF007AFF),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${(_brightness * 100).round()}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -418,68 +385,39 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Widget _buildVolumeOverlay() {
     return Positioned(
-      right: 40,
-      top: 0,
-      bottom: 0,
-      child: Center(
-        child: AnimatedOpacity(
-          opacity: _showVolumeOverlay ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: Container(
-            width: 70,
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(35),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
-                width: 1,
+      right: 30,
+      top: 100,
+      child: AnimatedOpacity(
+        opacity: _showVolumeOverlay ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 150),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _volume > 0.5
+                    ? Icons.volume_up_rounded
+                    : _volume > 0
+                        ? Icons.volume_down_rounded
+                        : Icons.volume_off_rounded,
+                color: Colors.white,
+                size: 20,
               ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _volume > 0.5
-                      ? Icons.volume_up_rounded
-                      : _volume > 0
-                          ? Icons.volume_down_rounded
-                          : Icons.volume_off_rounded,
+              const SizedBox(width: 8),
+              Text(
+                '${(_volume * 100).round()}%',
+                style: const TextStyle(
                   color: Colors.white,
-                  size: 24,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: Container(
-                    width: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Colors.white24,
-                    ),
-                    child: FractionallySizedBox(
-                      alignment: Alignment.bottomCenter,
-                      heightFactor: _volume,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: const Color(0xFF007AFF),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${(_volume * 100).round()}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -872,13 +810,18 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     );
   }
 
-  // Control functions
+  // Control functions - ACTUALLY WORKING
   void _togglePlayPause() {
-    if (_videoController.value.isPlaying) {
-      _videoController.pause();
-    } else {
-      _videoController.play();
-    }
+    setState(() {
+      if (_videoController.value.isPlaying) {
+        _videoController.pause();
+        _isPlaying = false;
+      } else {
+        _videoController.play();
+        _isPlaying = true;
+      }
+    });
+    print('Play/Pause toggled: $_isPlaying'); // Debug
   }
 
   void _seekBackward() {
@@ -930,28 +873,14 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     });
     
     _videoController.setPlaybackSpeed(_playbackSpeed);
+    print('Speed changed to: ${_playbackSpeed}x'); // Debug
   }
 
   void _toggleLoop() {
     setState(() {
       _isLooping = !_isLooping;
     });
-    
-    // Recreate controller with new loop setting
-    _chewieController?.dispose();
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController,
-      autoPlay: _isPlaying,
-      looping: _isLooping,
-      showControls: false,
-      allowFullScreen: false,
-      materialProgressColors: ChewieProgressColors(
-        playedColor: const Color(0xFF007AFF),
-        handleColor: const Color(0xFF007AFF),
-        backgroundColor: Colors.white24,
-        bufferedColor: Colors.white38,
-      ),
-    );
+    print('Loop toggled: $_isLooping'); // Debug
   }
 
   void _setPointA() {
