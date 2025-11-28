@@ -133,7 +133,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               onRefresh: _loadDownloads,
                               color: const Color(0xFF6C63FF),
                               child: ListView(
-                                physics: const AlwaysScrollableScrollPhysics(),
+                                physics: const BouncingScrollPhysics(), // iOS elastic effect
                                 children: [
                                   SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                                   const Center(
@@ -521,10 +521,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  void _playVideo(String? filePath) {
+  void _playVideo(String? filePath) async {
     if (filePath != null) {
-      // Open video with system video player
-      launchUrl(Uri.file(filePath));
+      try {
+        // Open video with system video player chooser
+        final uri = Uri.file(filePath);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication, // Shows app suggestions
+          );
+        } else {
+          Fluttertoast.showToast(msg: "No video player found");
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Failed to open video");
+      }
     }
   }
 }
