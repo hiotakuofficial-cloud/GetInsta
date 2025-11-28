@@ -163,11 +163,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       _playVideo(download['filePath']);
                                     },
                                     child: Container(
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF1E1E1E),
-                                      borderRadius: BorderRadius.circular(16),
+                                      margin: const EdgeInsets.only(bottom: 16),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1E1E1E),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
                                     ),
                                     child: Row(
                                       children: [
@@ -259,7 +260,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         ),
                                       ],
                                     ),
-                                  );
+                                  ),
+                                );
                                 },
                               ),
                             ),
