@@ -162,7 +162,7 @@ class DownloadService : Service() {
             // Save to app's internal storage (same as Flutter's getApplicationDocumentsDirectory)
             val historyFile = File(filesDir, "download_history.json")
             
-            val historyArray = if (historyFile.exists()) {
+            var historyArray = if (historyFile.exists()) {
                 org.json.JSONArray(historyFile.readText())
             } else {
                 org.json.JSONArray()
@@ -179,7 +179,7 @@ class DownloadService : Service() {
                     put("username", username)
                     put("caption", caption)
                     put("filePath", filePath)
-                    put("downloadTime", java.time.Instant.now().toString())
+                    put("downloadTime", System.currentTimeMillis().toString())
                 }
                 
                 // Add to beginning (most recent first)
