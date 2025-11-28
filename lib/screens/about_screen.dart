@@ -50,26 +50,30 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // Back Button
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
+                // Back Button - Left aligned
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1A1A),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Icon(
+                          CupertinoIcons.back,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
-                    child: const Icon(
-                      CupertinoIcons.back,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
+                  ],
                 ),
                 
                 const SizedBox(height: 40),
