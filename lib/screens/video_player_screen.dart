@@ -4,9 +4,11 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume_controller/volume_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:ui';
+import 'dart:convert';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoPath;
@@ -32,6 +34,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   bool _showControls = true;
   bool _isPlaying = false;
   bool _isBuffering = false;
+  bool _isMiniPlayer = false;
   
   // Timers and animations
   Timer? _hideTimer;
@@ -43,10 +46,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   // System controls
   double _currentBrightness = 0.5;
   double _currentVolume = 0.5;
+  bool _showVolumeSlider = false;
+  bool _showBrightnessSlider = false;
   
   // Playback controls
   double _playbackSpeed = 1.0;
   bool _isLooping = false;
+  
+  // Enhanced features
+  double _aspectRatio = 0.0; // 0=original, 1=16:9, 2=4:3, 3=fill
+  double _zoomLevel = 1.0;
+  Offset _panOffset = Offset.zero;
+  Duration? _aPoint;
+  Duration? _bPoint;
+  bool _isABLooping = false;
   
   // Gesture feedback
   String _seekFeedback = '';
@@ -55,6 +68,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   // Progress tracking
   Duration _currentPosition = Duration.zero;
   Duration _totalDuration = Duration.zero;
+  
+  // Call handling
+  bool _wasPlayingBeforeCall = false;
 
   @override
   void initState() {
@@ -63,6 +79,42 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _initializePlayer();
     _initializeSystemControls();
     _lockOrientation();
+    _setupCallHandling();
+    _loadPlaybackHistory();
+  }
+
+  void _setupCallHandling() {
+    // Listen to app lifecycle changes for call handling
+    WidgetsBinding.instance.addObserver(_AppLifecycleObserver(
+      onPaused: () {
+        if (_videoPlayerController.value.isPlaying) {
+          _wasPlayingBeforeCall = true;
+          _videoPlayerController.pause();
+        }
+      },
+      onResumed: () {
+        if (_wasPlayingBeforeCall) {
+          _videoPlayerController.play();
+          _wasPlayingBeforeCall = false;
+        }
+      },
+    ));
+  }
+
+  Future<void> _loadPlaybackHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPosition = prefs.getInt('video_${widget.videoPath.hashCode}') ?? 0;
+    if (savedPosition > 0) {
+      _videoPlayerController.seekTo(Duration(milliseconds: savedPosition));
+    }
+  }
+
+  Future<void> _savePlaybackHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(
+      'video_${widget.videoPath.hashCode}',
+      _currentPosition.inMilliseconds,
+    );
   }
 
   void _initializeAnimations() {
@@ -1053,5 +1105,27 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         ],
       ),
     );
+  }
+}
+
+// Call handling observer
+class _AppLifecycleObserver extends WidgetsBindingObserver {
+  final VoidCallback onPaused;
+  final VoidCallback onResumed;
+
+  _AppLifecycleObserver({required this.onPaused, required this.onResumed});
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        onPaused();
+        break;
+      case AppLifecycleState.resumed:
+        onResumed();
+        break;
+      default:
+        break;
+    }
   }
 }
