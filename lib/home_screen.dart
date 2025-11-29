@@ -4,12 +4,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'screens/history_screen.dart';
 import 'screens/professional_video_player.dart';
 import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
 import 'services/instagram_cache.dart';
+import 'services/youtube_pinterest_handler.dart';
 import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
@@ -173,10 +176,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _processInstagramUrl(String url) async {
+    // Check if it's YouTube or Pinterest first
+    if (YouTubePinterestHandler.isYouTubeUrl(url)) {
+      _processYouTubeUrl(url);
+      return;
+    }
+    
+    if (YouTubePinterestHandler.isPinterestUrl(url)) {
+      _processPinterestUrl(url);
+      return;
+    }
+
+    // Original Instagram processing (unchanged)
     if (!InstagramHandler.isValidInstagramUrl(url)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a valid Instagram post or reel URL'),
+          content: Text('Please enter a valid Instagram, YouTube, or Pinterest URL'),
           backgroundColor: Colors.red,
         ),
       );
@@ -1305,5 +1320,175 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  // YouTube processing
+  void _processYouTubeUrl(String url) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNoInternetToast();
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await YouTubePinterestHandler.getYouTubeInfo(url);
+      
+      if (result['success'] == true) {
+        _showYouTubeOptions(result['data'], url);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('YouTube Error: ${result['error']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _processPinterestUrl(String url) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNoInternetToast();
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await YouTubePinterestHandler.getPinterestInfo(url);
+      
+      if (result['success'] == true) {
+        _downloadPinterestMedia(result['data']);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pinterest Error: ${result['error']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showYouTubeOptions(Map<String, dynamic> data, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: Text(
+          data['title'] ?? 'YouTube Video',
+          style: const TextStyle(color: Colors.white),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              data['author'] ?? 'Unknown',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Select Quality:',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadYouTubeVideo(url, '720');
+            },
+            child: const Text('720p', style: TextStyle(color: Colors.blue)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadYouTubeVideo(url, '480');
+            },
+            child: const Text('480p', style: TextStyle(color: Colors.blue)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadYouTubeVideo(url, '360');
+            },
+            child: const Text('360p', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _downloadYouTubeVideo(String url, String quality) async {
+    Fluttertoast.showToast(msg: "⬇️ Downloading YouTube video ($quality)...");
+    
+    try {
+      final result = await YouTubePinterestHandler.downloadYouTubeVideo(url, quality);
+      
+      if (result['success'] == true) {
+        final downloadResult = await InstagramHandler.downloadMedia(
+          result['downloadUrl'],
+          result['filename'],
+          thumbnailUrl: null,
+          username: 'YouTube',
+          caption: result['filename'],
+        );
+        
+        if (downloadResult['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ YouTube video downloaded!", backgroundColor: Colors.green);
+        } else {
+          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+    }
+  }
+
+  void _downloadPinterestMedia(Map<String, dynamic> data) async {
+    Fluttertoast.showToast(msg: "⬇️ Downloading Pinterest media...");
+    
+    try {
+      final downloadUrl = data['video_url'] ?? data['image_url'];
+      final mediaType = data['type'] ?? 'unknown';
+      final extension = mediaType == 'video' ? 'mp4' : 'jpg';
+      final filename = 'pinterest_${mediaType}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+      
+      if (downloadUrl != null) {
+        final result = await InstagramHandler.downloadMedia(
+          downloadUrl,
+          filename,
+          thumbnailUrl: data['thumbnail'],
+          username: 'Pinterest',
+          caption: data['title'] ?? 'Pinterest Media',
+        );
+        
+        if (result['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ Pinterest media downloaded!", backgroundColor: Colors.green);
+        } else {
+          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+    }
   }
 }
