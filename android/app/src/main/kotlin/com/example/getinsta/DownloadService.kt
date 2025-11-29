@@ -214,13 +214,13 @@ class DownloadService : Service() {
             
             if (data.optBoolean("success", false)) {
                 // API structure: video_url or image_url (one will be null)
-                val videoUrl = data.optString("video_url")
-                val imageUrl = data.optString("image_url")
+                val videoUrl = data.optString("video_url", null)
+                val imageUrl = data.optString("image_url", null)
                 val type = data.optString("type", "image")
                 
                 val downloadUrl = when {
-                    !videoUrl.isNullOrEmpty() && videoUrl != "null" -> videoUrl
-                    !imageUrl.isNullOrEmpty() && imageUrl != "null" -> imageUrl
+                    videoUrl != null && videoUrl.isNotEmpty() && videoUrl != "null" -> videoUrl
+                    imageUrl != null && imageUrl.isNotEmpty() && imageUrl != "null" -> imageUrl
                     else -> null
                 }
                 
