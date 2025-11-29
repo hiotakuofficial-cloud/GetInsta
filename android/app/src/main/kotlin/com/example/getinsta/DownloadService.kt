@@ -191,29 +191,51 @@ class DownloadService : Service() {
                 showNotification("GetInsta", "Getting Pinterest media...", false)
             }
             
-            // Get Pinterest download link with proper connection
-            val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
+            // Pinterest API call with better error handling
+            val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
+            val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=$encodedUrl"
+            
             val connection = URL(apiUrl).openConnection()
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Android)")
-            connection.connectTimeout = 15000
-            connection.readTimeout = 15000
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36")
+            connection.connectTimeout = 20000
+            connection.readTimeout = 20000
             
             val response = connection.getInputStream().bufferedReader().readText()
+            
+            // Clean response - remove PHP warnings
             val jsonStart = response.indexOf("{")
-            val cleanResponse = if (jsonStart != -1) response.substring(jsonStart) else response
+            if (jsonStart == -1) {
+                throw Exception("No JSON found in response")
+            }
+            
+            val cleanResponse = response.substring(jsonStart)
             val data = JSONObject(cleanResponse)
             
             if (data.getBoolean("success")) {
-                val downloadUrl = data.optString("video_url").takeIf { it.isNotEmpty() } 
-                    ?: data.optString("image_url")
+                // Get download URL - prefer video over image
+                var downloadUrl: String? = null
                 
-                if (downloadUrl.isNotEmpty()) {
+                if (data.has("video_url") && !data.isNull("video_url")) {
+                    val videoUrl = data.getString("video_url")
+                    if (videoUrl.isNotEmpty() && videoUrl != "null") {
+                        downloadUrl = videoUrl
+                    }
+                }
+                
+                if (downloadUrl == null && data.has("image_url") && !data.isNull("image_url")) {
+                    val imageUrl = data.getString("image_url")
+                    if (imageUrl.isNotEmpty() && imageUrl != "null") {
+                        downloadUrl = imageUrl
+                    }
+                }
+                
+                if (downloadUrl != null) {
                     val mediaType = data.optString("type", "image")
                     val extension = if (mediaType == "video") ".mp4" else ".jpg"
                     val filename = "Downloaded From GetInsta By Nehu$extension"
                     
                     withContext(Dispatchers.Main) {
-                        showNotification("GetInsta", "Downloading...", false)
+                        showNotification("GetInsta", "Downloading Pinterest...", false)
                     }
                     
                     downloadFile(downloadUrl, filename)
@@ -223,15 +245,15 @@ class DownloadService : Service() {
                         Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    throw Exception("No URL")
+                    throw Exception("No valid download URL found")
                 }
             } else {
-                throw Exception("API failed")
+                throw Exception("Pinterest API returned success=false")
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Pinterest Failed", true)
-                Toast.makeText(this@DownloadService, "Pinterest Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
