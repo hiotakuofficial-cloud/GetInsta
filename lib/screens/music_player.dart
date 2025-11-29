@@ -521,7 +521,7 @@ class _MusicPlayerState extends State<MusicPlayer>
       ),
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    final details = NotificationDetails(android: androidDetails);
 
     await _notifications.show(
       100,
@@ -553,7 +553,7 @@ class _MusicPlayerState extends State<MusicPlayer>
         largeIcon: DrawableResourceAndroidBitmap('@mipmap/notification'),
       );
 
-      const details = NotificationDetails(android: androidDetails);
+      final details = NotificationDetails(android: androidDetails);
 
       await _notifications.show(
         100,
