@@ -17,6 +17,8 @@ class GetInstaApp extends StatefulWidget {
 
 class _GetInstaAppState extends State<GetInstaApp> {
   static const platform = MethodChannel('com.example.getinsta/video_intent');
+  bool _hasExternalVideo = false;
+  String? _externalVideoPath;
 
   @override
   void initState() {
@@ -28,23 +30,14 @@ class _GetInstaAppState extends State<GetInstaApp> {
     platform.setMethodCallHandler((call) async {
       if (call.method == 'openVideo') {
         final String videoPath = call.arguments;
-        _openVideoPlayer(videoPath);
+        print('Opening video: $videoPath');
+        
+        setState(() {
+          _hasExternalVideo = true;
+          _externalVideoPath = videoPath;
+        });
       }
     });
-  }
-
-  void _openVideoPlayer(String videoPath) {
-    print('Opening video: $videoPath'); // Debug log
-    
-    // Navigate to video player with the real file path
-    navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (context) => ProfessionalVideoPlayer(
-          videoPath: videoPath,
-          title: 'External Video',
-        ),
-      ),
-    );
   }
 
   @override
@@ -58,7 +51,12 @@ class _GetInstaAppState extends State<GetInstaApp> {
         cardColor: const Color(0xFF1E1E1E),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      home: _hasExternalVideo && _externalVideoPath != null
+          ? ProfessionalVideoPlayer(
+              videoPath: _externalVideoPath!,
+              title: 'External Video',
+            )
+          : const SplashScreen(),
       routes: {
         '/history': (context) => const HistoryScreen(),
       },

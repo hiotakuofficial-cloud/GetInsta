@@ -12,11 +12,15 @@ import 'dart:ui';
 class ProfessionalVideoPlayer extends StatefulWidget {
   final String videoPath;
   final String? title;
+  final List<String>? playlist;
+  final int? currentIndex;
 
   const ProfessionalVideoPlayer({
     super.key,
     required this.videoPath,
     this.title,
+    this.playlist,
+    this.currentIndex,
   });
 
   @override
@@ -75,15 +79,23 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   
   // Call handling
   bool _wasPlayingBeforeCall = false;
+  
+  // Playlist handling
+  List<String> _playlist = [];
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // Initialize playlist
+    _playlist = widget.playlist ?? [widget.videoPath];
+    _currentIndex = widget.currentIndex ?? 0;
+    
     _initializeAnimations();
     _initializeVideo();
     _loadSystemSettings();
-    _setOrientation();
   }
 
   void _initializeAnimations() {
@@ -131,8 +143,12 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   Future<void> _initializeVideo() async {
     try {
-      _videoController = VideoPlayerController.file(File(widget.videoPath));
+      final currentVideoPath = _playlist[_currentIndex];
+      _videoController = VideoPlayerController.file(File(currentVideoPath));
       await _videoController.initialize();
+      
+      // Auto-detect orientation based on aspect ratio
+      await _setAutoOrientation();
       
       _videoController.addListener(_videoListener);
       
@@ -222,11 +238,25 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     }
   }
 
-  Future<void> _setOrientation() async {
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+  Future<void> _setAutoOrientation() async {
+    final aspectRatio = _videoController.value.aspectRatio;
+    print('Video aspect ratio: $aspectRatio'); // Debug
+    
+    if (aspectRatio < 1.0) {
+      // Vertical video (9:16, etc.) - Portrait mode
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+      print('Set to Portrait mode for vertical video');
+    } else {
+      // Horizontal video (16:9, etc.) - Landscape mode  
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      print('Set to Landscape mode for horizontal video');
+    }
     
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
@@ -923,18 +953,47 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
 
   void _previousVideo() {
     if (_position.inSeconds > 3) {
+      // If more than 3 seconds played, restart current video
       _videoController.seekTo(Duration.zero);
       _showSeekFeedback('Restart');
+    } else if (_currentIndex > 0) {
+      // Go to previous video in playlist
+      _currentIndex--;
+      _switchToVideo(_currentIndex);
+      _showSeekFeedback('Previous Video');
     } else {
-      _showSeekFeedback('Previous');
-      // TODO: Implement playlist previous
+      // Already at first video, just restart
+      _videoController.seekTo(Duration.zero);
+      _showSeekFeedback('First Video');
     }
   }
 
   void _nextVideo() {
-    _videoController.seekTo(_duration);
-    _showSeekFeedback('Next');
-    // TODO: Implement playlist next
+    if (_currentIndex < _playlist.length - 1) {
+      // Go to next video in playlist
+      _currentIndex++;
+      _switchToVideo(_currentIndex);
+      _showSeekFeedback('Next Video');
+    } else {
+      // Already at last video
+      _showSeekFeedback('Last Video');
+    }
+  }
+
+  Future<void> _switchToVideo(int index) async {
+    // Dispose current video
+    await _videoController.pause();
+    _videoController.removeListener(_videoListener);
+    await _videoController.dispose();
+    _chewieController?.dispose();
+    
+    setState(() {
+      _isInitialized = false;
+      _currentIndex = index;
+    });
+    
+    // Initialize new video (will auto-detect orientation)
+    await _initializeVideo();
   }
 
   void _onSeek(double value) {
