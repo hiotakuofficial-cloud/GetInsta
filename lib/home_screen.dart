@@ -10,6 +10,7 @@ import 'services/instagram_handler.dart';
 import 'services/notification_service.dart';
 import 'services/download_history.dart';
 import 'services/instagram_cache.dart';
+import 'services/multi_platform_handler.dart';
 import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
@@ -173,10 +174,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _processInstagramUrl(String url) async {
+    // Check if it's YouTube or Pinterest
+    final platform = MultiPlatformHandler.detectPlatform(url);
+    
+    if (platform != 'instagram') {
+      _processMultiPlatformUrl(url, platform);
+      return;
+    }
+
+    // Original Instagram processing
     if (!InstagramHandler.isValidInstagramUrl(url)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a valid Instagram post or reel URL'),
+          content: Text('Please enter a valid Instagram, YouTube, or Pinterest URL'),
           backgroundColor: Colors.red,
         ),
       );
@@ -221,6 +231,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  void _processMultiPlatformUrl(String url, String platform) async {
+    // Check network connectivity
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNoInternetToast();
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await MultiPlatformHandler.processUrl(url);
+      
+      if (result['success'] == true) {
+        if (platform == 'youtube') {
+          _showYouTubeBottomSheet(result['data'], url);
+        } else if (platform == 'pinterest') {
+          _showPinterestBottomSheet(result['data']);
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${platform.toUpperCase()} Error: ${result['error']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -791,7 +837,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           fontSize: 16,
                                         ),
                                         decoration: InputDecoration(
-                                          hintText: 'Paste Instagram URL here...',
+                                          hintText: 'Paste Instagram, YouTube, or Pinterest URL here...',
                                           hintStyle: TextStyle(
                                             color: Colors.white.withOpacity(0.5),
                                             fontSize: 16,
@@ -1158,7 +1204,224 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _showHistoryVideoOptions(Map<String, dynamic> download) {
+  void _showYouTubeBottomSheet(Map<String, dynamic> data, String originalUrl) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              Text(
+                data['title'] ?? 'YouTube Video',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              
+              Text(
+                data['author'] ?? 'Unknown',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              const Text(
+                'Select Quality:',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              ...MultiPlatformHandler.getYouTubeQualities().map((quality) => 
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _downloadYouTubeVideo(originalUrl, quality['quality']!);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C63FF),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      quality['label']!,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ).toList(),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPinterestBottomSheet(Map<String, dynamic> data) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              Text(
+                data['title'] ?? 'Pinterest Media',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              
+              Text(
+                data['type'] == 'video' ? '📹 Video' : '📷 Image',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _downloadPinterestMedia(data);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C63FF),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Download ${data['type'] == 'video' ? 'Video' : 'Image'}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _downloadYouTubeVideo(String url, String quality) async {
+    try {
+      final result = await MultiPlatformHandler.downloadYouTubeVideo(url, quality);
+      
+      if (result['success'] == true) {
+        final downloadResult = await InstagramHandler.downloadMedia(
+          result['downloadUrl'],
+          result['filename'],
+          thumbnailUrl: null,
+          username: 'YouTube',
+          caption: result['filename'],
+        );
+        
+        if (downloadResult['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ YouTube video downloaded!", backgroundColor: Colors.green);
+        } else {
+          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+    }
+  }
+
+  void _downloadPinterestMedia(Map<String, dynamic> data) async {
+    try {
+      final downloadUrl = data['video_url'] ?? data['image_url'];
+      final mediaType = data['type'] ?? 'unknown';
+      final extension = mediaType == 'video' ? 'mp4' : 'jpg';
+      final filename = 'pinterest_${mediaType}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+      
+      if (downloadUrl != null) {
+        final result = await InstagramHandler.downloadMedia(
+          downloadUrl,
+          filename,
+          thumbnailUrl: data['thumbnail'],
+          username: 'Pinterest',
+          caption: data['title'] ?? 'Pinterest Media',
+        );
+        
+        if (result['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ Pinterest media downloaded!", backgroundColor: Colors.green);
+        } else {
+          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+    }
+  }
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
