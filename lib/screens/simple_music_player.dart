@@ -27,7 +27,7 @@ class _SimpleMusicPlayerState extends State<SimpleMusicPlayer>
     super.initState();
     _initializeAnimations();
     _setPortraitMode();
-    _openWithSystemPlayer();
+    // Don't auto-open, let user choose
   }
 
   void _initializeAnimations() {
@@ -48,12 +48,36 @@ class _SimpleMusicPlayerState extends State<SimpleMusicPlayer>
   }
 
   Future<void> _openWithSystemPlayer() async {
-    // Open with system music player
     try {
-      await OpenFile.open(widget.audioPath);
-      Navigator.pop(context); // Go back after opening
+      final result = await OpenFile.open(widget.audioPath);
+      print('OpenFile result: ${result.message}');
+      
+      if (result.type == ResultType.done) {
+        // File opened successfully, show feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Opening with system music player...'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        // Show error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${result.message}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print('Error opening file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error opening file: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -218,7 +242,7 @@ class _SimpleMusicPlayerState extends State<SimpleMusicPlayer>
           ),
           const SizedBox(height: 12),
           Text(
-            'Opening with system music player...',
+            'Tap the button below to open this audio file with your system music player.',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 16,
@@ -234,9 +258,10 @@ class _SimpleMusicPlayerState extends State<SimpleMusicPlayer>
   Widget _buildActions() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
+          SizedBox(
+            width: double.infinity,
             child: ElevatedButton(
               onPressed: _openWithSystemPlayer,
               style: ElevatedButton.styleFrom(
@@ -247,9 +272,31 @@ class _SimpleMusicPlayerState extends State<SimpleMusicPlayer>
                 ),
               ),
               child: const Text(
-                'Open Music Player',
+                'Open with Music Player',
                 style: TextStyle(
                   color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF667eea)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Close',
+                style: TextStyle(
+                  color: Color(0xFF667eea),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
