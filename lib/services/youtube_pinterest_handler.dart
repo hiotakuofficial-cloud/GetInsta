@@ -123,7 +123,22 @@ class YouTubePinterestHandler {
         final downloadUrl = videoUrl ?? imageUrl;
         
         if (downloadUrl != null) {
-          String extension = mediaType == 'video' ? '.mp4' : '.jpg';
+          // Smart extension detection from URL and type
+          String extension;
+          if (videoUrl != null && videoUrl.isNotEmpty()) {
+            // If video URL exists, it's definitely a video
+            extension = '.mp4';
+          } else if (downloadUrl.contains('.mp4') || downloadUrl.contains('video')) {
+            // Check URL for video indicators
+            extension = '.mp4';
+          } else if (downloadUrl.contains('.jpg') || downloadUrl.contains('.jpeg')) {
+            extension = '.jpg';
+          } else if (downloadUrl.contains('.png')) {
+            extension = '.png';
+          } else {
+            // Default based on type field
+            extension = mediaType == 'video' ? '.mp4' : '.jpg';
+          }
           
           return {
             'success': true,
