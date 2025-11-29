@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'screens/history_screen.dart';
+import 'screens/professional_video_player.dart';
 
 void main() {
   runApp(const GetInstaApp());
@@ -15,6 +16,44 @@ class GetInstaApp extends StatefulWidget {
 }
 
 class _GetInstaAppState extends State<GetInstaApp> {
+  static const platform = MethodChannel('com.example.getinsta/video_intent');
+
+  @override
+  void initState() {
+    super.initState();
+    _setupMethodChannel();
+  }
+
+  void _setupMethodChannel() {
+    platform.setMethodCallHandler((call) async {
+      if (call.method == 'openVideo') {
+        final String videoPath = call.arguments;
+        _openVideoPlayer(videoPath);
+      }
+    });
+  }
+
+  void _openVideoPlayer(String videoPath) {
+    // Convert content:// URI to file path if needed
+    String filePath = videoPath;
+    if (videoPath.startsWith('content://')) {
+      // Handle content URI - you might need to copy file to app directory
+      filePath = videoPath.replaceAll('content://', '/storage/emulated/0/');
+    } else if (videoPath.startsWith('file://')) {
+      filePath = videoPath.replaceAll('file://', '');
+    }
+
+    // Navigate to video player
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (context) => ProfessionalVideoPlayer(
+          videoPath: filePath,
+          title: 'External Video',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
