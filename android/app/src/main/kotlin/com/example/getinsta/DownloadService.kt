@@ -197,14 +197,12 @@ class DownloadService : Service() {
             
             val response = connection.getInputStream().bufferedReader().readText()
             
-            // Clean response - remove PHP warnings and extract JSON properly
-            val jsonStart = response.lastIndexOf("{")  // Use lastIndexOf to get the actual JSON
-            val jsonEnd = response.lastIndexOf("}") + 1
-            
-            val cleanResponse = if (jsonStart != -1 && jsonEnd > jsonStart) {
-                response.substring(jsonStart, jsonEnd)
+            // Clean response - remove PHP warnings properly
+            val jsonStart = response.indexOf("{")
+            val cleanResponse = if (jsonStart != -1) {
+                response.substring(jsonStart)
             } else {
-                throw Exception("No valid JSON found")
+                throw Exception("No JSON found")
             }
             
             val data = JSONObject(cleanResponse)
