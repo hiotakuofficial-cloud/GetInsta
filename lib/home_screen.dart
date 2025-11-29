@@ -1574,12 +1574,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _downloadYouTubeAudio(String url, String quality) async {
-    Fluttertoast.showToast(msg: "⬇️ Downloading YouTube audio (${quality}kbps)...");
-    
     try {
       final result = await YouTubePinterestHandler.downloadYouTubeAudio(url, quality);
       
       if (result['success'] == true) {
+        Fluttertoast.showToast(msg: "⬇️ Downloading audio...", backgroundColor: Colors.blue);
+        
         final downloadResult = await InstagramHandler.downloadMedia(
           result['downloadUrl'],
           result['filename'],
@@ -1589,23 +1589,41 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
         
         if (downloadResult['success'] == true) {
-          Fluttertoast.showToast(msg: "✅ YouTube audio downloaded!", backgroundColor: Colors.green);
+          Fluttertoast.showToast(
+            msg: "✅ YouTube audio downloaded (${quality}kbps)!", 
+            backgroundColor: Colors.green,
+            toastLength: Toast.LENGTH_LONG
+          );
         } else {
-          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+          Fluttertoast.showToast(
+            msg: "❌ Download failed: ${downloadResult['error']}", 
+            backgroundColor: Colors.red,
+            toastLength: Toast.LENGTH_LONG
+          );
         }
+      } else {
+        Fluttertoast.showToast(
+          msg: "❌ Failed to get audio link: ${result['error']}", 
+          backgroundColor: Colors.red,
+          toastLength: Toast.LENGTH_LONG
+        );
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+      Fluttertoast.showToast(
+        msg: "❌ Audio download error: $e", 
+        backgroundColor: Colors.red,
+        toastLength: Toast.LENGTH_LONG
+      );
     }
   }
 
   void _downloadYouTubeVideo(String url, String quality) async {
-    Fluttertoast.showToast(msg: "⬇️ Downloading YouTube video ($quality)...");
-    
     try {
       final result = await YouTubePinterestHandler.downloadYouTubeVideo(url, quality);
       
       if (result['success'] == true) {
+        Fluttertoast.showToast(msg: "⬇️ Downloading video...", backgroundColor: Colors.blue);
+        
         final downloadResult = await InstagramHandler.downloadMedia(
           result['downloadUrl'],
           result['filename'],
@@ -1615,20 +1633,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
         
         if (downloadResult['success'] == true) {
-          Fluttertoast.showToast(msg: "✅ YouTube video downloaded!", backgroundColor: Colors.green);
+          Fluttertoast.showToast(
+            msg: "✅ YouTube video downloaded (${quality}p)!", 
+            backgroundColor: Colors.green,
+            toastLength: Toast.LENGTH_LONG
+          );
         } else {
-          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+          Fluttertoast.showToast(
+            msg: "❌ Download failed: ${downloadResult['error']}", 
+            backgroundColor: Colors.red,
+            toastLength: Toast.LENGTH_LONG
+          );
         }
+      } else {
+        Fluttertoast.showToast(
+          msg: "❌ Failed to get video link: ${result['error']}", 
+          backgroundColor: Colors.red,
+          toastLength: Toast.LENGTH_LONG
+        );
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+      Fluttertoast.showToast(
+        msg: "❌ Video download error: $e", 
+        backgroundColor: Colors.red,
+        toastLength: Toast.LENGTH_LONG
+      );
     }
   }
 
   void _downloadPinterestMedia(Map<String, dynamic> data) async {
-    Fluttertoast.showToast(msg: "⬇️ Downloading Pinterest media...");
-    
     try {
+      Fluttertoast.showToast(msg: "⬇️ Downloading Pinterest media...", backgroundColor: Colors.pink);
+      
       final downloadUrl = data['video_url'] ?? data['image_url'];
       final mediaType = data['type'] ?? 'unknown';
       final extension = mediaType == 'video' ? 'mp4' : 'jpg';
@@ -1644,13 +1680,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
         
         if (result['success'] == true) {
-          Fluttertoast.showToast(msg: "✅ Pinterest media downloaded!", backgroundColor: Colors.green);
+          Fluttertoast.showToast(
+            msg: "✅ Pinterest ${mediaType} downloaded!", 
+            backgroundColor: Colors.green,
+            toastLength: Toast.LENGTH_LONG
+          );
         } else {
-          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+          Fluttertoast.showToast(
+            msg: "❌ Download failed: ${result['error']}", 
+            backgroundColor: Colors.red,
+            toastLength: Toast.LENGTH_LONG
+          );
         }
+      } else {
+        Fluttertoast.showToast(
+          msg: "❌ No download URL found", 
+          backgroundColor: Colors.red,
+          toastLength: Toast.LENGTH_LONG
+        );
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+      Fluttertoast.showToast(
+        msg: "❌ Pinterest download error: $e", 
+        backgroundColor: Colors.red,
+        toastLength: Toast.LENGTH_LONG
+      );
     }
   }
 }

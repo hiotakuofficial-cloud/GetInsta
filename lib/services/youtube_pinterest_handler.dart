@@ -22,7 +22,7 @@ class YouTubePinterestHandler {
   // YouTube functions
   static Future<Map<String, dynamic>> getYouTubeInfo(String url) async {
     try {
-      Fluttertoast.showToast(msg: "🔍 Fetching YouTube info...");
+      Fluttertoast.showToast(msg: "🎥 Fetching YouTube info...", backgroundColor: Colors.blue);
       
       final response = await http.get(
         Uri.parse('$youtubeApiBase?action=url&url=$url'),
@@ -31,6 +31,7 @@ class YouTubePinterestHandler {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ YouTube video found!", backgroundColor: Colors.green);
           return {'success': true, 'data': data};
         } else {
           throw Exception(data['error'] ?? 'YouTube API error');
@@ -39,13 +40,15 @@ class YouTubePinterestHandler {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ YouTube Error: $e", backgroundColor: Colors.red);
+      Fluttertoast.showToast(msg: "❌ YouTube Error: $e", backgroundColor: Colors.red, toastLength: Toast.LENGTH_LONG);
       return {'success': false, 'error': e.toString()};
     }
   }
 
   static Future<Map<String, dynamic>> downloadYouTubeVideo(String url, String quality) async {
     try {
+      Fluttertoast.showToast(msg: "📹 Getting ${quality}p video link...", backgroundColor: Colors.purple);
+      
       final response = await http.get(
         Uri.parse('$youtubeApiBase?action=download&url=$url&q=$quality&type=mp4'),
       ).timeout(const Duration(seconds: 20));
@@ -56,21 +59,24 @@ class YouTubePinterestHandler {
           return {
             'success': true,
             'downloadUrl': data['download_url'],
-            'filename': data['filename'] ?? 'youtube_${quality}p.mp4',
+            'filename': data['filename'] ?? 'youtube_${quality}p_${DateTime.now().millisecondsSinceEpoch}.mp4',
           };
         } else {
-          throw Exception(data['error'] ?? 'Download failed');
+          throw Exception(data['error'] ?? 'Video download failed');
         }
       } else {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Video Error: $e", backgroundColor: Colors.red, toastLength: Toast.LENGTH_LONG);
       return {'success': false, 'error': e.toString()};
     }
   }
 
   static Future<Map<String, dynamic>> downloadYouTubeAudio(String url, String quality) async {
     try {
+      Fluttertoast.showToast(msg: "🎵 Getting ${quality}kbps audio link...", backgroundColor: Colors.green);
+      
       final response = await http.get(
         Uri.parse('$youtubeApiBase?action=download&url=$url&q=$quality&type=mp3'),
       ).timeout(const Duration(seconds: 20));
@@ -81,15 +87,16 @@ class YouTubePinterestHandler {
           return {
             'success': true,
             'downloadUrl': data['download_url'],
-            'filename': data['filename'] ?? 'youtube_${quality}kbps.mp3',
+            'filename': data['filename'] ?? 'youtube_${quality}kbps_${DateTime.now().millisecondsSinceEpoch}.mp3',
           };
         } else {
-          throw Exception(data['error'] ?? 'Download failed');
+          throw Exception(data['error'] ?? 'Audio download failed');
         }
       } else {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Audio Error: $e", backgroundColor: Colors.red, toastLength: Toast.LENGTH_LONG);
       return {'success': false, 'error': e.toString()};
     }
   }
@@ -97,7 +104,7 @@ class YouTubePinterestHandler {
   // Pinterest functions
   static Future<Map<String, dynamic>> getPinterestInfo(String url) async {
     try {
-      Fluttertoast.showToast(msg: "🔍 Fetching Pinterest info...");
+      Fluttertoast.showToast(msg: "📌 Fetching Pinterest info...", backgroundColor: Colors.pink);
       
       final response = await http.get(
         Uri.parse('$pinterestApiBase?action=url&url=$url'),
@@ -116,6 +123,7 @@ class YouTubePinterestHandler {
         
         final data = json.decode(responseBody);
         if (data['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ Pinterest media found!", backgroundColor: Colors.green);
           return {'success': true, 'data': data};
         } else {
           throw Exception('Pinterest API error');
@@ -124,7 +132,7 @@ class YouTubePinterestHandler {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "❌ Pinterest Error: $e", backgroundColor: Colors.red);
+      Fluttertoast.showToast(msg: "❌ Pinterest Error: $e", backgroundColor: Colors.red, toastLength: Toast.LENGTH_LONG);
       return {'success': false, 'error': e.toString()};
     }
   }
