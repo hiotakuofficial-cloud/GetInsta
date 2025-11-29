@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _searchAnimation;
   bool _isLoading = false;
   bool _hasText = false; // Track if input has text
+  bool _isQuickAction = false; // Flag for share/quick downloads
   Set<int> _selectedMediaIndices = {}; // For multiple media selection
   List<Map<String, dynamic>> _cachedPosts = []; // Cached Instagram posts
 
@@ -154,13 +155,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _onPastePressed() async {
     if (_hasText) {
-      // If text exists, treat as download action
+      // If text exists, treat as download action (manual input)
       final url = _searchController.text;
       if (url.isNotEmpty) {
+        _isQuickAction = false; // Manual input = show options
         _processInstagramUrl(url);
       }
     } else {
-      // If no text, paste from clipboard
+      // If no text, paste from clipboard (quick action)
       _pasteController.forward().then((_) {
         _pasteController.reverse();
       });
@@ -171,6 +173,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         _searchController2.forward().then((_) {
           _searchController2.reverse();
         });
+        
+        // Auto-process for quick action
+        _isQuickAction = true; // Paste from clipboard = quick download
+        _processInstagramUrl(data.text!);
       }
     }
   }
@@ -1335,10 +1341,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     try {
-      // Check if it's quick action (empty text field = share action)
-      final isQuickAction = _searchController.text.isEmpty;
-      
-      if (isQuickAction) {
+      // Use the quick action flag instead of text field check
+      if (_isQuickAction) {
         // Quick download 360p
         final result = await YouTubePinterestHandler.quickDownloadYouTube(url);
         
@@ -1399,10 +1403,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     try {
-      // Check if it's quick action (empty text field = share action)
-      final isQuickAction = _searchController.text.isEmpty;
-      
-      if (isQuickAction) {
+      // Use the quick action flag instead of text field check
+      if (_isQuickAction) {
         // Quick download
         final result = await YouTubePinterestHandler.quickDownloadPinterest(url);
         
