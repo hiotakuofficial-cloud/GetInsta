@@ -66,46 +66,73 @@ class _MusicPlayerState extends State<MusicPlayer>
   }
 
   Future<void> _initializeAudioPlayer() async {
-    _audioPlayer = AudioPlayer();
-    
-    // Listen to player state changes
-    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      setState(() {
-        _isPlaying = state == PlayerState.playing;
+    try {
+      _audioPlayer = AudioPlayer();
+      
+      // Listen to player state changes
+      _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+        if (mounted) {
+          setState(() {
+            _isPlaying = state == PlayerState.playing;
+          });
+          
+          if (_isPlaying) {
+            _rotationController.repeat();
+            _pulseController.repeat(reverse: true);
+            _showMusicNotification();
+            _startPositionTimer();
+          } else {
+            _rotationController.stop();
+            _pulseController.stop();
+            _hideMusicNotification();
+            _stopPositionTimer();
+          }
+        }
       });
       
-      if (_isPlaying) {
-        _rotationController.repeat();
-        _pulseController.repeat(reverse: true);
-        _showMusicNotification();
-        _startPositionTimer();
+      // Listen to duration changes
+      _audioPlayer.onDurationChanged.listen((Duration duration) {
+        if (mounted) {
+          setState(() {
+            _duration = duration;
+          });
+        }
+      });
+      
+      // Listen to position changes
+      _audioPlayer.onPositionChanged.listen((Duration position) {
+        if (mounted) {
+          setState(() {
+            _position = position;
+          });
+        }
+      });
+      
+      // Check if file exists before playing
+      final file = File(widget.audioPath);
+      if (await file.exists()) {
+        await _audioPlayer.play(DeviceFileSource(widget.audioPath));
       } else {
-        _rotationController.stop();
-        _pulseController.stop();
-        _hideMusicNotification();
-        _stopPositionTimer();
+        print('Audio file not found: ${widget.audioPath}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Audio file not found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
-    });
-    
-    // Listen to duration changes
-    _audioPlayer.onDurationChanged.listen((Duration duration) {
-      setState(() {
-        _duration = duration;
-      });
-    });
-    
-    // Listen to position changes
-    _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _position = position;
-      });
-    });
-    
-    // Auto-play the audio file
-    try {
-      await _audioPlayer.play(DeviceFileSource(widget.audioPath));
     } catch (e) {
-      print('Error playing audio: $e');
+      print('Error initializing audio player: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error playing audio: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -493,51 +520,23 @@ class _MusicPlayerState extends State<MusicPlayer>
   }
 
   void _togglePlayPause() async {
-    if (_isPlaying) {
-      await _audioPlayer.pause();
-    } else {
-      await _audioPlayer.resume();
+    try {
+      if (_isPlaying) {
+        await _audioPlayer.pause();
+      } else {
+        await _audioPlayer.resume();
+      }
+    } catch (e) {
+      print('Error toggling playback: $e');
     }
   }
 
   Future<void> _showMusicNotification() async {
-    final fileName = widget.audioPath.split('/').last;
-    final songName = fileName.replaceAll(RegExp(r'\.[^.]*$'), '');
-    
-    const androidDetails = AndroidNotificationDetails(
-      'music_channel',
-      'Music Player',
-      channelDescription: 'Music playback controls',
-      importance: Importance.low,
-      priority: Priority.low,
-      ongoing: true,
-      autoCancel: false,
-      showWhen: false,
-      icon: '@mipmap/notification',
-      largeIcon: DrawableResourceAndroidBitmap('@mipmap/notification'),
-      styleInformation: MediaStyleInformation(
-        htmlFormatContent: true,
-        htmlFormatTitle: true,
-      ),
-    );
-
-    final details = NotificationDetails(android: androidDetails);
-
-    await _notifications.show(
-      100,
-      songName,
-      'GetInsta Music Player • Now Playing',
-      details,
-    );
-  }
-
-  Future<void> _updateNotificationProgress() async {
-    if (_duration.inMilliseconds > 0) {
-      final progress = (_position.inMilliseconds / _duration.inMilliseconds * 100).round();
+    try {
       final fileName = widget.audioPath.split('/').last;
       final songName = fileName.replaceAll(RegExp(r'\.[^.]*$'), '');
       
-      final androidDetails = AndroidNotificationDetails(
+      const androidDetails = AndroidNotificationDetails(
         'music_channel',
         'Music Player',
         channelDescription: 'Music playback controls',
@@ -546,11 +545,12 @@ class _MusicPlayerState extends State<MusicPlayer>
         ongoing: true,
         autoCancel: false,
         showWhen: false,
-        showProgress: true,
-        maxProgress: 100,
-        progress: progress,
         icon: '@mipmap/notification',
         largeIcon: DrawableResourceAndroidBitmap('@mipmap/notification'),
+        styleInformation: MediaStyleInformation(
+          htmlFormatContent: true,
+          htmlFormatTitle: true,
+        ),
       );
 
       final details = NotificationDetails(android: androidDetails);
@@ -558,14 +558,57 @@ class _MusicPlayerState extends State<MusicPlayer>
       await _notifications.show(
         100,
         songName,
-        '${_formatDuration(_position)} / ${_formatDuration(_duration)}',
+        'GetInsta Music Player • Now Playing',
         details,
       );
+    } catch (e) {
+      print('Error showing notification: $e');
+    }
+  }
+
+  Future<void> _updateNotificationProgress() async {
+    try {
+      if (_duration.inMilliseconds > 0) {
+        final progress = (_position.inMilliseconds / _duration.inMilliseconds * 100).round();
+        final fileName = widget.audioPath.split('/').last;
+        final songName = fileName.replaceAll(RegExp(r'\.[^.]*$'), '');
+        
+        final androidDetails = AndroidNotificationDetails(
+          'music_channel',
+          'Music Player',
+          channelDescription: 'Music playback controls',
+          importance: Importance.low,
+          priority: Priority.low,
+          ongoing: true,
+          autoCancel: false,
+          showWhen: false,
+          showProgress: true,
+          maxProgress: 100,
+          progress: progress,
+          icon: '@mipmap/notification',
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/notification'),
+        );
+
+        final details = NotificationDetails(android: androidDetails);
+
+        await _notifications.show(
+          100,
+          songName,
+          '${_formatDuration(_position)} / ${_formatDuration(_duration)}',
+          details,
+        );
+      }
+    } catch (e) {
+      print('Error updating notification: $e');
     }
   }
 
   Future<void> _hideMusicNotification() async {
-    await _notifications.cancel(100);
+    try {
+      await _notifications.cancel(100);
+    } catch (e) {
+      print('Error hiding notification: $e');
+    }
   }
 
   String _formatDuration(Duration duration) {
@@ -577,13 +620,17 @@ class _MusicPlayerState extends State<MusicPlayer>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _rotationController.dispose();
-    _pulseController.dispose();
-    _stopPositionTimer();
-    _audioPlayer.dispose();
-    _hideMusicNotification();
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    try {
+      WidgetsBinding.instance.removeObserver(this);
+      _rotationController.dispose();
+      _pulseController.dispose();
+      _stopPositionTimer();
+      _audioPlayer.dispose();
+      _hideMusicNotification();
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    } catch (e) {
+      print('Error disposing music player: $e');
+    }
     super.dispose();
   }
 }
