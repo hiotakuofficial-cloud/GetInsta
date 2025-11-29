@@ -218,6 +218,11 @@ class DownloadService : Service() {
                 val imageUrl = data.optString("image_url", null)
                 val type = data.optString("type", "image")
                 
+                // Debug: show what we actually got
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DownloadService, "Video: $videoUrl, Image: $imageUrl", Toast.LENGTH_LONG).show()
+                }
+                
                 val downloadUrl = when {
                     videoUrl != null && videoUrl.isNotEmpty() && videoUrl != "null" -> videoUrl
                     imageUrl != null && imageUrl.isNotEmpty() && imageUrl != "null" -> imageUrl
