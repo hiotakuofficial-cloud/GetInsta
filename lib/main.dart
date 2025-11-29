@@ -29,7 +29,11 @@ class _GetInstaAppState extends State<GetInstaApp> {
   }
 
   void _setupMethodChannel() {
+    print('Setting up method channel...');
     platform.setMethodCallHandler((call) async {
+      print('Method channel call received: ${call.method}');
+      print('Arguments: ${call.arguments}');
+      
       if (call.method == 'openVideo') {
         final String videoPath = call.arguments;
         print('Opening video: $videoPath');
