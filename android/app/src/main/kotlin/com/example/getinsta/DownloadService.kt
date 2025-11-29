@@ -242,7 +242,7 @@ class DownloadService : Service() {
                         showNotification("GetInsta", "Downloading Pinterest...", false)
                     }
                     
-                    downloadFile(downloadUrl, filename)
+                    downloadFileWithHeaders(downloadUrl, filename)
                     
                     withContext(Dispatchers.Main) {
                         showNotification("GetInsta", "Pinterest Complete!", true)
@@ -438,10 +438,24 @@ class DownloadService : Service() {
         return withContext(Dispatchers.IO) {
             val connection = URL(downloadUrl).openConnection()
             
-            // Add headers for YouTube downloads
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-            connection.setRequestProperty("Referer", "https://www.youtube.com/")
+            // Add headers for downloads
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
             connection.setRequestProperty("Accept", "*/*")
+            connection.setRequestProperty("Accept-Language", "en-US,en;q=0.9")
+            connection.setRequestProperty("Accept-Encoding", "identity")
+            
+            // Add specific referer based on URL
+            when {
+                downloadUrl.contains("youtube") || downloadUrl.contains("yt-dl") -> {
+                    connection.setRequestProperty("Referer", "https://www.youtube.com/")
+                }
+                downloadUrl.contains("pinterest") || downloadUrl.contains("pinsave") -> {
+                    connection.setRequestProperty("Referer", "https://www.pinterest.com/")
+                }
+            }
+            
+            connection.connectTimeout = 30000
+            connection.readTimeout = 30000
             
             val inputStream = connection.getInputStream()
             
@@ -450,7 +464,7 @@ class DownloadService : Service() {
                 downloadsDir.mkdirs()
             }
             
-            val file = File(downloadsDir, filename)
+            val file = getUniqueFile(downloadsDir, filename)
             val outputStream = FileOutputStream(file)
             
             inputStream.copyTo(outputStream)
