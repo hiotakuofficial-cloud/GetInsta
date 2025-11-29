@@ -189,16 +189,11 @@ class DownloadService : Service() {
         try {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Getting Pinterest media...", false)
-                Toast.makeText(this@DownloadService, "API call for: ${url.take(30)}...", Toast.LENGTH_SHORT).show()
             }
             
             // Pinterest API call
             val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
             val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=$encodedUrl"
-            
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@DownloadService, "Calling API...", Toast.LENGTH_SHORT).show()
-            }
             
             val connection = URL(apiUrl).openConnection()
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36")
@@ -207,63 +202,35 @@ class DownloadService : Service() {
             
             val response = connection.getInputStream().bufferedReader().readText()
             
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@DownloadService, "Got response: ${response.take(100)}...", Toast.LENGTH_LONG).show()
-            }
-            
-            // Clean response - remove PHP warnings
+            // Clean response - remove PHP warnings before JSON
             val jsonStart = response.indexOf("{")
-            if (jsonStart == -1) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DownloadService, "No JSON found in response", Toast.LENGTH_LONG).show()
-                }
-                throw Exception("No JSON in response")
-            }
-            
-            val cleanResponse = response.substring(jsonStart)
-            
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@DownloadService, "Clean JSON: ${cleanResponse.take(100)}...", Toast.LENGTH_LONG).show()
+            val cleanResponse = if (jsonStart != -1) {
+                response.substring(jsonStart)
+            } else {
+                throw Exception("No JSON found")
             }
             
             val data = JSONObject(cleanResponse)
             
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@DownloadService, "Success: ${data.optBoolean("success", false)}", Toast.LENGTH_SHORT).show()
-            }
-            
             if (data.optBoolean("success", false)) {
-                // Get all available fields for debugging
-                val videoUrl = data.optString("video_url", "")
-                val imageUrl = data.optString("image_url", "")
-                val type = data.optString("type", "")
-                val title = data.optString("title", "")
+                // API structure: video_url or image_url (one will be null)
+                val videoUrl = data.optString("video_url")
+                val imageUrl = data.optString("image_url")
+                val type = data.optString("type", "image")
                 
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DownloadService, "Type: $type, Video: ${videoUrl.take(20)}, Image: ${imageUrl.take(20)}", Toast.LENGTH_LONG).show()
-                }
-                
-                var downloadUrl: String? = null
-                
-                // Check video_url first
-                if (videoUrl.isNotEmpty() && videoUrl != "null") {
-                    downloadUrl = videoUrl
-                }
-                
-                // Fallback to image_url
-                if (downloadUrl == null && imageUrl.isNotEmpty() && imageUrl != "null") {
-                    downloadUrl = imageUrl
+                val downloadUrl = when {
+                    !videoUrl.isNullOrEmpty() && videoUrl != "null" -> videoUrl
+                    !imageUrl.isNullOrEmpty() && imageUrl != "null" -> imageUrl
+                    else -> null
                 }
                 
                 if (downloadUrl != null) {
-                    withContext(Dispatchers.Main) {
-                        showNotification("GetInsta", "Downloading Pinterest...", false)
-                        Toast.makeText(this@DownloadService, "Downloading from: ${downloadUrl.take(30)}...", Toast.LENGTH_SHORT).show()
-                    }
-                    
-                    // Use simple extension based on type
                     val extension = if (type == "video") ".mp4" else ".jpg"
                     val filename = "Downloaded From GetInsta By Nehu$extension"
+                    
+                    withContext(Dispatchers.Main) {
+                        showNotification("GetInsta", "Downloading Pinterest...", false)
+                    }
                     
                     downloadFileWithHeaders(downloadUrl, filename)
                     
@@ -272,22 +239,15 @@ class DownloadService : Service() {
                         Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DownloadService, "No valid URLs found in response", Toast.LENGTH_LONG).show()
-                    }
-                    throw Exception("No download URL found")
+                    throw Exception("No download URL in response")
                 }
             } else {
-                val error = data.optString("error", "Unknown error")
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DownloadService, "API Error: $error", Toast.LENGTH_LONG).show()
-                }
-                throw Exception("API error: $error")
+                throw Exception("API returned success=false")
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Pinterest Failed", true)
-                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
