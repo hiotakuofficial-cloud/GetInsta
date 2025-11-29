@@ -101,6 +101,52 @@ class YouTubePinterestHandler {
     }
   }
 
+  // Quick download functions
+  static Future<Map<String, dynamic>> quickDownloadYouTube(String url) async {
+    Fluttertoast.showToast(msg: "⚡ Quick YouTube download (360p)...", backgroundColor: Colors.blue);
+    return await downloadYouTubeVideo(url, '360');
+  }
+
+  static Future<Map<String, dynamic>> quickDownloadPinterest(String url) async {
+    try {
+      Fluttertoast.showToast(msg: "⚡ Quick Pinterest download...", backgroundColor: Colors.pink);
+      
+      final result = await getPinterestInfo(url);
+      if (result['success'] == true) {
+        final data = result['data'];
+        final downloadUrl = data['video_url'] ?? data['image_url'];
+        final mediaType = data['type'] ?? 'unknown';
+        
+        String extension = 'jpg';
+        if (mediaType == 'video') {
+          extension = 'mp4';
+        } else if (downloadUrl != null) {
+          final uri = Uri.parse(downloadUrl);
+          final path = uri.path.toLowerCase();
+          if (path.contains('.mp4')) extension = 'mp4';
+          else if (path.contains('.webm')) extension = 'webm';
+          else if (path.contains('.png')) extension = 'png';
+          else if (path.contains('.gif')) extension = 'gif';
+          else if (path.contains('.jpeg')) extension = 'jpeg';
+        }
+        
+        return {
+          'success': true,
+          'downloadUrl': downloadUrl,
+          'filename': 'Downloaded From GetInsta By Nehu.$extension',
+          'mediaType': mediaType,
+          'thumbnail': data['thumbnail'],
+          'title': data['title'] ?? 'Pinterest Media',
+        };
+      } else {
+        return result;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Pinterest Error: $e", backgroundColor: Colors.red, toastLength: Toast.LENGTH_LONG);
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   // Pinterest functions
   static Future<Map<String, dynamic>> getPinterestInfo(String url) async {
     try {

@@ -1335,17 +1335,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     try {
-      final result = await YouTubePinterestHandler.getYouTubeInfo(url);
+      // Check if it's quick action (empty text field = share action)
+      final isQuickAction = _searchController.text.isEmpty;
       
-      if (result['success'] == true) {
-        _showYouTubeOptions(result['data'], url);
+      if (isQuickAction) {
+        // Quick download 360p
+        final result = await YouTubePinterestHandler.quickDownloadYouTube(url);
+        
+        if (result['success'] == true) {
+          final downloadResult = await InstagramHandler.downloadMedia(
+            result['downloadUrl'],
+            result['filename'],
+            thumbnailUrl: null,
+            username: 'YouTube',
+            caption: result['filename'],
+          );
+          
+          if (downloadResult['success'] == true) {
+            Fluttertoast.showToast(
+              msg: "✅ Quick YouTube download completed!", 
+              backgroundColor: Colors.green,
+              toastLength: Toast.LENGTH_LONG
+            );
+          } else {
+            Fluttertoast.showToast(
+              msg: "❌ Download failed: ${downloadResult['error']}", 
+              backgroundColor: Colors.red,
+              toastLength: Toast.LENGTH_LONG
+            );
+          }
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('YouTube Error: ${result['error']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Show quality selection bottom sheet
+        final result = await YouTubePinterestHandler.getYouTubeInfo(url);
+        
+        if (result['success'] == true) {
+          _showYouTubeOptions(result['data'], url);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('YouTube Error: ${result['error']}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } finally {
       setState(() {
@@ -1366,17 +1399,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
 
     try {
-      final result = await YouTubePinterestHandler.getPinterestInfo(url);
+      // Check if it's quick action (empty text field = share action)
+      final isQuickAction = _searchController.text.isEmpty;
       
-      if (result['success'] == true) {
-        _downloadPinterestMedia(result['data']);
+      if (isQuickAction) {
+        // Quick download
+        final result = await YouTubePinterestHandler.quickDownloadPinterest(url);
+        
+        if (result['success'] == true) {
+          final downloadResult = await InstagramHandler.downloadMedia(
+            result['downloadUrl'],
+            result['filename'],
+            thumbnailUrl: result['thumbnail'],
+            username: 'Pinterest',
+            caption: result['title'],
+          );
+          
+          if (downloadResult['success'] == true) {
+            Fluttertoast.showToast(
+              msg: "✅ Quick Pinterest download completed!", 
+              backgroundColor: Colors.green,
+              toastLength: Toast.LENGTH_LONG
+            );
+          } else {
+            Fluttertoast.showToast(
+              msg: "❌ Download failed: ${downloadResult['error']}", 
+              backgroundColor: Colors.red,
+              toastLength: Toast.LENGTH_LONG
+            );
+          }
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pinterest Error: ${result['error']}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Normal Pinterest processing (direct download)
+        final result = await YouTubePinterestHandler.getPinterestInfo(url);
+        
+        if (result['success'] == true) {
+          _downloadPinterestMedia(result['data']);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Pinterest Error: ${result['error']}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } finally {
       setState(() {
