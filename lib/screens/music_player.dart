@@ -27,8 +27,9 @@ class _MusicPlayerState extends State<MusicPlayer>
   late Animation<double> _pulseAnimation;
   
   // Audio player
-  late AudioPlayer _audioPlayer;
+  AudioPlayer? _audioPlayer;
   bool _isPlaying = false;
+  bool _isInitialized = false;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
   Timer? _positionTimer;
@@ -67,31 +68,24 @@ class _MusicPlayerState extends State<MusicPlayer>
 
   Future<void> _initializeAudioPlayer() async {
     try {
+      // Delay initialization to prevent crashes
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (!mounted) return;
+      
       _audioPlayer = AudioPlayer();
       
-      // Listen to player state changes
-      _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+      // Simple listeners without complex logic
+      _audioPlayer!.onPlayerStateChanged.listen((PlayerState state) {
         if (mounted) {
           setState(() {
             _isPlaying = state == PlayerState.playing;
+            _isInitialized = true;
           });
-          
-          if (_isPlaying) {
-            _rotationController.repeat();
-            _pulseController.repeat(reverse: true);
-            _showMusicNotification();
-            _startPositionTimer();
-          } else {
-            _rotationController.stop();
-            _pulseController.stop();
-            _hideMusicNotification();
-            _stopPositionTimer();
-          }
         }
       });
       
-      // Listen to duration changes
-      _audioPlayer.onDurationChanged.listen((Duration duration) {
+      _audioPlayer!.onDurationChanged.listen((Duration duration) {
         if (mounted) {
           setState(() {
             _duration = duration;
@@ -99,8 +93,7 @@ class _MusicPlayerState extends State<MusicPlayer>
         }
       });
       
-      // Listen to position changes
-      _audioPlayer.onPositionChanged.listen((Duration position) {
+      _audioPlayer!.onPositionChanged.listen((Duration position) {
         if (mounted) {
           setState(() {
             _position = position;
@@ -108,30 +101,17 @@ class _MusicPlayerState extends State<MusicPlayer>
         }
       });
       
-      // Check if file exists before playing
+      // Try to play the file
       final file = File(widget.audioPath);
       if (await file.exists()) {
-        await _audioPlayer.play(DeviceFileSource(widget.audioPath));
-      } else {
-        print('Audio file not found: ${widget.audioPath}');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Audio file not found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        await _audioPlayer!.play(DeviceFileSource(widget.audioPath));
       }
     } catch (e) {
-      print('Error initializing audio player: $e');
+      print('Audio player error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error playing audio: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        setState(() {
+          _isInitialized = true; // Show UI even if audio fails
+        });
       }
     }
   }
@@ -184,6 +164,17 @@ class _MusicPlayerState extends State<MusicPlayer>
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: const Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF667eea),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -520,14 +511,16 @@ class _MusicPlayerState extends State<MusicPlayer>
   }
 
   void _togglePlayPause() async {
+    if (_audioPlayer == null) return;
+    
     try {
       if (_isPlaying) {
-        await _audioPlayer.pause();
+        await _audioPlayer!.pause();
       } else {
-        await _audioPlayer.resume();
+        await _audioPlayer!.resume();
       }
     } catch (e) {
-      print('Error toggling playback: $e');
+      print('Playback error: $e');
     }
   }
 
@@ -624,12 +617,11 @@ class _MusicPlayerState extends State<MusicPlayer>
       WidgetsBinding.instance.removeObserver(this);
       _rotationController.dispose();
       _pulseController.dispose();
-      _stopPositionTimer();
-      _audioPlayer.dispose();
-      _hideMusicNotification();
+      _positionTimer?.cancel();
+      _audioPlayer?.dispose();
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     } catch (e) {
-      print('Error disposing music player: $e');
+      print('Dispose error: $e');
     }
     super.dispose();
   }
