@@ -59,7 +59,7 @@ class YouTubePinterestHandler {
           return {
             'success': true,
             'downloadUrl': data['download_url'],
-            'filename': data['filename'] ?? 'youtube_${quality}p_${DateTime.now().millisecondsSinceEpoch}.mp4',
+            'filename': data['filename'] ?? 'youtube_video_${DateTime.now().millisecondsSinceEpoch}.mp4',
           };
         } else {
           throw Exception(data['error'] ?? 'Video download failed');
@@ -87,7 +87,7 @@ class YouTubePinterestHandler {
           return {
             'success': true,
             'downloadUrl': data['download_url'],
-            'filename': data['filename'] ?? 'youtube_${quality}kbps_${DateTime.now().millisecondsSinceEpoch}.mp3',
+            'filename': data['filename'] ?? 'youtube_audio_${DateTime.now().millisecondsSinceEpoch}.mp3',
           };
         } else {
           throw Exception(data['error'] ?? 'Audio download failed');

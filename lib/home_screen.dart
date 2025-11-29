@@ -1667,7 +1667,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       
       final downloadUrl = data['video_url'] ?? data['image_url'];
       final mediaType = data['type'] ?? 'unknown';
-      final extension = mediaType == 'video' ? 'mp4' : 'jpg';
+      
+      // Get proper extension from URL or type
+      String extension = 'jpg'; // default
+      if (mediaType == 'video') {
+        extension = 'mp4';
+      } else if (downloadUrl != null) {
+        // Try to get extension from URL
+        final uri = Uri.parse(downloadUrl);
+        final path = uri.path.toLowerCase();
+        if (path.contains('.mp4')) extension = 'mp4';
+        else if (path.contains('.webm')) extension = 'webm';
+        else if (path.contains('.png')) extension = 'png';
+        else if (path.contains('.gif')) extension = 'gif';
+        else if (path.contains('.jpeg')) extension = 'jpeg';
+      }
+      
       final filename = 'pinterest_${mediaType}_${DateTime.now().millisecondsSinceEpoch}.$extension';
       
       if (downloadUrl != null) {
@@ -1681,7 +1696,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         if (result['success'] == true) {
           Fluttertoast.showToast(
-            msg: "✅ Pinterest ${mediaType} downloaded!", 
+            msg: "✅ Pinterest ${mediaType} downloaded (.$extension)!", 
             backgroundColor: Colors.green,
             toastLength: Toast.LENGTH_LONG
           );
