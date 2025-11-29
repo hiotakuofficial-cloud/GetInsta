@@ -1683,7 +1683,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         else if (path.contains('.jpeg')) extension = 'jpeg';
       }
       
-      final filename = 'pinterest_${mediaType}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+      final filename = 'Downloaded From GetInsta By Nehu.$extension';
       
       if (downloadUrl != null) {
         final result = await InstagramHandler.downloadMedia(
