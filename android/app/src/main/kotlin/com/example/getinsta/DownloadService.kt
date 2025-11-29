@@ -214,18 +214,13 @@ class DownloadService : Service() {
             
             if (data.optBoolean("success", false)) {
                 // API structure: video_url or image_url (one will be null)
-                val videoUrl = data.optString("video_url", null)
-                val imageUrl = data.optString("image_url", null)
+                val videoUrl = if (data.isNull("video_url")) null else data.optString("video_url")
+                val imageUrl = if (data.isNull("image_url")) null else data.optString("image_url")
                 val type = data.optString("type", "image")
                 
-                // Debug: show what we actually got
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DownloadService, "Video: $videoUrl, Image: $imageUrl", Toast.LENGTH_LONG).show()
-                }
-                
                 val downloadUrl = when {
-                    videoUrl != null && videoUrl.isNotEmpty() && videoUrl != "null" -> videoUrl
-                    imageUrl != null && imageUrl.isNotEmpty() && imageUrl != "null" -> imageUrl
+                    videoUrl != null && videoUrl.isNotEmpty() -> videoUrl
+                    imageUrl != null && imageUrl.isNotEmpty() -> imageUrl
                     else -> null
                 }
                 
