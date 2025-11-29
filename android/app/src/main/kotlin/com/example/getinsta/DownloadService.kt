@@ -100,7 +100,120 @@ class DownloadService : Service() {
                 showNotification("GetInsta", "Processing URL...", false)
             }
             
-            // Fetch Instagram data
+            // Detect platform and handle accordingly
+            when {
+                isYouTubeUrl(url) -> downloadYouTubeMedia(url)
+                isPinterestUrl(url) -> downloadPinterestMedia(url)
+                else -> downloadInstagramMediaOriginal(url)
+            }
+            
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Download failed: ${e.message}", true)
+                Toast.makeText(this@DownloadService, "Download Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun isYouTubeUrl(url: String): Boolean {
+        return url.contains("youtube.com") || url.contains("youtu.be") || url.contains("m.youtube.com")
+    }
+    
+    private fun isPinterestUrl(url: String): Boolean {
+        return url.contains("pinterest.com") || url.contains("pin.it")
+    }
+    
+    private suspend fun downloadYouTubeMedia(url: String) {
+        try {
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Getting YouTube video (360p)...", false)
+            }
+            
+            // Get YouTube download link (360p)
+            val apiUrl = "https://v1-w3sc.onrender.com/yt/api.php?action=download&url=${java.net.URLEncoder.encode(url, "UTF-8")}&q=360&type=mp4"
+            val response = URL(apiUrl).readText()
+            val data = JSONObject(response)
+            
+            if (data.getBoolean("success")) {
+                val downloadUrl = data.getString("download_url")
+                val filename = data.optString("filename", "youtube_video_${System.currentTimeMillis()}.mp4")
+                
+                withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "Downloading YouTube video...", false)
+                }
+                
+                val filePath = downloadFileWithHeaders(downloadUrl, filename)
+                
+                withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "YouTube download complete!", true)
+                    Toast.makeText(this@DownloadService, "YouTube Complete!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                throw Exception("YouTube API error")
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "YouTube download failed", true)
+                Toast.makeText(this@DownloadService, "YouTube Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private suspend fun downloadPinterestMedia(url: String) {
+        try {
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Getting Pinterest media...", false)
+            }
+            
+            // Get Pinterest download link
+            val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
+            val response = URL(apiUrl).readText()
+            
+            // Handle PHP warnings
+            val cleanResponse = if (response.contains("{")) {
+                response.substring(response.indexOf("{"))
+            } else response
+            
+            val data = JSONObject(cleanResponse)
+            
+            if (data.getBoolean("success")) {
+                val downloadUrl = data.optString("video_url") ?: data.optString("image_url")
+                val mediaType = data.optString("type", "unknown")
+                
+                val extension = when {
+                    mediaType == "video" -> ".mp4"
+                    downloadUrl.contains(".png") -> ".png"
+                    downloadUrl.contains(".gif") -> ".gif"
+                    downloadUrl.contains(".jpeg") -> ".jpeg"
+                    else -> ".jpg"
+                }
+                
+                val filename = "Downloaded From GetInsta By Nehu$extension"
+                
+                withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "Downloading Pinterest media...", false)
+                }
+                
+                val filePath = downloadFile(downloadUrl, filename)
+                
+                withContext(Dispatchers.Main) {
+                    showNotification("GetInsta", "Pinterest download complete!", true)
+                    Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                throw Exception("Pinterest API error")
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                showNotification("GetInsta", "Pinterest download failed", true)
+                Toast.makeText(this@DownloadService, "Pinterest Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private suspend fun downloadInstagramMediaOriginal(url: String) {
+        try {
+            // Original Instagram processing code
             val apiUrl = "https://v1-w3sc.onrender.com/insta/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
             val response = URL(apiUrl).readText()
             val data = JSONObject(response)
@@ -215,6 +328,34 @@ class DownloadService : Service() {
         }
     }
     
+    private suspend fun downloadFileWithHeaders(downloadUrl: String, filename: String): String {
+        return withContext(Dispatchers.IO) {
+            val connection = URL(downloadUrl).openConnection()
+            
+            // Add headers for YouTube downloads
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+            connection.setRequestProperty("Referer", "https://www.youtube.com/")
+            connection.setRequestProperty("Accept", "*/*")
+            
+            val inputStream = connection.getInputStream()
+            
+            val downloadsDir = File("/storage/emulated/0/Download/reel")
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdirs()
+            }
+            
+            val file = File(downloadsDir, filename)
+            val outputStream = FileOutputStream(file)
+            
+            inputStream.copyTo(outputStream)
+            
+            inputStream.close()
+            outputStream.close()
+            
+            file.absolutePath
+        }
+    }
+
     private suspend fun downloadFile(downloadUrl: String, filename: String): String {
         // Create Downloads/reel directory
         val downloadDir = File("/storage/emulated/0/Download/reel")
