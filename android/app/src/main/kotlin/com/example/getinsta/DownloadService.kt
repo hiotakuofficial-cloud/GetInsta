@@ -267,23 +267,52 @@ class DownloadService : Service() {
             try {
                 val connection = URL(downloadUrl).openConnection()
                 connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36")
+                connection.setRequestProperty("Accept", "*/*")
                 connection.connectTimeout = 10000
                 connection.readTimeout = 10000
                 connection.requestMethod = "HEAD" // Only get headers, not content
                 
+                connection.connect()
                 val contentType = connection.contentType?.lowercase() ?: ""
+                val contentDisposition = connection.getHeaderField("Content-Disposition")?.lowercase() ?: ""
                 
+                // Check content-disposition first for filename hints
+                if (contentDisposition.contains(".mp4") || contentDisposition.contains(".webm")) {
+                    return@withContext ".mp4"
+                }
+                if (contentDisposition.contains(".jpg") || contentDisposition.contains(".jpeg")) {
+                    return@withContext ".jpg"
+                }
+                if (contentDisposition.contains(".png")) {
+                    return@withContext ".png"
+                }
+                if (contentDisposition.contains(".gif")) {
+                    return@withContext ".gif"
+                }
+                
+                // Then check content-type
                 when {
-                    contentType.contains("video/mp4") -> ".mp4"
+                    contentType.contains("video/mp4") || contentType.contains("video/webm") -> ".mp4"
                     contentType.contains("video/") -> ".mp4"
                     contentType.contains("image/png") -> ".png"
                     contentType.contains("image/gif") -> ".gif"
                     contentType.contains("image/jpeg") || contentType.contains("image/jpg") -> ".jpg"
                     contentType.contains("image/") -> ".jpg"
-                    else -> ".jpg" // default fallback
+                    // Fallback: check URL path
+                    downloadUrl.contains(".mp4") -> ".mp4"
+                    downloadUrl.contains(".webm") -> ".mp4"
+                    downloadUrl.contains(".png") -> ".png"
+                    downloadUrl.contains(".gif") -> ".gif"
+                    else -> ".jpg" // default fallback for images
                 }
             } catch (e: Exception) {
-                ".jpg" // fallback on error
+                // If HEAD request fails, try to guess from URL
+                when {
+                    downloadUrl.contains(".mp4") || downloadUrl.contains("video") -> ".mp4"
+                    downloadUrl.contains(".png") -> ".png"
+                    downloadUrl.contains(".gif") -> ".gif"
+                    else -> ".jpg"
+                }
             }
         }
     }
