@@ -149,12 +149,13 @@ class DownloadService : Service() {
                     Toast.makeText(this@DownloadService, "YouTube Complete!", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                throw Exception("YouTube API error")
+                val error = data.optString("error", "Unknown error")
+                throw Exception("YouTube API error: $error")
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
-                showNotification("GetInsta", "YouTube download failed", true)
-                Toast.makeText(this@DownloadService, "YouTube Failed", Toast.LENGTH_SHORT).show()
+                showNotification("GetInsta", "YouTube failed: ${e.message}", true)
+                Toast.makeText(this@DownloadService, "YouTube Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -169,44 +170,60 @@ class DownloadService : Service() {
             val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
             val response = URL(apiUrl).readText()
             
-            // Handle PHP warnings
-            val cleanResponse = if (response.contains("{")) {
-                response.substring(response.indexOf("{"))
-            } else response
+            // Handle PHP warnings - find JSON start
+            val jsonStart = response.indexOf("{")
+            val cleanResponse = if (jsonStart != -1) {
+                response.substring(jsonStart)
+            } else {
+                response
+            }
             
             val data = JSONObject(cleanResponse)
             
             if (data.getBoolean("success")) {
-                val downloadUrl = data.optString("video_url") ?: data.optString("image_url")
-                val mediaType = data.optString("type", "unknown")
+                val videoUrl = if (data.has("video_url") && !data.isNull("video_url")) {
+                    data.getString("video_url")
+                } else null
                 
-                val extension = when {
-                    mediaType == "video" -> ".mp4"
-                    downloadUrl.contains(".png") -> ".png"
-                    downloadUrl.contains(".gif") -> ".gif"
-                    downloadUrl.contains(".jpeg") -> ".jpeg"
-                    else -> ".jpg"
-                }
+                val imageUrl = if (data.has("image_url") && !data.isNull("image_url")) {
+                    data.getString("image_url")
+                } else null
                 
-                val filename = "Downloaded From GetInsta By Nehu$extension"
+                val downloadUrl = videoUrl ?: imageUrl
                 
-                withContext(Dispatchers.Main) {
-                    showNotification("GetInsta", "Downloading Pinterest media...", false)
-                }
-                
-                val filePath = downloadFile(downloadUrl, filename)
-                
-                withContext(Dispatchers.Main) {
-                    showNotification("GetInsta", "Pinterest download complete!", true)
-                    Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
+                if (downloadUrl != null) {
+                    val mediaType = data.optString("type", "unknown")
+                    
+                    val extension = when {
+                        mediaType == "video" -> ".mp4"
+                        downloadUrl.contains(".png") -> ".png"
+                        downloadUrl.contains(".gif") -> ".gif"
+                        downloadUrl.contains(".jpeg") -> ".jpeg"
+                        else -> ".jpg"
+                    }
+                    
+                    val filename = "Downloaded From GetInsta By Nehu$extension"
+                    
+                    withContext(Dispatchers.Main) {
+                        showNotification("GetInsta", "Downloading Pinterest media...", false)
+                    }
+                    
+                    val filePath = downloadFile(downloadUrl, filename)
+                    
+                    withContext(Dispatchers.Main) {
+                        showNotification("GetInsta", "Pinterest download complete!", true)
+                        Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    throw Exception("No download URL found")
                 }
             } else {
-                throw Exception("Pinterest API error")
+                throw Exception("Pinterest API returned success=false")
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
-                showNotification("GetInsta", "Pinterest download failed", true)
-                Toast.makeText(this@DownloadService, "Pinterest Failed", Toast.LENGTH_SHORT).show()
+                showNotification("GetInsta", "Pinterest failed: ${e.message}", true)
+                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
