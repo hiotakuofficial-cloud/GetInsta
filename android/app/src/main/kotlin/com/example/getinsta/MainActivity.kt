@@ -30,9 +30,21 @@ class MainActivity: FlutterActivity() {
             if (uri != null) {
                 val realPath = getRealPathFromURI(uri)
                 if (realPath != null) {
-                    // Send real file path to Flutter
+                    // Check if it's audio or video file
+                    val mimeType = contentResolver.getType(uri)
+                    val isAudio = mimeType?.startsWith("audio/") == true || 
+                                 realPath.endsWith(".mp3", true) || 
+                                 realPath.endsWith(".m4a", true) ||
+                                 realPath.endsWith(".wav", true) ||
+                                 realPath.endsWith(".flac", true)
+                    
+                    // Send to appropriate player
                     flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-                        MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", realPath)
+                        if (isAudio) {
+                            MethodChannel(messenger, CHANNEL).invokeMethod("openAudio", realPath)
+                        } else {
+                            MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", realPath)
+                        }
                     }
                 }
             }
