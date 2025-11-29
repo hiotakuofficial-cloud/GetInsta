@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/professional_video_player.dart';
-import 'screens/music_player.dart';
+import 'screens/simple_music_player.dart';
 
 void main() {
   runApp(const GetInstaApp());
@@ -65,7 +65,7 @@ class _GetInstaAppState extends State<GetInstaApp> {
       ),
       home: _hasExternalMedia && _externalMediaPath != null
           ? _isAudio
-              ? MusicPlayer(
+              ? SimpleMusicPlayer(
                   audioPath: _externalMediaPath!,
                   title: 'External Audio',
                 )
