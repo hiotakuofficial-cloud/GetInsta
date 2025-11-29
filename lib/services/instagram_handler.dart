@@ -129,6 +129,17 @@ class InstagramHandler {
     try {
       
       final request = http.Request('GET', Uri.parse(mediaUrl));
+      
+      // Add proper headers for YouTube and other downloads
+      request.headers.addAll({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Referer': 'https://www.youtube.com/',
+      });
+      
       final response = await request.send();
       
       
