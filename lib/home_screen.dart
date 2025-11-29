@@ -223,11 +223,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     
     if (YouTubePinterestHandler.isPinterestUrl(url)) {
-      Fluttertoast.showToast(
-        msg: "📌 DEBUG: Detected Pinterest URL, Quick: $_isQuickAction",
-        backgroundColor: Colors.pink,
-        toastLength: Toast.LENGTH_LONG
-      );
       _processPinterestUrl(url);
       return;
     }

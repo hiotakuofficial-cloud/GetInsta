@@ -114,12 +114,7 @@ class DownloadService : Service() {
                     }
                     downloadYouTubeMedia(url)
                 }
-                isPinterestUrl(url) -> {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DownloadService, "Detected: Pinterest", Toast.LENGTH_SHORT).show()
-                    }
-                    downloadPinterestMedia(url)
-                }
+                isPinterestUrl(url) -> downloadPinterestMedia(url)
                 else -> {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@DownloadService, "Detected: Instagram", Toast.LENGTH_SHORT).show()
