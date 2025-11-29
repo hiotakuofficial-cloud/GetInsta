@@ -105,7 +105,12 @@ class DownloadService : Service() {
             // Detect platform and handle accordingly
             when {
                 isYouTubeUrl(url) -> downloadYouTubeMedia(url)
-                isPinterestUrl(url) -> downloadPinterestMedia(url)
+                isPinterestUrl(url) -> {
+                    withContext(Dispatchers.Main) {
+                        showNotification("GetInsta", "Pinterest: Use main app", true)
+                        Toast.makeText(this@DownloadService, "Pinterest: Use main app for downloads", Toast.LENGTH_LONG).show()
+                    }
+                }
                 else -> downloadInstagramMediaOriginal(url)
             }
             
@@ -166,73 +171,6 @@ class DownloadService : Service() {
         }
     }
 
-    private suspend fun downloadPinterestMedia(url: String) {
-        try {
-            withContext(Dispatchers.Main) {
-                showNotification("GetInsta", "Getting Pinterest media...", false)
-            }
-            
-            // Pinterest API call
-            val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
-            val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=$encodedUrl"
-            
-            val connection = URL(apiUrl).openConnection()
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36")
-            connection.connectTimeout = 30000
-            connection.readTimeout = 30000
-            
-            val response = connection.getInputStream().bufferedReader().readText()
-            
-            // Clean response - remove PHP warnings properly
-            val jsonStart = response.indexOf("{")
-            val cleanResponse = if (jsonStart != -1) {
-                response.substring(jsonStart)
-            } else {
-                throw Exception("No JSON found")
-            }
-            
-            val data = JSONObject(cleanResponse)
-            
-            if (data.optBoolean("success", false)) {
-                // API structure: video_url or image_url (one will be null)
-                val videoUrl = if (data.isNull("video_url")) null else data.optString("video_url")
-                val imageUrl = if (data.isNull("image_url")) null else data.optString("image_url")
-                val type = data.optString("type", "image")
-                
-                val downloadUrl = when {
-                    videoUrl != null && videoUrl.isNotEmpty() -> videoUrl
-                    imageUrl != null && imageUrl.isNotEmpty() -> imageUrl
-                    else -> null
-                }
-                
-                if (downloadUrl != null) {
-                    val extension = if (type == "video") ".mp4" else ".jpg"
-                    val filename = "Downloaded From GetInsta By Nehu$extension"
-                    
-                    withContext(Dispatchers.Main) {
-                        showNotification("GetInsta", "Downloading Pinterest...", false)
-                    }
-                    
-                    downloadFileWithHeaders(downloadUrl, filename)
-                    
-                    withContext(Dispatchers.Main) {
-                        showNotification("GetInsta", "Pinterest Complete!", true)
-                        Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    throw Exception("No download URL in response")
-                }
-            } else {
-                throw Exception("API returned success=false")
-            }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                showNotification("GetInsta", "Pinterest Failed", true)
-                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-    
     private suspend fun getActualFileExtension(downloadUrl: String): String {
         return withContext(Dispatchers.IO) {
             try {
