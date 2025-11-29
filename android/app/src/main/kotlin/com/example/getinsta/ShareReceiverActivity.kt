@@ -28,9 +28,6 @@ class ShareReceiverActivity : Activity() {
         if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             val sharedUrl = intent.getStringExtra(Intent.EXTRA_TEXT)
             if (sharedUrl != null) {
-                // Debug toast to see received URL
-                Toast.makeText(this, "Received: ${sharedUrl.take(50)}...", Toast.LENGTH_LONG).show()
-                
                 // Start background service - NO activity launch
                 val serviceIntent = Intent(this, DownloadService::class.java).apply {
                     putExtra("SHARED_URL", sharedUrl)

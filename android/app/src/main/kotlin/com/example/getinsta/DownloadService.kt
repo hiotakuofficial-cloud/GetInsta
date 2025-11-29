@@ -32,9 +32,6 @@ class DownloadService : Service() {
         val sharedUrl = intent?.getStringExtra("SHARED_URL")
         
         if (sharedUrl != null) {
-            // Debug toast to see what service received
-            Toast.makeText(this, "Service got: ${sharedUrl.take(30)}...", Toast.LENGTH_LONG).show()
-            
             // Start as foreground service for Android 15
             startForeground(NOTIFICATION_ID, createInitialNotification())
             
@@ -103,24 +100,13 @@ class DownloadService : Service() {
             // Show processing notification
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Processing URL...", false)
-                Toast.makeText(this@DownloadService, "Processing: ${url.take(30)}...", Toast.LENGTH_LONG).show()
             }
             
             // Detect platform and handle accordingly
             when {
-                isYouTubeUrl(url) -> {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DownloadService, "Detected: YouTube", Toast.LENGTH_SHORT).show()
-                    }
-                    downloadYouTubeMedia(url)
-                }
+                isYouTubeUrl(url) -> downloadYouTubeMedia(url)
                 isPinterestUrl(url) -> downloadPinterestMedia(url)
-                else -> {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@DownloadService, "Detected: Instagram", Toast.LENGTH_SHORT).show()
-                    }
-                    downloadInstagramMediaOriginal(url)
-                }
+                else -> downloadInstagramMediaOriginal(url)
             }
             
         } catch (e: Exception) {
