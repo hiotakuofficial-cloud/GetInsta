@@ -114,30 +114,28 @@ class YouTubePinterestHandler {
       final result = await getPinterestInfo(url);
       if (result['success'] == true) {
         final data = result['data'];
-        final downloadUrl = data['video_url'] ?? data['image_url'];
-        final mediaType = data['type'] ?? 'unknown';
+        // API returns video_url or image_url (one will be null)
+        final videoUrl = data['video_url'];
+        final imageUrl = data['image_url'];
+        final mediaType = data['type'] ?? 'image';
         
-        String extension = 'jpg';
-        if (mediaType == 'video') {
-          extension = 'mp4';
-        } else if (downloadUrl != null) {
-          final uri = Uri.parse(downloadUrl);
-          final path = uri.path.toLowerCase();
-          if (path.contains('.mp4')) extension = 'mp4';
-          else if (path.contains('.webm')) extension = 'webm';
-          else if (path.contains('.png')) extension = 'png';
-          else if (path.contains('.gif')) extension = 'gif';
-          else if (path.contains('.jpeg')) extension = 'jpeg';
+        // Prefer video over image
+        final downloadUrl = videoUrl ?? imageUrl;
+        
+        if (downloadUrl != null) {
+          String extension = mediaType == 'video' ? '.mp4' : '.jpg';
+          
+          return {
+            'success': true,
+            'downloadUrl': downloadUrl,
+            'filename': 'Downloaded From GetInsta By Nehu$extension',
+            'mediaType': mediaType,
+            'thumbnail': data['thumbnail'],
+            'title': data['title'] ?? 'Pinterest Media',
+          };
+        } else {
+          throw Exception('No download URL found');
         }
-        
-        return {
-          'success': true,
-          'downloadUrl': downloadUrl,
-          'filename': 'Downloaded From GetInsta By Nehu.$extension',
-          'mediaType': mediaType,
-          'thumbnail': data['thumbnail'],
-          'title': data['title'] ?? 'Pinterest Media',
-        };
       } else {
         return result;
       }
@@ -159,12 +157,12 @@ class YouTubePinterestHandler {
       if (response.statusCode == 200) {
         String responseBody = response.body;
         
-        // Handle PHP warnings
-        if (responseBody.contains('<br />')) {
-          final jsonStart = responseBody.indexOf('{');
-          if (jsonStart != -1) {
-            responseBody = responseBody.substring(jsonStart);
-          }
+        // Handle PHP warnings - extract complete JSON block
+        final jsonStart = responseBody.lastIndexOf('{');
+        final jsonEnd = responseBody.lastIndexOf('}') + 1;
+        
+        if (jsonStart != -1 && jsonEnd > jsonStart) {
+          responseBody = responseBody.substring(jsonStart, jsonEnd);
         }
         
         final data = json.decode(responseBody);
