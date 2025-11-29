@@ -212,19 +212,21 @@ class DownloadService : Service() {
             val data = JSONObject(cleanResponse)
             
             if (data.getBoolean("success")) {
-                // Get download URL - prefer video over image
+                // Get download URL with better checking
                 var downloadUrl: String? = null
                 
-                if (data.has("video_url") && !data.isNull("video_url")) {
-                    val videoUrl = data.getString("video_url")
-                    if (videoUrl.isNotEmpty() && videoUrl != "null") {
+                // Check video_url first
+                if (data.has("video_url")) {
+                    val videoUrl = data.optString("video_url", "")
+                    if (videoUrl.isNotEmpty() && videoUrl != "null" && !data.isNull("video_url")) {
                         downloadUrl = videoUrl
                     }
                 }
                 
-                if (downloadUrl == null && data.has("image_url") && !data.isNull("image_url")) {
-                    val imageUrl = data.getString("image_url")
-                    if (imageUrl.isNotEmpty() && imageUrl != "null") {
+                // Fallback to image_url
+                if (downloadUrl == null && data.has("image_url")) {
+                    val imageUrl = data.optString("image_url", "")
+                    if (imageUrl.isNotEmpty() && imageUrl != "null" && !data.isNull("image_url")) {
                         downloadUrl = imageUrl
                     }
                 }
@@ -232,6 +234,7 @@ class DownloadService : Service() {
                 if (downloadUrl != null) {
                     withContext(Dispatchers.Main) {
                         showNotification("GetInsta", "Checking file type...", false)
+                        Toast.makeText(this@DownloadService, "Found URL: ${downloadUrl.take(30)}...", Toast.LENGTH_SHORT).show()
                     }
                     
                     // Check actual content type from download URL
@@ -249,7 +252,12 @@ class DownloadService : Service() {
                         Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    throw Exception("No download URL found")
+                    // Debug: show what we got from API
+                    val debugInfo = "video_url: ${data.optString("video_url", "null")}, image_url: ${data.optString("image_url", "null")}"
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@DownloadService, "Debug: $debugInfo", Toast.LENGTH_LONG).show()
+                    }
+                    throw Exception("No download URL found in API response")
                 }
             } else {
                 throw Exception("API returned success=false")
@@ -257,7 +265,7 @@ class DownloadService : Service() {
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Pinterest Failed", true)
-                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
