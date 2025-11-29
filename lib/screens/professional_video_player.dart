@@ -331,40 +331,14 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   }
 
   Widget _buildGestureLayer() {
-    return GestureDetector(
-      onTap: () {
-        print('Screen tapped - toggling controls'); // Debug
-        _toggleControls();
-      },
-      onDoubleTapDown: (details) {
-        print('Double tap detected'); // Debug
-        _handleDoubleTap(details);
-      },
-      onScaleStart: (_) {
-        print('Scale gesture started'); // Debug
-        setState(() => _isDragging = true);
-      },
-      onScaleUpdate: (details) {
-        if (details.scale != 1.0) {
-          _handleScaleUpdate(details);
-        }
-      },
-      onScaleEnd: (_) {
-        print('Scale gesture ended'); // Debug
-        setState(() => _isDragging = false);
-      },
-      onPanUpdate: (details) {
-        if (_zoomLevel > 1.0) {
-          _handlePan(details);
-        } else {
-          _handleVerticalPan(details);
-        }
-      },
-      behavior: HitTestBehavior.translucent, // Important for gesture detection
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.transparent,
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: () {
+          print('Screen tapped - toggling controls');
+          _toggleControls();
+        },
+        behavior: HitTestBehavior.translucent,
+        child: Container(color: Colors.transparent),
       ),
     );
   }
@@ -612,7 +586,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Previous button - NO BACKGROUND
+        // Previous button - FIXED
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -624,7 +598,11 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
             child: Container(
               width: 64,
               height: 64,
-              child: Icon(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(32),
+              ),
+              child: const Icon(
                 Icons.skip_previous_rounded,
                 color: Colors.white,
                 size: 32,
@@ -633,7 +611,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
           ),
         ),
         const SizedBox(width: 40),
-        // Play/Pause button - BIGGER ICON, NO BACKGROUND
+        // Play/Pause button - FIXED
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -645,16 +623,20 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
             child: Container(
               width: 80,
               height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(40),
+              ),
               child: Icon(
                 _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                 color: Colors.white,
-                size: 50, // BIGGER ICON
+                size: 50,
               ),
             ),
           ),
         ),
         const SizedBox(width: 40),
-        // Next button - NO BACKGROUND
+        // Next button - FIXED
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -666,7 +648,11 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
             child: Container(
               width: 64,
               height: 64,
-              child: Icon(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(32),
+              ),
+              child: const Icon(
                 Icons.skip_next_rounded,
                 color: Colors.white,
                 size: 32,
@@ -774,52 +760,31 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   }
 
   Widget _buildProgressBar() {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        // Swipe on seek bar for precise seeking
-        final RenderBox box = context.findRenderObject() as RenderBox;
-        final localPosition = box.globalToLocal(details.globalPosition);
-        final progress = (localPosition.dx / box.size.width).clamp(0.0, 1.0);
-        final position = Duration(milliseconds: (progress * _duration.inMilliseconds).round());
-        
-        setState(() {
-          _isDragging = true;
-        });
-        
-        _videoController.seekTo(position);
-        print('Seek bar swiped to: ${position.inSeconds}s');
-      },
-      onHorizontalDragEnd: (_) {
-        setState(() {
-          _isDragging = false;
-        });
-      },
-      child: SliderTheme(
-        data: SliderTheme.of(context).copyWith(
-          activeTrackColor: const Color(0xFF007AFF),
-          inactiveTrackColor: Colors.white24,
-          thumbColor: const Color(0xFF007AFF),
-          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-          overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-          trackHeight: 4,
-        ),
-        child: Slider(
-          value: _duration.inMilliseconds > 0
-              ? _position.inMilliseconds / _duration.inMilliseconds
-              : 0.0,
-          onChanged: (value) {
-            print('Slider changed to: $value');
-            _onSeek(value);
-          },
-          onChangeStart: (_) {
-            print('Slider drag started');
-            setState(() => _isDragging = true);
-          },
-          onChangeEnd: (_) {
-            print('Slider drag ended');
-            setState(() => _isDragging = false);
-          },
-        ),
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        activeTrackColor: const Color(0xFF007AFF),
+        inactiveTrackColor: Colors.white24,
+        thumbColor: const Color(0xFF007AFF),
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+        trackHeight: 4,
+      ),
+      child: Slider(
+        value: _duration.inMilliseconds > 0
+            ? _position.inMilliseconds / _duration.inMilliseconds
+            : 0.0,
+        onChanged: (value) {
+          print('Slider changed to: $value');
+          _onSeek(value);
+        },
+        onChangeStart: (_) {
+          print('Slider drag started');
+          setState(() => _isDragging = true);
+        },
+        onChangeEnd: (_) {
+          print('Slider drag ended');
+          setState(() => _isDragging = false);
+        },
       ),
     );
   }
@@ -841,6 +806,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
         child: Container(
           width: 40,
           height: 40,
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: isActive
                 ? const Color(0xFF007AFF).withOpacity(0.2)
@@ -860,13 +826,13 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
                     Icon(
                       icon,
                       color: Colors.white,
-                      size: 16,
+                      size: 14,
                     ),
                     Text(
                       badge,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: 7,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -875,7 +841,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
               : Icon(
                   icon,
                   color: Colors.white,
-                  size: 20,
+                  size: 18,
                 ),
         ),
       ),
@@ -1069,30 +1035,37 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   }
 
   Widget _buildSmallButton(String text, VoidCallback onPressed, {bool isActive = false}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: isActive
-              ? const Color(0xFF007AFF).withOpacity(0.3)
-              : Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          print('Small button clicked: $text');
+          onPressed();
+        },
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
             color: isActive
-                ? const Color(0xFF007AFF)
-                : Colors.white.withOpacity(0.3),
-            width: 1,
+                ? const Color(0xFF007AFF).withOpacity(0.3)
+                : Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isActive
+                  ? const Color(0xFF007AFF)
+                  : Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
           ),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: isActive ? const Color(0xFF007AFF) : Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isActive ? const Color(0xFF007AFF) : Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
