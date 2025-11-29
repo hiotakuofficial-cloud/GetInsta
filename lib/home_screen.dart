@@ -1386,55 +1386,217 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _showYouTubeOptions(Map<String, dynamic> data, String url) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: Text(
-          data['title'] ?? 'YouTube Video',
-          style: const TextStyle(color: Colors.white),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        content: Column(
+        padding: const EdgeInsets.all(20),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            
+            // Title
+            Text(
+              data['title'] ?? 'YouTube Video',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            
+            // Author
             Text(
               data['author'] ?? 'Unknown',
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 14,
+              ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Select Quality:',
-              style: TextStyle(color: Colors.white),
+            const SizedBox(height: 20),
+            
+            // Format selection
+            Row(
+              children: [
+                // MP3 Section
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          '🎵 MP3 Audio',
+                          style: TextStyle(
+                            color: Color(0xFF4CAF50),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // MP3 Quality buttons
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _downloadYouTubeAudio(url, '128');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4CAF50),
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('128kbps', style: TextStyle(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _downloadYouTubeAudio(url, '320');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4CAF50),
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('320kbps', style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                // MP4 Section
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6C63FF).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          '🎥 MP4 Video',
+                          style: TextStyle(
+                            color: Color(0xFF6C63FF),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // MP4 Quality buttons
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _downloadYouTubeVideo(url, '720');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C63FF),
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('720p', style: TextStyle(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _downloadYouTubeVideo(url, '480');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C63FF),
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('480p', style: TextStyle(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _downloadYouTubeVideo(url, '360');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C63FF),
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('360p', style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            
+            const SizedBox(height: 20),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _downloadYouTubeVideo(url, '720');
-            },
-            child: const Text('720p', style: TextStyle(color: Colors.blue)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _downloadYouTubeVideo(url, '480');
-            },
-            child: const Text('480p', style: TextStyle(color: Colors.blue)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _downloadYouTubeVideo(url, '360');
-            },
-            child: const Text('360p', style: TextStyle(color: Colors.blue)),
-          ),
-        ],
       ),
     );
+  }
+
+  void _downloadYouTubeAudio(String url, String quality) async {
+    Fluttertoast.showToast(msg: "⬇️ Downloading YouTube audio (${quality}kbps)...");
+    
+    try {
+      final result = await YouTubePinterestHandler.downloadYouTubeAudio(url, quality);
+      
+      if (result['success'] == true) {
+        final downloadResult = await InstagramHandler.downloadMedia(
+          result['downloadUrl'],
+          result['filename'],
+          thumbnailUrl: null,
+          username: 'YouTube',
+          caption: result['filename'],
+        );
+        
+        if (downloadResult['success'] == true) {
+          Fluttertoast.showToast(msg: "✅ YouTube audio downloaded!", backgroundColor: Colors.green);
+        } else {
+          Fluttertoast.showToast(msg: "❌ Download failed", backgroundColor: Colors.red);
+        }
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Error: $e", backgroundColor: Colors.red);
+    }
   }
 
   void _downloadYouTubeVideo(String url, String quality) async {

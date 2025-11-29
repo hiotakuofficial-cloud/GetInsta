@@ -69,6 +69,31 @@ class YouTubePinterestHandler {
     }
   }
 
+  static Future<Map<String, dynamic>> downloadYouTubeAudio(String url, String quality) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$youtubeApiBase?action=download&url=$url&q=$quality&type=mp3'),
+      ).timeout(const Duration(seconds: 20));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return {
+            'success': true,
+            'downloadUrl': data['download_url'],
+            'filename': data['filename'] ?? 'youtube_${quality}kbps.mp3',
+          };
+        } else {
+          throw Exception(data['error'] ?? 'Download failed');
+        }
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   // Pinterest functions
   static Future<Map<String, dynamic>> getPinterestInfo(String url) async {
     try {
