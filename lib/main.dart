@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/professional_video_player.dart';
-import 'screens/simple_music_player.dart';
 
 void main() {
   runApp(const GetInstaApp());
@@ -18,9 +17,8 @@ class GetInstaApp extends StatefulWidget {
 
 class _GetInstaAppState extends State<GetInstaApp> {
   static const platform = MethodChannel('com.example.getinsta/video_intent');
-  bool _hasExternalMedia = false;
-  String? _externalMediaPath;
-  bool _isAudio = false;
+  bool _hasExternalVideo = false;
+  String? _externalVideoPath;
 
   @override
   void initState() {
@@ -39,18 +37,8 @@ class _GetInstaAppState extends State<GetInstaApp> {
         print('Opening video: $videoPath');
         
         setState(() {
-          _hasExternalMedia = true;
-          _externalMediaPath = videoPath;
-          _isAudio = false;
-        });
-      } else if (call.method == 'openAudio') {
-        final String audioPath = call.arguments;
-        print('Opening audio: $audioPath');
-        
-        setState(() {
-          _hasExternalMedia = true;
-          _externalMediaPath = audioPath;
-          _isAudio = true;
+          _hasExternalVideo = true;
+          _externalVideoPath = videoPath;
         });
       }
     });
@@ -67,16 +55,11 @@ class _GetInstaAppState extends State<GetInstaApp> {
         cardColor: const Color(0xFF1E1E1E),
         useMaterial3: true,
       ),
-      home: _hasExternalMedia && _externalMediaPath != null
-          ? _isAudio
-              ? SimpleMusicPlayer(
-                  audioPath: _externalMediaPath!,
-                  title: 'External Audio',
-                )
-              : ProfessionalVideoPlayer(
-                  videoPath: _externalMediaPath!,
-                  title: 'External Video',
-                )
+      home: _hasExternalVideo && _externalVideoPath != null
+          ? ProfessionalVideoPlayer(
+              videoPath: _externalVideoPath!,
+              title: 'External Video',
+            )
           : const SplashScreen(),
       routes: {
         '/history': (context) => const HistoryScreen(),

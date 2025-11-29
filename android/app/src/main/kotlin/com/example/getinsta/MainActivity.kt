@@ -37,26 +37,12 @@ class MainActivity: FlutterActivity() {
                 android.util.Log.d("GetInsta", "Real path: $realPath")
                 
                 if (realPath != null) {
-                    // Check if it's audio or video file
-                    val mimeType = contentResolver.getType(uri)
-                    android.util.Log.d("GetInsta", "MIME type: $mimeType")
+                    android.util.Log.d("GetInsta", "Real path: $realPath")
                     
-                    val isAudio = mimeType?.startsWith("audio/") == true || 
-                                 realPath.endsWith(".mp3", true) || 
-                                 realPath.endsWith(".m4a", true) ||
-                                 realPath.endsWith(".wav", true) ||
-                                 realPath.endsWith(".flac", true)
-                    
-                    android.util.Log.d("GetInsta", "Is audio: $isAudio")
-                    
-                    // Send to appropriate player
+                    // Send to video player only
                     flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-                        android.util.Log.d("GetInsta", "Sending to Flutter")
-                        if (isAudio) {
-                            MethodChannel(messenger, CHANNEL).invokeMethod("openAudio", realPath)
-                        } else {
-                            MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", realPath)
-                        }
+                        android.util.Log.d("GetInsta", "Sending video to Flutter")
+                        MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", realPath)
                     } ?: run {
                         android.util.Log.e("GetInsta", "Flutter engine not ready")
                     }

@@ -58,9 +58,6 @@
                 <!-- For all video types -->
                 <data android:mimeType="video/*" />
 
-                <!-- For all audio types -->
-                <data android:mimeType="audio/*" />
-
                 <!-- Common formats -->
                 <data android:mimeType="application/mp4" />
                 <data android:mimeType="application/x-mpegURL" />
