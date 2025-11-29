@@ -270,7 +270,11 @@ class DownloadService : Service() {
                 connection.setRequestProperty("Accept", "*/*")
                 connection.connectTimeout = 10000
                 connection.readTimeout = 10000
-                connection.requestMethod = "HEAD" // Only get headers, not content
+                
+                // Cast to HttpURLConnection to set request method
+                if (connection is java.net.HttpURLConnection) {
+                    connection.requestMethod = "HEAD"
+                }
                 
                 connection.connect()
                 val contentType = connection.contentType?.lowercase() ?: ""
