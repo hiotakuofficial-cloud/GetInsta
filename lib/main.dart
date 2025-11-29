@@ -34,20 +34,13 @@ class _GetInstaAppState extends State<GetInstaApp> {
   }
 
   void _openVideoPlayer(String videoPath) {
-    // Convert content:// URI to file path if needed
-    String filePath = videoPath;
-    if (videoPath.startsWith('content://')) {
-      // Handle content URI - you might need to copy file to app directory
-      filePath = videoPath.replaceAll('content://', '/storage/emulated/0/');
-    } else if (videoPath.startsWith('file://')) {
-      filePath = videoPath.replaceAll('file://', '');
-    }
-
-    // Navigate to video player
+    print('Opening video: $videoPath'); // Debug log
+    
+    // Navigate to video player with the real file path
     navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (context) => ProfessionalVideoPlayer(
-          videoPath: filePath,
+          videoPath: videoPath,
           title: 'External Video',
         ),
       ),

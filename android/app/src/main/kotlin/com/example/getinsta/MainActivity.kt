@@ -3,6 +3,8 @@ package com.example.getinsta
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.database.Cursor
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
 
@@ -26,11 +28,32 @@ class MainActivity: FlutterActivity() {
         if (intent?.action == Intent.ACTION_VIEW) {
             val uri: Uri? = intent.data
             if (uri != null) {
-                // Send video path to Flutter
-                flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-                    MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", uri.toString())
+                val realPath = getRealPathFromURI(uri)
+                if (realPath != null) {
+                    // Send real file path to Flutter
+                    flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
+                        MethodChannel(messenger, CHANNEL).invokeMethod("openVideo", realPath)
+                    }
                 }
             }
+        }
+    }
+    
+    private fun getRealPathFromURI(uri: Uri): String? {
+        return when (uri.scheme) {
+            "file" -> uri.path
+            "content" -> {
+                val projection = arrayOf(MediaStore.Video.Media.DATA)
+                val cursor: Cursor? = contentResolver.query(uri, projection, null, null, null)
+                cursor?.use {
+                    if (it.moveToFirst()) {
+                        val columnIndex = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
+                        return it.getString(columnIndex)
+                    }
+                }
+                null
+            }
+            else -> null
         }
     }
 }

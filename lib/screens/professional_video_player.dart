@@ -291,26 +291,30 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   Widget _buildVideoPlayer() {
     return Stack(
       children: [
-        // Video layer
-        _buildVideoLayer(),
+        // Video layer with tap detection
+        GestureDetector(
+          onTap: _toggleControls,
+          behavior: HitTestBehavior.opaque,
+          child: _buildVideoLayer(),
+        ),
         
         // Overlay controls
         if (_showBrightnessOverlay) _buildBrightnessOverlay(),
         if (_showVolumeOverlay) _buildVolumeOverlay(),
         
-        // Main controls
-        AnimatedBuilder(
-          animation: _controlsOpacity,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _controlsOpacity.value,
-              child: _showControls ? _buildControls() : const SizedBox(),
-            );
-          },
+        // Main controls - NO GESTURE BLOCKING
+        IgnorePointer(
+          ignoring: !_showControls,
+          child: AnimatedBuilder(
+            animation: _controlsOpacity,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _controlsOpacity.value,
+                child: _showControls ? _buildControls() : const SizedBox(),
+              );
+            },
+          ),
         ),
-        
-        // Gesture detector
-        _buildGestureLayer(),
       ],
     );
   }
@@ -527,10 +531,17 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
         child: Column(
           children: [
             _buildTopBar(),
-            const Spacer(),
-            if (_isBuffering) _buildBufferingIndicator(),
-            if (!_isBuffering) _buildCenterControls(),
-            const Spacer(),
+            Expanded(
+              child: GestureDetector(
+                onTap: _toggleControls,
+                behavior: HitTestBehavior.translucent,
+                child: Center(
+                  child: _isBuffering 
+                    ? _buildBufferingIndicator()
+                    : _buildCenterControls(),
+                ),
+              ),
+            ),
             _buildBottomControls(),
           ],
         ),
