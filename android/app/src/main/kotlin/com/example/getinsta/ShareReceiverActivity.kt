@@ -28,15 +28,19 @@ class ShareReceiverActivity : Activity() {
         if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             val sharedUrl = intent.getStringExtra(Intent.EXTRA_TEXT)
             if (sharedUrl != null) {
-                // Show waiting toast
-                Toast.makeText(this, "Waiting...", Toast.LENGTH_SHORT).show()
+                // Debug toast to see received URL
+                Toast.makeText(this, "Received: ${sharedUrl.take(50)}...", Toast.LENGTH_LONG).show()
                 
                 // Start background service - NO activity launch
                 val serviceIntent = Intent(this, DownloadService::class.java).apply {
                     putExtra("SHARED_URL", sharedUrl)
                 }
                 startService(serviceIntent)
+            } else {
+                Toast.makeText(this, "No URL received", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            Toast.makeText(this, "Invalid share intent", Toast.LENGTH_SHORT).show()
         }
     }
 }

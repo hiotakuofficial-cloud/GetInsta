@@ -32,6 +32,9 @@ class DownloadService : Service() {
         val sharedUrl = intent?.getStringExtra("SHARED_URL")
         
         if (sharedUrl != null) {
+            // Debug toast to see what service received
+            Toast.makeText(this, "Service got: ${sharedUrl.take(30)}...", Toast.LENGTH_LONG).show()
+            
             // Start as foreground service for Android 15
             startForeground(NOTIFICATION_ID, createInitialNotification())
             
@@ -41,6 +44,8 @@ class DownloadService : Service() {
                 stopForeground(true) // Remove foreground notification
                 stopSelf() // Stop service when done
             }
+        } else {
+            Toast.makeText(this, "Service: No URL received", Toast.LENGTH_SHORT).show()
         }
         
         return START_NOT_STICKY
@@ -98,19 +103,35 @@ class DownloadService : Service() {
             // Show processing notification
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Processing URL...", false)
+                Toast.makeText(this@DownloadService, "Processing: ${url.take(30)}...", Toast.LENGTH_LONG).show()
             }
             
             // Detect platform and handle accordingly
             when {
-                isYouTubeUrl(url) -> downloadYouTubeMedia(url)
-                isPinterestUrl(url) -> downloadPinterestMedia(url)
-                else -> downloadInstagramMediaOriginal(url)
+                isYouTubeUrl(url) -> {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@DownloadService, "Detected: YouTube", Toast.LENGTH_SHORT).show()
+                    }
+                    downloadYouTubeMedia(url)
+                }
+                isPinterestUrl(url) -> {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@DownloadService, "Detected: Pinterest", Toast.LENGTH_SHORT).show()
+                    }
+                    downloadPinterestMedia(url)
+                }
+                else -> {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@DownloadService, "Detected: Instagram", Toast.LENGTH_SHORT).show()
+                    }
+                    downloadInstagramMediaOriginal(url)
+                }
             }
             
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Download failed: ${e.message}", true)
-                Toast.makeText(this@DownloadService, "Download Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DownloadService, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
