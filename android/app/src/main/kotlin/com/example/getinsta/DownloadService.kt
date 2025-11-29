@@ -191,7 +191,7 @@ class DownloadService : Service() {
                 showNotification("GetInsta", "Getting Pinterest media...", false)
             }
             
-            // Pinterest API call with better error handling
+            // Pinterest API call
             val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
             val apiUrl = "https://v1-w3sc.onrender.com/pin/api.php?action=url&url=$encodedUrl"
             
@@ -205,7 +205,7 @@ class DownloadService : Service() {
             // Clean response - remove PHP warnings
             val jsonStart = response.indexOf("{")
             if (jsonStart == -1) {
-                throw Exception("No JSON found in response")
+                throw Exception("No JSON in response")
             }
             
             val cleanResponse = response.substring(jsonStart)
@@ -230,9 +230,13 @@ class DownloadService : Service() {
                 }
                 
                 if (downloadUrl != null) {
-                    val mediaType = data.optString("type", "image")
-                    val extension = if (mediaType == "video") ".mp4" else ".jpg"
-                    val filename = "Downloaded From GetInsta By Nehu$extension"
+                    withContext(Dispatchers.Main) {
+                        showNotification("GetInsta", "Checking file type...", false)
+                    }
+                    
+                    // Check actual content type from download URL
+                    val actualExtension = getActualFileExtension(downloadUrl)
+                    val filename = "Downloaded From GetInsta By Nehu$actualExtension"
                     
                     withContext(Dispatchers.Main) {
                         showNotification("GetInsta", "Downloading Pinterest...", false)
@@ -245,15 +249,41 @@ class DownloadService : Service() {
                         Toast.makeText(this@DownloadService, "Pinterest Complete!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    throw Exception("No valid download URL found")
+                    throw Exception("No download URL found")
                 }
             } else {
-                throw Exception("Pinterest API returned success=false")
+                throw Exception("API returned success=false")
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 showNotification("GetInsta", "Pinterest Failed", true)
                 Toast.makeText(this@DownloadService, "Pinterest Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private suspend fun getActualFileExtension(downloadUrl: String): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(downloadUrl).openConnection()
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36")
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+                connection.requestMethod = "HEAD" // Only get headers, not content
+                
+                val contentType = connection.contentType?.lowercase() ?: ""
+                
+                when {
+                    contentType.contains("video/mp4") -> ".mp4"
+                    contentType.contains("video/") -> ".mp4"
+                    contentType.contains("image/png") -> ".png"
+                    contentType.contains("image/gif") -> ".gif"
+                    contentType.contains("image/jpeg") || contentType.contains("image/jpg") -> ".jpg"
+                    contentType.contains("image/") -> ".jpg"
+                    else -> ".jpg" // default fallback
+                }
+            } catch (e: Exception) {
+                ".jpg" // fallback on error
             }
         }
     }
