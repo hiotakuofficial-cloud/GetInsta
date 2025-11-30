@@ -155,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _onPastePressed() async {
     Fluttertoast.showToast(
-      msg: "📋 DEBUG: Paste pressed, hasText: $_hasText",
       backgroundColor: Colors.grey,
       toastLength: Toast.LENGTH_LONG
     );
@@ -166,7 +165,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (url.isNotEmpty) {
         _isQuickAction = false; // Manual input = show options
         Fluttertoast.showToast(
-          msg: "⌨️ DEBUG: Manual input detected, Quick: $_isQuickAction",
           backgroundColor: Colors.indigo,
           toastLength: Toast.LENGTH_LONG
         );
@@ -188,14 +186,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         // Auto-process for quick action
         _isQuickAction = true; // Paste from clipboard = quick download
         Fluttertoast.showToast(
-          msg: "📋 DEBUG: Clipboard paste detected, Quick: $_isQuickAction, URL: ${data.text!.substring(0, data.text!.length > 30 ? 30 : data.text!.length)}...",
           backgroundColor: Colors.teal,
           toastLength: Toast.LENGTH_LONG
         );
         _processInstagramUrl(data.text!);
       } else {
         Fluttertoast.showToast(
-          msg: "❌ DEBUG: No clipboard data found",
           backgroundColor: Colors.red,
           toastLength: Toast.LENGTH_LONG
         );
@@ -206,7 +202,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void _processInstagramUrl(String url) async {
     // Debug toast to see what URL is received
     Fluttertoast.showToast(
-      msg: "🔍 DEBUG: Received URL: ${url.substring(0, url.length > 50 ? 50 : url.length)}...",
       backgroundColor: Colors.orange,
       toastLength: Toast.LENGTH_LONG
     );
@@ -214,7 +209,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Check if it's YouTube or Pinterest first
     if (YouTubePinterestHandler.isYouTubeUrl(url)) {
       Fluttertoast.showToast(
-        msg: "🎥 DEBUG: Detected YouTube URL, Quick: $_isQuickAction",
         backgroundColor: Colors.blue,
         toastLength: Toast.LENGTH_LONG
       );
@@ -229,7 +223,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Debug for Instagram detection
     Fluttertoast.showToast(
-      msg: "📷 DEBUG: Processing as Instagram URL",
       backgroundColor: Colors.purple,
       toastLength: Toast.LENGTH_LONG
     );
@@ -1372,7 +1365,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // YouTube processing
   void _processYouTubeUrl(String url) async {
     Fluttertoast.showToast(
-      msg: "🎥 DEBUG: YouTube processing started, Quick: $_isQuickAction",
       backgroundColor: Colors.blue,
       toastLength: Toast.LENGTH_LONG
     );
@@ -1391,7 +1383,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       // Use the quick action flag instead of text field check
       if (_isQuickAction) {
         Fluttertoast.showToast(
-          msg: "⚡ DEBUG: Starting quick YouTube download...",
           backgroundColor: Colors.green,
           toastLength: Toast.LENGTH_LONG
         );
@@ -1400,7 +1391,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final result = await YouTubePinterestHandler.quickDownloadYouTube(url);
         
         Fluttertoast.showToast(
-          msg: "📊 DEBUG: Quick download result: ${result['success']}",
           backgroundColor: Colors.yellow,
           toastLength: Toast.LENGTH_LONG
         );
@@ -1436,7 +1426,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }
       } else {
         Fluttertoast.showToast(
-          msg: "🎛️ DEBUG: Showing YouTube options UI...",
           backgroundColor: Colors.cyan,
           toastLength: Toast.LENGTH_LONG
         );
