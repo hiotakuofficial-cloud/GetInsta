@@ -18,14 +18,16 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     
-    // Complete full-screen - no status bar space
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    // Full screen edge-to-edge - no black status bar
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     
-    // Set transparent status bar
+    // Transparent status bar with light icons
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
     
