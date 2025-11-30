@@ -136,10 +136,21 @@ class DownloadService : Service() {
                 showNotification("GetInsta", "Getting YouTube video...", false)
             }
             
-            // Get YouTube download link with proper connection
-            val apiUrl = "https://v1-w3sc.onrender.com/yt/api.php?action=download&url=${java.net.URLEncoder.encode(url, "UTF-8")}&q=360&type=mp4"
+            // Build secure API URL with token
+            val apiUrl = SecureConfig.buildApiUrl(SecureConfig.Endpoints.YOUTUBE, mapOf(
+                "action" to "download",
+                "url" to url,
+                "q" to "360",
+                "type" to "mp4"
+            ))
+            
             val connection = URL(apiUrl).openConnection()
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Android)")
+            
+            // Add secure headers
+            SecureConfig.getHeaders().forEach { (key, value) ->
+                connection.setRequestProperty(key, value)
+            }
+            
             connection.connectTimeout = 15000
             connection.readTimeout = 15000
             
@@ -232,9 +243,20 @@ class DownloadService : Service() {
     
     private suspend fun downloadInstagramMediaOriginal(url: String) {
         try {
-            // Original Instagram processing code
-            val apiUrl = "https://v1-w3sc.onrender.com/insta/api.php?action=url&url=${java.net.URLEncoder.encode(url, "UTF-8")}"
-            val response = URL(apiUrl).readText()
+            // Build secure API URL with token
+            val apiUrl = SecureConfig.buildApiUrl(SecureConfig.Endpoints.INSTAGRAM, mapOf(
+                "action" to "url",
+                "url" to url
+            ))
+            
+            val connection = URL(apiUrl).openConnection()
+            
+            // Add secure headers
+            SecureConfig.getHeaders().forEach { (key, value) ->
+                connection.setRequestProperty(key, value)
+            }
+            
+            val response = connection.getInputStream().bufferedReader().readText()
             val data = JSONObject(response)
             
             if (data.getBoolean("success") && data.has("download_links")) {
@@ -351,10 +373,12 @@ class DownloadService : Service() {
         return withContext(Dispatchers.IO) {
             val connection = URL(downloadUrl).openConnection()
             
-            // Add headers for downloads
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-            connection.setRequestProperty("Accept", "*/*")
-            connection.setRequestProperty("Accept-Language", "en-US,en;q=0.9")
+            // Add secure headers
+            SecureConfig.getHeaders().forEach { (key, value) ->
+                connection.setRequestProperty(key, value)
+            }
+            
+            // Override specific headers for downloads
             connection.setRequestProperty("Accept-Encoding", "identity")
             
             // Add specific referer based on URL
