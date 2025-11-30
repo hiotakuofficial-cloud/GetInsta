@@ -23,12 +23,16 @@ class YouTubePinterestHandler {
     try {
       Fluttertoast.showToast(msg: "🎥 Fetching YouTube info...", backgroundColor: Colors.blue);
       
+      // Custom headers without compression for YouTube
+      final customHeaders = Map<String, String>.from(ApiConfig.headers);
+      customHeaders['Accept-Encoding'] = 'identity'; // Disable compression
+      
       final response = await http.get(
         Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
           'action': 'url',
           'url': url,
         })),
-        headers: ApiConfig.headers,
+        headers: customHeaders,
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
@@ -52,6 +56,10 @@ class YouTubePinterestHandler {
     try {
       Fluttertoast.showToast(msg: "📹 Getting ${quality}p video link...", backgroundColor: Colors.purple);
       
+      // Custom headers without compression for YouTube
+      final customHeaders = Map<String, String>.from(ApiConfig.headers);
+      customHeaders['Accept-Encoding'] = 'identity'; // Disable compression
+      
       final response = await http.get(
         Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
           'action': 'download',
@@ -59,7 +67,7 @@ class YouTubePinterestHandler {
           'q': quality,
           'type': 'mp4',
         })),
-        headers: ApiConfig.headers,
+        headers: customHeaders,
       ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
@@ -86,6 +94,10 @@ class YouTubePinterestHandler {
     try {
       Fluttertoast.showToast(msg: "🎵 Getting ${quality}kbps audio link...", backgroundColor: Colors.green);
       
+      // Custom headers without compression for YouTube
+      final customHeaders = Map<String, String>.from(ApiConfig.headers);
+      customHeaders['Accept-Encoding'] = 'identity'; // Disable compression
+      
       final response = await http.get(
         Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
           'action': 'download',
@@ -93,7 +105,7 @@ class YouTubePinterestHandler {
           'q': quality,
           'type': 'mp3',
         })),
-        headers: ApiConfig.headers,
+        headers: customHeaders,
       ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
