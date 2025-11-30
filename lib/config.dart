@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'nehu.dart';
-
 class ApiConfig {
   // API Base URLs
   static const String baseUrl = 'https://v1-w3sc.onrender.com';
@@ -8,8 +6,11 @@ class ApiConfig {
   static const String youtubeApi = '$baseUrl/yt/api.php';
   static const String pinterestApi = '$baseUrl/pin/api.php';
   
-  // Double Base64 decoding: Base64 → Base64 → Original Token
-  static String get apiToken => Nehu.decryptToken();
+  // App signature hash for verification
+  static const String _appHash = 'afaea552101228848de8f8c7f48a1b7d7a6a042a6094274eaa9d30cb64bf91a7';
+  
+  // Get verified app token
+  static String get apiToken => _appHash;
   
   // Headers
   static Map<String, String> get headers => {

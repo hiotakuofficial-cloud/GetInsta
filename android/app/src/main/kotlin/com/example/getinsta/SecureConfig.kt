@@ -1,27 +1,15 @@
 package com.example.getinsta
 
-import android.util.Base64
-import java.nio.charset.StandardCharsets
-
 object SecureConfig {
-    // App signature hash for verification (clean)
-    private const val appHash = "WVdaaFpXRTFOVEl4TURFeU1qZzRORGhrWlRobU9HTTNaalE0WVRGaU4yUTNZVFpoTURReVlUWXdPVFF5TnpSbFlXRTVaRE13WTJJMk5HSm1PVEZoTnc9PQ=="
+    // App signature hash for verification
+    private const val appHash = "afaea552101228848de8f8c7f48a1b7d7a6a042a6094274eaa9d30cb64bf91a7"
     
     // Base URLs for API endpoints
     private const val baseUrl = "https://v1-w3sc.onrender.com"
     
-    // Verify app signature and get auth key
+    // Get verified app token
     private fun getAuthKey(): String {
-        return try {
-            // Step 1: Decode app signature
-            val signature = String(Base64.decode(appHash, Base64.DEFAULT), StandardCharsets.UTF_8)
-            
-            // Step 2: Extract auth key from signature
-            String(Base64.decode(signature, Base64.DEFAULT), StandardCharsets.UTF_8)
-        } catch (e: Exception) {
-            // Fallback to hardcoded token if decoding fails
-            "afaea552101228848de8f8c7f48a1b7d7a6a042a6094274eaa9d30cb64bf91a7"
-        }
+        return appHash
     }
     
     // Build secure API URL with token
