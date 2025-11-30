@@ -154,20 +154,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _onPastePressed() async {
-    Fluttertoast.showToast(
-      backgroundColor: Colors.grey,
-      toastLength: Toast.LENGTH_LONG
-    );
-
     if (_hasText) {
       // If text exists, treat as download action (manual input)
       final url = _searchController.text;
       if (url.isNotEmpty) {
         _isQuickAction = false; // Manual input = show options
-        Fluttertoast.showToast(
-          backgroundColor: Colors.indigo,
-          toastLength: Toast.LENGTH_LONG
-        );
         _processInstagramUrl(url);
       }
     } else {
@@ -185,33 +176,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         // Auto-process for quick action
         _isQuickAction = true; // Paste from clipboard = quick download
-        Fluttertoast.showToast(
-          backgroundColor: Colors.teal,
-          toastLength: Toast.LENGTH_LONG
-        );
         _processInstagramUrl(data.text!);
-      } else {
-        Fluttertoast.showToast(
-          backgroundColor: Colors.red,
-          toastLength: Toast.LENGTH_LONG
-        );
       }
     }
   }
 
   void _processInstagramUrl(String url) async {
-    // Debug toast to see what URL is received
-    Fluttertoast.showToast(
-      backgroundColor: Colors.orange,
-      toastLength: Toast.LENGTH_LONG
-    );
-
     // Check if it's YouTube or Pinterest first
     if (YouTubePinterestHandler.isYouTubeUrl(url)) {
-      Fluttertoast.showToast(
-        backgroundColor: Colors.blue,
-        toastLength: Toast.LENGTH_LONG
-      );
       _processYouTubeUrl(url);
       return;
     }
@@ -220,12 +192,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _processPinterestUrl(url);
       return;
     }
-
-    // Debug for Instagram detection
-    Fluttertoast.showToast(
-      backgroundColor: Colors.purple,
-      toastLength: Toast.LENGTH_LONG
-    );
 
     // Original Instagram processing (unchanged)
     if (!InstagramHandler.isValidInstagramUrl(url)) {
@@ -1362,13 +1328,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  // YouTube processing
   void _processYouTubeUrl(String url) async {
-    Fluttertoast.showToast(
-      backgroundColor: Colors.blue,
-      toastLength: Toast.LENGTH_LONG
-    );
-
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       _showNoInternetToast();
@@ -1382,18 +1342,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     try {
       // Use the quick action flag instead of text field check
       if (_isQuickAction) {
-        Fluttertoast.showToast(
-          backgroundColor: Colors.green,
-          toastLength: Toast.LENGTH_LONG
-        );
-        
         // Quick download 360p
         final result = await YouTubePinterestHandler.quickDownloadYouTube(url);
-        
-        Fluttertoast.showToast(
-          backgroundColor: Colors.yellow,
-          toastLength: Toast.LENGTH_LONG
-        );
         
         if (result['success'] == true) {
           final downloadResult = await InstagramHandler.downloadMedia(
@@ -1405,31 +1355,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
           
           if (downloadResult['success'] == true) {
-            Fluttertoast.showToast(
-              msg: "✅ Quick YouTube download completed!", 
-              backgroundColor: Colors.green,
-              toastLength: Toast.LENGTH_LONG
-            );
+            Fluttertoast.showToast(msg: "Complete");
           } else {
-            Fluttertoast.showToast(
-              msg: "❌ Download failed: ${downloadResult['error']}", 
-              backgroundColor: Colors.red,
-              toastLength: Toast.LENGTH_LONG
-            );
+            Fluttertoast.showToast(msg: "Failed");
           }
         } else {
-          Fluttertoast.showToast(
-            msg: "❌ Quick download failed: ${result['error']}", 
-            backgroundColor: Colors.red,
-            toastLength: Toast.LENGTH_LONG
-          );
+          Fluttertoast.showToast(msg: "Failed");
         }
       } else {
-        Fluttertoast.showToast(
-          backgroundColor: Colors.cyan,
-          toastLength: Toast.LENGTH_LONG
-        );
-        
         // Show quality selection bottom sheet
         final result = await YouTubePinterestHandler.getYouTubeInfo(url);
         
@@ -1478,18 +1411,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
           
           if (downloadResult['success'] == true) {
-            Fluttertoast.showToast(
-              msg: "✅ Quick Pinterest download completed!", 
-              backgroundColor: Colors.green,
-              toastLength: Toast.LENGTH_LONG
-            );
+            Fluttertoast.showToast(msg: "Complete");
           } else {
-            Fluttertoast.showToast(
-              msg: "❌ Download failed: ${downloadResult['error']}", 
-              backgroundColor: Colors.red,
-              toastLength: Toast.LENGTH_LONG
-            );
+            Fluttertoast.showToast(msg: "Failed");
           }
+        } else {
+          Fluttertoast.showToast(msg: "Failed");
         }
       } else {
         // Normal Pinterest processing (direct download)
@@ -1706,7 +1633,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final result = await YouTubePinterestHandler.downloadYouTubeAudio(url, quality);
       
       if (result['success'] == true) {
-        Fluttertoast.showToast(msg: "⬇️ Downloading audio...", backgroundColor: Colors.blue);
+        Fluttertoast.showToast(msg: "Downloading...");
         
         final downloadResult = await InstagramHandler.downloadMedia(
           result['downloadUrl'],
@@ -1718,27 +1645,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         if (downloadResult['success'] == true) {
           Fluttertoast.showToast(
-            msg: "✅ YouTube audio downloaded (${quality}kbps)!", 
+            msg: "Complete", 
             backgroundColor: Colors.green,
             toastLength: Toast.LENGTH_LONG
           );
         } else {
           Fluttertoast.showToast(
-            msg: "❌ Download failed: ${downloadResult['error']}", 
+            msg: "Failed", 
             backgroundColor: Colors.red,
             toastLength: Toast.LENGTH_LONG
           );
         }
       } else {
         Fluttertoast.showToast(
-          msg: "❌ Failed to get audio link: ${result['error']}", 
+          msg: "Failed", 
           backgroundColor: Colors.red,
           toastLength: Toast.LENGTH_LONG
         );
       }
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "❌ Audio download error: $e", 
+        msg: "Failed", 
         backgroundColor: Colors.red,
         toastLength: Toast.LENGTH_LONG
       );
@@ -1750,7 +1677,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final result = await YouTubePinterestHandler.downloadYouTubeVideo(url, quality);
       
       if (result['success'] == true) {
-        Fluttertoast.showToast(msg: "⬇️ Downloading video...", backgroundColor: Colors.blue);
+        Fluttertoast.showToast(msg: "Downloading...");
         
         final downloadResult = await InstagramHandler.downloadMedia(
           result['downloadUrl'],
@@ -1762,27 +1689,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         if (downloadResult['success'] == true) {
           Fluttertoast.showToast(
-            msg: "✅ YouTube video downloaded (${quality}p)!", 
+            msg: "Complete", 
             backgroundColor: Colors.green,
             toastLength: Toast.LENGTH_LONG
           );
         } else {
           Fluttertoast.showToast(
-            msg: "❌ Download failed: ${downloadResult['error']}", 
+            msg: "Failed", 
             backgroundColor: Colors.red,
             toastLength: Toast.LENGTH_LONG
           );
         }
       } else {
         Fluttertoast.showToast(
-          msg: "❌ Failed to get video link: ${result['error']}", 
+          msg: "Failed", 
           backgroundColor: Colors.red,
           toastLength: Toast.LENGTH_LONG
         );
       }
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "❌ Video download error: $e", 
+        msg: "Failed", 
         backgroundColor: Colors.red,
         toastLength: Toast.LENGTH_LONG
       );
@@ -1791,7 +1718,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _downloadPinterestMedia(Map<String, dynamic> data) async {
     try {
-      Fluttertoast.showToast(msg: "⬇️ Downloading Pinterest media...", backgroundColor: Colors.pink);
+      Fluttertoast.showToast(msg: "Downloading...");
       
       final downloadUrl = data['video_url'] ?? data['image_url'];
       final mediaType = data['type'] ?? 'unknown';
@@ -1824,27 +1751,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         if (result['success'] == true) {
           Fluttertoast.showToast(
-            msg: "✅ Pinterest ${mediaType} downloaded (.$extension)!", 
+            msg: "Complete", 
             backgroundColor: Colors.green,
             toastLength: Toast.LENGTH_LONG
           );
         } else {
           Fluttertoast.showToast(
-            msg: "❌ Download failed: ${result['error']}", 
+            msg: "Failed", 
             backgroundColor: Colors.red,
             toastLength: Toast.LENGTH_LONG
           );
         }
       } else {
         Fluttertoast.showToast(
-          msg: "❌ No download URL found", 
+          msg: "Failed", 
           backgroundColor: Colors.red,
           toastLength: Toast.LENGTH_LONG
         );
       }
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "❌ Pinterest download error: $e", 
+        msg: "Failed", 
         backgroundColor: Colors.red,
         toastLength: Toast.LENGTH_LONG
       );
