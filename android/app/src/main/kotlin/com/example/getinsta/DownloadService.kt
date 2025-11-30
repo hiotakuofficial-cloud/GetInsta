@@ -151,6 +151,9 @@ class DownloadService : Service() {
                 connection.setRequestProperty(key, value)
             }
             
+            // Override compression for YouTube API
+            connection.setRequestProperty("Accept-Encoding", "identity")
+            
             connection.connectTimeout = 15000
             connection.readTimeout = 15000
             
@@ -255,6 +258,9 @@ class DownloadService : Service() {
             SecureConfig.getHeaders().forEach { (key, value) ->
                 connection.setRequestProperty(key, value)
             }
+            
+            // Override compression for Instagram API
+            connection.setRequestProperty("Accept-Encoding", "identity")
             
             val response = connection.getInputStream().bufferedReader().readText()
             val data = JSONObject(response)
