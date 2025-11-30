@@ -2,10 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import '../config.dart';
 
 class YouTubePinterestHandler {
-  static const String youtubeApiBase = 'https://v1-w3sc.onrender.com/yt/api.php';
-  static const String pinterestApiBase = 'https://v1-w3sc.onrender.com/pin/api.php';
 
   // Platform detection
   static bool isYouTubeUrl(String url) {
@@ -25,7 +24,11 @@ class YouTubePinterestHandler {
       Fluttertoast.showToast(msg: "🎥 Fetching YouTube info...", backgroundColor: Colors.blue);
       
       final response = await http.get(
-        Uri.parse('$youtubeApiBase?action=url&url=$url'),
+        Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
+          'action': 'url',
+          'url': url,
+        })),
+        headers: ApiConfig.headers,
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
@@ -50,7 +53,13 @@ class YouTubePinterestHandler {
       Fluttertoast.showToast(msg: "📹 Getting ${quality}p video link...", backgroundColor: Colors.purple);
       
       final response = await http.get(
-        Uri.parse('$youtubeApiBase?action=download&url=$url&q=$quality&type=mp4'),
+        Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
+          'action': 'download',
+          'url': url,
+          'q': quality,
+          'type': 'mp4',
+        })),
+        headers: ApiConfig.headers,
       ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
@@ -78,7 +87,13 @@ class YouTubePinterestHandler {
       Fluttertoast.showToast(msg: "🎵 Getting ${quality}kbps audio link...", backgroundColor: Colors.green);
       
       final response = await http.get(
-        Uri.parse('$youtubeApiBase?action=download&url=$url&q=$quality&type=mp3'),
+        Uri.parse(ApiConfig.buildUrl(ApiConfig.youtubeApi, {
+          'action': 'download',
+          'url': url,
+          'q': quality,
+          'type': 'mp3',
+        })),
+        headers: ApiConfig.headers,
       ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
@@ -166,7 +181,11 @@ class YouTubePinterestHandler {
       Fluttertoast.showToast(msg: "📌 Fetching Pinterest info...", backgroundColor: Colors.pink);
       
       final response = await http.get(
-        Uri.parse('$pinterestApiBase?action=url&url=$url'),
+        Uri.parse(ApiConfig.buildUrl(ApiConfig.pinterestApi, {
+          'action': 'url',
+          'url': url,
+        })),
+        headers: ApiConfig.headers,
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {

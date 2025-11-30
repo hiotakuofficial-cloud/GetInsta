@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../services/notification_service.dart';
 import '../services/download_history.dart';
+import '../config.dart';
 
 class InstagramHandler {
-  static const String _apiBaseUrl = 'https://v1-w3sc.onrender.com/insta/api.php';
   
   // Check if URL is valid Instagram URL
   static bool isValidInstagramUrl(String url) {
@@ -38,8 +38,11 @@ class InstagramHandler {
       final contentType = getContentType(url);
       
       // Call real API
-      final apiUrl = '$_apiBaseUrl?action=url&url=${Uri.encodeComponent(url)}';
-      final response = await http.get(Uri.parse(apiUrl));
+      final apiUrl = ApiConfig.buildUrl(ApiConfig.instagramApi, {
+        'action': 'url',
+        'url': url,
+      });
+      final response = await http.get(Uri.parse(apiUrl), headers: ApiConfig.headers);
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -130,15 +133,8 @@ class InstagramHandler {
       
       final request = http.Request('GET', Uri.parse(mediaUrl));
       
-      // Add proper headers for YouTube and other downloads
-      request.headers.addAll({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': '*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Referer': 'https://www.youtube.com/',
-      });
+      // Add proper headers for downloads
+      request.headers.addAll(ApiConfig.headers);
       
       final response = await request.send();
       
