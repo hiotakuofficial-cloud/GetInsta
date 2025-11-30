@@ -37,12 +37,16 @@ class InstagramHandler {
       
       final contentType = getContentType(url);
       
-      // Call real API
+      // Call real API with custom headers (disable compression)
       final apiUrl = ApiConfig.buildUrl(ApiConfig.instagramApi, {
         'action': 'url',
         'url': url,
       });
-      final response = await http.get(Uri.parse(apiUrl), headers: ApiConfig.headers);
+      
+      final customHeaders = Map<String, String>.from(ApiConfig.headers);
+      customHeaders['Accept-Encoding'] = 'identity'; // Disable compression
+      
+      final response = await http.get(Uri.parse(apiUrl), headers: customHeaders);
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

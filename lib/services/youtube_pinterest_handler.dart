@@ -192,12 +192,16 @@ class YouTubePinterestHandler {
     try {
       Fluttertoast.showToast(msg: "📌 Fetching Pinterest info...", backgroundColor: Colors.pink);
       
+      // Custom headers without compression for Pinterest
+      final customHeaders = Map<String, String>.from(ApiConfig.headers);
+      customHeaders['Accept-Encoding'] = 'identity'; // Disable compression
+      
       final response = await http.get(
         Uri.parse(ApiConfig.buildUrl(ApiConfig.pinterestApi, {
           'action': 'url',
           'url': url,
         })),
-        headers: ApiConfig.headers,
+        headers: customHeaders,
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
