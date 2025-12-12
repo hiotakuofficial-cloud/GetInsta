@@ -26,6 +26,8 @@ dependencies:
   shared_preferences: ^2.2.2
   audioplayers: ^5.2.1
   audio_service: ^0.18.12
+  shimmer: ^3.0.0
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:

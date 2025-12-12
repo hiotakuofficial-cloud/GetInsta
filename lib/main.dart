@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'splash_screen.dart';
-import 'screens/history_screen.dart';
+import 'screens/enhanced_history_screen.dart';
 import 'screens/professional_video_player.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const GetInstaApp());
 }
 
@@ -62,7 +67,7 @@ class _GetInstaAppState extends State<GetInstaApp> {
             )
           : const SplashScreen(),
       routes: {
-        '/history': (context) => const HistoryScreen(),
+        '/history': (context) => const EnhancedHistoryScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

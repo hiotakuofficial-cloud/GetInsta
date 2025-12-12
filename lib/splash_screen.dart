@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'home_screen.dart';
+import 'screens/enhanced_home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, _) => const HomeScreen(),
+          pageBuilder: (context, animation, _) => const EnhancedHomeScreen(),
           transitionDuration: const Duration(milliseconds: 1200),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(
