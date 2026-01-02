@@ -316,7 +316,7 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
                 padding: const EdgeInsets.only(left: 16, right: 12),
                 child: Icon(
                   Icons.search_rounded,
-                  color: const Color(0xFF6C63FF).withOpacity(0.7),
+                  color: const Color(0xFF6C63FF).withValues(alpha: 0.7),
                   size: 22,
                 ),
               ),
@@ -326,7 +326,7 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
                   decoration: InputDecoration(
                     hintText: 'Search downloads...',
                     hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 15,
                     ),
                     border: InputBorder.none,
@@ -502,14 +502,14 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
                               children: [
                                 Icon(
                                   Icons.access_time_rounded,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   size: 14,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   _formatDate(download['downloadTime']),
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -558,7 +558,7 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -657,7 +657,7 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
               width: 70,
               height: 70,
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -695,7 +695,7 @@ class _EnhancedHistoryScreenState extends State<EnhancedHistoryScreen>
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                       ),
                     ),
                     child: const Text(

@@ -62,7 +62,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                           color: const Color(0xFF1A1A1A),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -109,7 +109,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -126,7 +126,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                     color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: const Color(0xFF6C63FF).withOpacity(0.2),
+                      color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -136,7 +136,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.1),
+                          color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -170,7 +170,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           height: 1.5,
                         ),
                       ),
@@ -188,7 +188,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                     color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
@@ -198,7 +198,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.1),
+                          color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -226,7 +226,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 height: 1.4,
                               ),
                             ),
@@ -247,7 +247,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                     color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFF6C63FF).withOpacity(0.2),
+                      color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -260,7 +260,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6C63FF).withOpacity(0.1),
+                              color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -291,7 +291,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.1),
+                          color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -341,7 +341,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
@@ -387,7 +387,7 @@ class _AboutScreenState extends State<AboutScreen> with SingleTickerProviderStat
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ),

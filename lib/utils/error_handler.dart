@@ -160,7 +160,7 @@ class ErrorHandler {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: error.color.withOpacity(0.1),
+                      color: error.color.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -202,7 +202,7 @@ class ErrorHandler {
                         error.details!,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
                           height: 1.4,
                         ),
@@ -222,7 +222,7 @@ class ErrorHandler {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                               ),
                             ),
                           ),
@@ -355,12 +355,12 @@ class ErrorHandler {
                 color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: error.color.withOpacity(0.3),
+                  color: error.color.withValues(alpha: 0.3),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 20,
                     spreadRadius: 0,
                     offset: const Offset(0, 10),
@@ -373,7 +373,7 @@ class ErrorHandler {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: error.color.withOpacity(0.1),
+                      color: error.color.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

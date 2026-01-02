@@ -111,7 +111,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
                   borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF6C63FF).withOpacity(0.3),
+                      color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 0,
                       offset: const Offset(0, 8),
@@ -149,7 +149,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -171,7 +171,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6C63FF).withOpacity(0.3),
+              color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
               blurRadius: 20,
               spreadRadius: 0,
               offset: const Offset(0, 10),
@@ -185,7 +185,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
@@ -217,7 +217,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -234,7 +234,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
               'This app is crafted specially for someone who means the world to me',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 14,
                 height: 1.6,
               ),
@@ -287,7 +287,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: (feature['color'] as Color).withOpacity(0.1),
+                      color: (feature['color'] as Color).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
@@ -313,7 +313,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
                         Text(
                           feature['description'] as String,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 13,
                             height: 1.4,
                           ),
@@ -342,7 +342,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6C63FF).withOpacity(0.1),
+                    color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -400,7 +400,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
                       Text(
                         'Key Features',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -440,7 +440,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -462,7 +462,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
               children: [
                 Icon(
                   CupertinoIcons.info_circle,
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   size: 18,
                 ),
                 const SizedBox(width: 8),
@@ -482,7 +482,7 @@ class _EnhancedAboutScreenState extends State<EnhancedAboutScreen>
             'Made with Flutter',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontWeight: FontWeight.w500,
             ),
           ),

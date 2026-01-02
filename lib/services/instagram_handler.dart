@@ -265,7 +265,7 @@ class InstagramHandler {
             Text(
               'Analyzing content type and media...',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 12,
               ),
             ),
@@ -325,7 +325,7 @@ class InstagramHandler {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6C63FF).withOpacity(0.2),
+                      color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -363,7 +363,7 @@ class InstagramHandler {
                     Text(
                       result['caption'],
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 12,
                       ),
                       maxLines: 3,
@@ -479,7 +479,7 @@ class InstagramHandler {
               Text(
                 'Successfully downloaded $successCount ${successCount == 1 ? 'file' : 'files'}',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
                 ),
               ),
@@ -495,7 +495,7 @@ class InstagramHandler {
             Text(
               'Files saved to: /Android/data/com.example.getinsta/files/GetInsta/Downloads/',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 fontSize: 12,
               ),
             ),

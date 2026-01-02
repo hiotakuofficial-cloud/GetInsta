@@ -23,15 +23,15 @@ class GlassmorphicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: (color ?? Colors.white).withOpacity(opacity),
+        color: (color ?? Colors.white).withValues(alpha: opacity),
         borderRadius: borderRadius ?? BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 10),
@@ -198,7 +198,7 @@ class _AnimatedGradientButtonState extends State<AnimatedGradientButton>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: widget.gradientColors.first.withOpacity(0.4),
+                color: widget.gradientColors.first.withValues(alpha: 0.4),
                 blurRadius: _isPressed ? 10 : 20,
                 spreadRadius: 0,
                 offset: Offset(0, _isPressed ? 5 : 10),
@@ -263,13 +263,13 @@ class NeumorphicContainer extends StatelessWidget {
         boxShadow: isPressed
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   offset: const Offset(2, 2),
                   blurRadius: 4,
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: const Color(0xFF2A2A2A).withOpacity(0.5),
+                  color: const Color(0xFF2A2A2A).withValues(alpha: 0.5),
                   offset: const Offset(-2, -2),
                   blurRadius: 4,
                   spreadRadius: 0,
@@ -277,13 +277,13 @@ class NeumorphicContainer extends StatelessWidget {
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   offset: const Offset(8, 8),
                   blurRadius: 16,
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: const Color(0xFF2A2A2A).withOpacity(0.8),
+                  color: const Color(0xFF2A2A2A).withValues(alpha: 0.8),
                   offset: const Offset(-8, -8),
                   blurRadius: 16,
                   spreadRadius: 0,
@@ -343,10 +343,10 @@ class _PulsingDotState extends State<PulsingDot>
           height: widget.size * _animation.value,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: widget.color.withOpacity(1.0 - (_animation.value - 1.0)),
+            color: widget.color.withValues(alpha: 1.0 - (_animation.value - 1.0)),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(0.5),
+                color: widget.color.withValues(alpha: 0.5),
                 blurRadius: widget.size * _animation.value,
                 spreadRadius: widget.size * (_animation.value - 1.0),
               ),
@@ -525,7 +525,7 @@ class _FloatingActionButtonExtendedState
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color: widget.gradientColors.first.withOpacity(0.4),
+                color: widget.gradientColors.first.withValues(alpha: 0.4),
                 blurRadius: 20,
                 spreadRadius: 0,
                 offset: const Offset(0, 10),

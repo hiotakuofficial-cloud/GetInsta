@@ -54,11 +54,12 @@ class _GetInstaAppState extends State<GetInstaApp> {
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'GetInsta',
-      theme: ThemeData.dark().copyWith(
+      theme: ThemeData.dark(
+        useMaterial3: true,
+      ).copyWith(
         primaryColor: const Color(0xFF1A1A1A),
         scaffoldBackgroundColor: const Color(0xFF121212),
         cardColor: const Color(0xFF1E1E1E),
-        useMaterial3: true,
       ),
       home: _hasExternalVideo && _externalVideoPath != null
           ? ProfessionalVideoPlayer(

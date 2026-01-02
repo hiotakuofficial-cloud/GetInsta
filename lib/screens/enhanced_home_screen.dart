@@ -285,7 +285,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -331,7 +331,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
                       Text(
                         '${result['mediaCount']} ${result['mediaCount'] == 1 ? 'item' : 'items'}',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 14,
                         ),
                       ),
@@ -352,7 +352,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                       ),
                     ),
                     child: const Text(
@@ -401,7 +401,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -610,7 +610,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
                 'Powered by Nehu',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   fontWeight: FontWeight.w300,
                 ),
               ),
@@ -645,7 +645,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -712,7 +712,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
               padding: const EdgeInsets.only(left: 16, right: 12),
               child: Icon(
                 Icons.search_rounded,
-                color: const Color(0xFF6C63FF).withOpacity(0.7),
+                color: const Color(0xFF6C63FF).withValues(alpha: 0.7),
                 size: 24,
               ),
             ),
@@ -723,7 +723,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
                 decoration: InputDecoration(
                   hintText: 'Paste Instagram, YouTube, or Pinterest URL...',
                   hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 14,
                   ),
                   border: InputBorder.none,
@@ -769,7 +769,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
               'Paste a URL to get started',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -840,7 +840,7 @@ class _EnhancedHomeScreenState extends State<EnhancedHomeScreen>
                             Text(
                               post['caption'] ?? 'No caption',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 fontSize: 12,
                               ),
                               maxLines: 2,

@@ -4,8 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'screens/history_screen.dart';
 import 'screens/professional_video_player.dart';
 import 'services/instagram_handler.dart';
@@ -264,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -341,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withOpacity(0.2),
+                color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -387,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Text(
                   result['caption'],
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                   maxLines: 3,
@@ -407,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                       ),
                     ),
                     child: const Text(
@@ -478,15 +476,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E).withOpacity(0.95),
+                      color: const Color(0xFF1E1E1E).withValues(alpha: 0.95),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.red.withOpacity(0.3),
+                        color: Colors.red.withValues(alpha: 0.3),
                         width: 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 20,
                           spreadRadius: 0,
                           offset: const Offset(0, 8),
@@ -498,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       children: [
                         Icon(
                           Icons.wifi_off_rounded,
-                          color: Colors.red.withOpacity(0.8),
+                          color: Colors.red.withValues(alpha: 0.8),
                           size: 24,
                         ),
                         const SizedBox(width: 12),
@@ -581,8 +579,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     
     // Show results (removed dialog, just notifications now)
-    int successCount = downloadResults.where((r) => r['success'] == true).length;
-    int failCount = downloadResults.length - successCount;
+    // Downloads are tracked via notifications
   }
 
   @override
@@ -646,7 +643,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 8,
                                     spreadRadius: 0,
                                   ),
@@ -691,7 +688,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     letterSpacing: 1.2,
                                     shadows: [
                                       Shadow(
-                                        color: const Color(0xFF6C63FF).withOpacity(0.3),
+                                        color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -735,7 +732,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF6C63FF).withOpacity(0.3),
+                                      color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
                                       blurRadius: 8,
                                       spreadRadius: 0,
                                       offset: const Offset(0, 2),
@@ -769,22 +766,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   color: const Color(0xFF1E1E1E),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: const Color(0xFF6C63FF).withOpacity(0.4),
+                                    color: const Color(0xFF6C63FF).withValues(alpha: 0.4),
                                     width: 1,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF6C63FF).withOpacity(0.15),
+                                      color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
                                       blurRadius: 25,
                                       spreadRadius: 0,
                                     ),
                                     BoxShadow(
-                                      color: const Color(0xFF6C63FF).withOpacity(0.1),
+                                      color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                                       blurRadius: 50,
                                       spreadRadius: 5,
                                     ),
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       offset: const Offset(0, 8),
                                       blurRadius: 16,
                                       spreadRadius: 0,
@@ -798,7 +795,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       padding: const EdgeInsets.only(left: 16, right: 12),
                                       child: Icon(
                                         Icons.search_rounded,
-                                        color: const Color(0xFF6C63FF).withOpacity(0.7),
+                                        color: const Color(0xFF6C63FF).withValues(alpha: 0.7),
                                         size: 24,
                                       ),
                                     ),
@@ -814,7 +811,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         decoration: InputDecoration(
                                           hintText: 'Paste Instagram URL here...',
                                           hintStyle: TextStyle(
-                                            color: Colors.white.withOpacity(0.5),
+                                            color: Colors.white.withValues(alpha: 0.5),
                                             fontSize: 16,
                                           ),
                                           border: InputBorder.none,
@@ -874,7 +871,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             'Paste Instagram URL to start downloading',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white.withOpacity(0.6),
+                              color: Colors.white.withValues(alpha: 0.6),
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
@@ -891,7 +888,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                               ),
                             ),
                           ),
@@ -966,7 +963,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             Text(
                                               post['caption'] ?? 'No caption',
                                               style: TextStyle(
-                                                color: Colors.white.withOpacity(0.7),
+                                                color: Colors.white.withValues(alpha: 0.7),
                                                 fontSize: 12,
                                               ),
                                               maxLines: 2,
@@ -1132,7 +1129,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   'Powered by Nehu',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     fontWeight: FontWeight.w300,
                     letterSpacing: 0.5,
                   ),
@@ -1142,13 +1139,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
     );
-  }
-  
-  void _playVideo(String? filePath) {
-    if (filePath != null) {
-      // Open video with system video player
-      launchUrl(Uri.file(filePath));
-    }
   }
 
   void _playVideoFromRecent(Map<String, dynamic> download) async {
@@ -1177,155 +1167,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } else {
       Fluttertoast.showToast(msg: "File path is null");
     }
-  }
-
-  void _showHistoryVideoOptions(Map<String, dynamic> download) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white54,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            
-            // Video info
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  // Thumbnail
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: const Color(0xFF2A2A2A),
-                    ),
-                    child: download['thumbnailUrl'] != null && download['thumbnailUrl'].isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              download['thumbnailUrl'],
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.video_library, color: Colors.white54);
-                              },
-                            ),
-                          )
-                        : const Icon(Icons.video_library, color: Colors.white54),
-                  ),
-                  
-                  const SizedBox(width: 16),
-                  
-                  // File info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          download['filename'] ?? 'Unknown',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (download['username'] != null)
-                          Text(
-                            '@${download['username']}',
-                            style: const TextStyle(
-                              color: Color(0xFF6C63FF),
-                              fontSize: 14,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Action buttons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  // Play button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _playVideo(download['filePath']);
-                      },
-                      icon: const Icon(Icons.play_arrow, color: Colors.white),
-                      label: const Text('Play Video', style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C63FF),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Download Again button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Fluttertoast.showToast(msg: "Downloading...");
-                        // Re-download the video
-                        if (download['videoUrl'] != null) {
-                          InstagramHandler.downloadMedia(
-                            download['videoUrl'],
-                            download['filename'],
-                            thumbnailUrl: download['thumbnailUrl'],
-                            username: download['username'],
-                            caption: download['caption'],
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.download, color: Colors.white70),
-                      label: const Text('Download Again', style: TextStyle(color: Colors.white70)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2A2A2A),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
   }
 
   void _processYouTubeUrl(String url) async {
@@ -1459,7 +1300,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1483,7 +1324,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Text(
               data['author'] ?? 'Unknown',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -1499,7 +1340,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                          color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
@@ -1556,7 +1397,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.2),
+                          color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(

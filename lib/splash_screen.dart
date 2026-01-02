@@ -127,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
+                                  color: Colors.black.withValues(alpha: 0.4),
                                   blurRadius: 30,
                                   spreadRadius: 0,
                                   offset: const Offset(0, 10),
@@ -189,7 +189,7 @@ class _SplashScreenState extends State<SplashScreen>
                             'Premium Instagram Downloader',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontWeight: FontWeight.w400,
                               letterSpacing: 0.3,
                             ),
@@ -218,7 +218,7 @@ class _SplashScreenState extends State<SplashScreen>
                         'Powered by Nehu',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           fontWeight: FontWeight.w300,
                           letterSpacing: 0.5,
                         ),

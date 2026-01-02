@@ -7,7 +7,6 @@ import 'package:volume_controller/volume_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:async';
-import 'dart:ui';
 
 class ProfessionalVideoPlayer extends StatefulWidget {
   final String videoPath;
@@ -41,8 +40,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
   
   // Animations
   late Animation<double> _controlsOpacity;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
   
   // State management
   bool _isInitialized = false;
@@ -120,22 +117,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     ).animate(CurvedAnimation(
       parent: _controlsAnimationController,
       curve: Curves.easeInOut,
-    ));
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeAnimationController,
-      curve: Curves.easeOut,
-    ));
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleAnimationController,
-      curve: Curves.elasticOut,
     ));
     
     _controlsAnimationController.forward();
@@ -308,7 +289,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
           Text(
             'Loading video...',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -354,25 +335,12 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       child: Transform(
         alignment: Alignment.center,
         transform: Matrix4.identity()
-          ..scale(_zoomLevel)
-          ..translate(_panOffset.dx / _zoomLevel, _panOffset.dy / _zoomLevel),
+          ..scaleByDouble(_zoomLevel, _zoomLevel, _zoomLevel, 1.0)
+          ..translateByDouble(_panOffset.dx / _zoomLevel, _panOffset.dy / _zoomLevel, 0.0, 0.0),
         child: AspectRatio(
           aspectRatio: _getAspectRatio(),
           child: Chewie(controller: _chewieController!),
         ),
-      ),
-    );
-  }
-
-  Widget _buildGestureLayer() {
-    return Positioned.fill(
-      child: GestureDetector(
-        onTap: () {
-          print('Screen tapped - toggling controls');
-          _toggleControls();
-        },
-        behavior: HitTestBehavior.translucent,
-        child: Container(color: Colors.transparent),
       ),
     );
   }
@@ -387,7 +355,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -424,7 +392,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -466,62 +434,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     }
   }
 
-  void _handleDoubleTap(TapDownDetails details) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final tapX = details.globalPosition.dx;
-    
-    if (tapX < screenWidth * 0.4) {
-      _seekBackward();
-    } else if (tapX > screenWidth * 0.6) {
-      _seekForward();
-    } else {
-      _togglePlayPause();
-    }
-  }
-
-  void _handleScaleUpdate(ScaleUpdateDetails details) {
-    if (details.scale != 1.0) {
-      setState(() {
-        _zoomLevel = (_zoomLevel * details.scale).clamp(1.0, 4.0);
-      });
-    }
-  }
-
-  void _handlePan(DragUpdateDetails details) {
-    if (_zoomLevel > 1.0) {
-      setState(() {
-        _panOffset += details.delta;
-      });
-    }
-  }
-
-  void _handleVerticalPan(DragUpdateDetails details) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLeftSide = details.globalPosition.dx < screenWidth / 2;
-    final delta = details.delta.dy / 200; // More sensitive
-    
-    if (isLeftSide) {
-      // Brightness control
-      setState(() {
-        _brightness = (_brightness - delta).clamp(0.0, 1.0);
-        _showBrightnessOverlay = true;
-      });
-      ScreenBrightness().setScreenBrightness(_brightness);
-      _fadeAnimationController.forward();
-      _startOverlayTimer();
-    } else {
-      // Volume control - prevent system UI
-      setState(() {
-        _volume = (_volume - delta).clamp(0.0, 1.0);
-        _showVolumeOverlay = true;
-      });
-      // Use setVolume with showSystemUI: false to prevent system overlay
-      VolumeController().setVolume(_volume, showSystemUI: false);
-      _fadeAnimationController.forward();
-      _startOverlayTimer();
-    }
-  }
-
   // Utility methods
   double _getAspectRatio() {
     switch (_aspectRatio.toInt()) {
@@ -549,10 +461,10 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.6),
+            Colors.black.withValues(alpha: 0.6),
             Colors.transparent,
             Colors.transparent,
-            Colors.black.withOpacity(0.6),
+            Colors.black.withValues(alpha: 0.6),
           ],
           stops: const [0.0, 0.3, 0.7, 1.0],
         ),
@@ -640,7 +552,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(32),
               ),
               child: const Icon(
@@ -665,7 +577,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Icon(
@@ -690,7 +602,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(32),
               ),
               child: const Icon(
@@ -752,7 +664,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF007AFF).withOpacity(0.2),
+                    color: const Color(0xFF007AFF).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: const Color(0xFF007AFF),
@@ -788,7 +700,7 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(30),
       ),
       child: const Center(
@@ -850,13 +762,13 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: isActive
-                ? const Color(0xFF007AFF).withOpacity(0.2)
-                : Colors.white.withOpacity(0.1),
+                ? const Color(0xFF007AFF).withValues(alpha: 0.2)
+                : Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isActive
                   ? const Color(0xFF007AFF)
-                  : Colors.white.withOpacity(0.2),
+                  : Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -889,42 +801,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
     );
   }
 
-  Widget _buildControlButton({
-    required IconData icon,
-    required double size,
-    required VoidCallback onPressed,
-    bool isPrimary = false,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        print('Control button tapped: $icon, size: $size, primary: $isPrimary'); // Debug
-        onPressed();
-      },
-      behavior: HitTestBehavior.opaque, // Ensure tap detection
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: isPrimary
-              ? const Color(0xFF007AFF).withOpacity(0.2)
-              : Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(size / 2),
-          border: Border.all(
-            color: isPrimary
-                ? const Color(0xFF007AFF)
-                : Colors.white.withOpacity(0.3),
-            width: isPrimary ? 2 : 1,
-          ),
-        ),
-        child: Icon(
-          icon,
-          color: Colors.white,
-          size: size * 0.4,
-        ),
-      ),
-    );
-  }
-
   // Control functions - ACTUALLY WORKING
   void _togglePlayPause() {
     setState(() {
@@ -937,18 +813,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
       }
     });
     print('Play/Pause toggled: $_isPlaying'); // Debug
-  }
-
-  void _seekBackward() {
-    final newPosition = _position - const Duration(seconds: 10);
-    _videoController.seekTo(newPosition > Duration.zero ? newPosition : Duration.zero);
-    _showSeekFeedback('-10s');
-  }
-
-  void _seekForward() {
-    final newPosition = _position + const Duration(seconds: 10);
-    _videoController.seekTo(newPosition < _duration ? newPosition : _duration);
-    _showSeekFeedback('+10s');
   }
 
   void _previousVideo() {
@@ -1118,13 +982,13 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
           height: 32,
           decoration: BoxDecoration(
             color: isActive
-                ? const Color(0xFF007AFF).withOpacity(0.3)
-                : Colors.white.withOpacity(0.1),
+                ? const Color(0xFF007AFF).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isActive
                   ? const Color(0xFF007AFF)
-                  : Colors.white.withOpacity(0.3),
+                  : Colors.white.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -1141,18 +1005,6 @@ class _ProfessionalVideoPlayerState extends State<ProfessionalVideoPlayer>
         ),
       ),
     );
-  }
-
-  void _startOverlayTimer() {
-    _overlayTimer?.cancel();
-    _overlayTimer = Timer(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          _showBrightnessOverlay = false;
-          _showVolumeOverlay = false;
-        });
-      }
-    });
   }
 
   @override
