@@ -1,301 +1,228 @@
-# GetInsta - Universal Media Downloader
+# AI/ML Environment
 
-<div align="center">
+A comprehensive Python-based AI/ML environment with modular structure for machine learning and deep learning projects.
 
-![GetInsta Logo](https://img.shields.io/badge/GetInsta-Universal%20Downloader-blue?style=for-the-badge&logo=download)
+## Project Structure
 
-**A powerful, secure, and user-friendly Flutter application for downloading media from Instagram, YouTube, and Pinterest**
+```
+.
+├── config.py                 # Configuration settings
+├── requirements.txt          # Python dependencies
+├── main.py                   # Example usage and entry point
+│
+├── models/                   # ML/DL Models
+│   ├── __init__.py
+│   ├── base_model.py        # Abstract base model class
+│   ├── classifier.py        # Classification models
+│   ├── regressor.py         # Regression models
+│   ├── neural_network.py    # Neural network models
+│   └── saved/               # Saved model files
+│
+├── preprocessing/            # Data Preprocessing
+│   ├── __init__.py
+│   ├── data_cleaner.py      # Data cleaning utilities
+│   ├── feature_engineer.py  # Feature engineering
+│   ├── scaler.py            # Data scaling/normalization
+│   ├── text_processor.py    # NLP preprocessing
+│   └── image_processor.py   # Computer vision preprocessing
+│
+├── data/                     # Data Management
+│   ├── __init__.py
+│   ├── data_loader.py       # Data loading utilities
+│   ├── dataset.py           # Custom PyTorch datasets
+│   ├── raw/                 # Raw data files
+│   └── processed/           # Processed data files
+│
+├── training/                 # Training Utilities
+│   ├── __init__.py
+│   ├── trainer.py           # Training loop implementation
+│   └── callbacks.py         # Training callbacks
+│
+├── utils/                    # Utilities
+│   ├── __init__.py
+│   ├── logger.py            # Logging utilities
+│   ├── metrics.py           # Metrics calculation
+│   └── visualization.py     # Visualization tools
+│
+├── logs/                     # Training logs
+├── checkpoints/              # Model checkpoints
+└── .env.example             # Environment variables template
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg?logo=flutter)](https://flutter.dev/)
-[![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg?logo=dart)](https://dart.dev/)
-[![Android](https://img.shields.io/badge/Android-5.0+-green.svg?logo=android)](https://android.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Downloads](https://img.shields.io/badge/Downloads-1K+-brightgreen.svg)](https://github.com/hiotakuofficial-cloud/GetInsta/releases)
-
-</div>
-
-## 📱 App Screenshots
-
-<div align="center">
-
-### 🏠 Main Interface
-<img src="screenshots/home.jpg" width="200" alt="Home Screen" />
-<img src="screenshots/Quick_Download.jpg" width="200" alt="Quick Download" />
-<img src="screenshots/video_player.jpg" width="200" alt="Video Player" />
-
-### 📊 Management & Info
-<img src="screenshots/downloads.jpg" width="200" alt="Downloads History" />
-<img src="screenshots/about.jpg" width="200" alt="About Screen" />
-
-</div>
-
-## ✨ Key Features
-
-### 🎯 **Multi-Platform Download Support**
-- **📸 Instagram**: Posts, Reels, Stories, IGTV videos with high quality
-- **🎥 YouTube**: Videos (360p-720p), Audio (128kbps-320kbps), Playlists support
-- **📌 Pinterest**: Images, Videos, GIFs with original quality preservation
-- **⚡ Quick Download**: One-tap downloads with smart quality selection
-
-### 🚀 **Advanced Functionality**
-- **🔍 Smart URL Detection**: Automatically identifies platform and content type
-- **📦 Batch Downloads**: Handle multiple media files from carousel posts
-- **🔄 Background Processing**: Downloads continue when app is minimized
-- **📤 Share Integration**: Direct downloads from other apps via share menu
-- **📋 Download Manager**: Complete history with search and filter options
-- **🎮 Built-in Video Player**: Preview downloaded videos without leaving app
-- **💾 Smart Caching**: Efficient memory management and duplicate prevention
-
-### 🔒 **Enterprise-Grade Security**
-- **🔐 Encrypted API Communication**: Advanced token obfuscation system
-- **🛡️ Zero Data Collection**: Complete privacy protection
-- **🔒 Secure Headers**: Industry-standard security protocols
-- **💽 Local-Only Storage**: All data remains on your device
-- **🚫 No Tracking**: No analytics or user behavior monitoring
-
-### 🎨 **Premium User Experience**
-- **🌙 Material Design 3**: Modern, adaptive interface with dark theme
-- **📊 Real-time Progress**: Live download indicators with speed metrics
-- **🔔 Smart Notifications**: Contextual feedback for all operations
-- **⚠️ Intelligent Error Handling**: User-friendly error messages with solutions
-- **🎯 Gesture Navigation**: Intuitive swipe and tap interactions
-- **🔄 Auto-Updates**: Background update checking system
-
-## 🏗️ Technical Architecture
-
-### **Frontend Stack**
-- **Framework**: Flutter 3.0+ with Dart 3.0+
-- **UI Library**: Material Design 3 Components
-- **State Management**: Efficient StatefulWidget architecture
-- **Navigation**: Flutter Navigator 2.0 with deep linking
-- **Media Handling**: Advanced video/audio processing
-
-### **Backend Integration**
-- **API Design**: RESTful architecture with secure endpoints
-- **Authentication**: Token-based security with encryption
-- **Network Layer**: Custom HTTP client with retry logic
-- **Compression**: Smart response handling (gzip/identity)
-- **Caching**: Multi-layer caching strategy
-
-### **Native Integration**
-- **Android Services**: Kotlin-based background processing
-- **File System**: Secure storage with permission management
-- **Intent Handling**: Deep links and share intent processing
-- **Notifications**: Rich notification system with actions
-
-## 📋 System Requirements
-
-### **Minimum Requirements**
-- **OS**: Android 5.0 (API 21) or higher
-- **RAM**: 2GB minimum, 4GB recommended
-- **Storage**: 100MB app size + download space
-- **Network**: Stable internet connection (WiFi/Mobile data)
-
-### **Recommended Specifications**
-- **OS**: Android 8.0+ for optimal performance
-- **RAM**: 4GB+ for smooth multitasking
-- **Storage**: 1GB+ free space for downloads
-- **Network**: High-speed connection for faster downloads
-
-## 🚀 Installation Guide
-
-### **📱 Quick Install (Recommended)**
-1. **Download**: Get the latest APK from [Releases](https://github.com/hiotakuofficial-cloud/GetInsta/releases)
-2. **Enable**: Allow "Install from Unknown Sources" in Settings
-3. **Install**: Tap the APK file and follow prompts
-4. **Permissions**: Grant storage and network permissions
-5. **Ready**: Start downloading your favorite content!
-
-### **🛠️ Developer Build**
-```bash
-# Prerequisites: Flutter SDK, Android Studio, Git
-
-# Clone repository
-git clone https://github.com/hiotakuofficial-cloud/GetInsta.git
-cd GetInsta
-
-# Install dependencies
-flutter pub get
-
-# Run on device/emulator
-flutter run
-
-# Build release APK
-flutter build apk --release --split-per-abi
 ```
 
-## 📖 Complete Usage Guide
+## Features
 
-### **🎯 Basic Download Workflow**
-1. **📋 Copy URL**: Copy media link from Instagram/YouTube/Pinterest
-2. **📱 Open GetInsta**: Launch the app and paste URL in input field
-3. **⚙️ Select Options**: Choose quality, format, or use quick download
-4. **⬇️ Download**: Tap download button and monitor progress
-5. **📁 Access Files**: Find media in `/Download/reel/` folder
-6. **▶️ Play/View**: Use built-in player or gallery app
+### Models
+- **Base Model**: Abstract class for all ML models with save/load functionality
+- **Classifier**: Wrapper for scikit-learn classifiers (Random Forest, Gradient Boosting, Logistic Regression, SVM)
+- **Regressor**: Wrapper for scikit-learn regressors (Random Forest, Gradient Boosting, Linear, Ridge, Lasso, SVR)
+- **Neural Network**: Flexible PyTorch neural network with customizable architecture
 
-### **⚡ Advanced Features**
-- **🔄 Batch Processing**: Paste multiple URLs (one per line)
-- **📤 Share Integration**: Share URLs directly from other apps
-- **🎵 Audio Extraction**: Download YouTube videos as MP3 files
-- **📊 Quality Selection**: Choose from multiple resolution options
-- **🔍 Smart Search**: Find downloads in history with search
-- **🗂️ File Management**: Organize downloads with smart naming
+### Preprocessing
+- **Data Cleaner**: Handle missing values, outliers, duplicates, data type conversion
+- **Feature Engineer**: Create polynomial features, interactions, binning, log transforms, datetime features, lag features, rolling features
+- **Data Scaler**: Standard, MinMax, Robust, MaxAbs scaling
+- **Text Processor**: Tokenization, stopword removal, stemming, lemmatization, TF-IDF
+- **Image Processor**: Loading, resizing, normalization, augmentation, edge detection
 
-### **🎮 Video Player Features**
-- **▶️ Full Controls**: Play, pause, seek, volume control
-- **🔄 Repeat Mode**: Loop videos for continuous playback
-- **📱 Orientation**: Auto-rotate for landscape viewing
-- **⏩ Speed Control**: Adjust playback speed (0.5x - 2x)
-- **📋 Playlist**: Queue multiple videos for continuous play
+### Data Management
+- **Data Loader**: Load CSV, Excel, JSON, NumPy files; train/test/val splitting
+- **Custom Datasets**: PyTorch datasets for arrays, images, text, time series
 
-## ⚙️ Advanced Configuration
+### Training
+- **Trainer**: Generic PyTorch training loop with validation
+- **Callbacks**: Early stopping, model checkpointing, learning rate scheduling
 
-### **📁 Storage Settings**
-- **Default Path**: `/storage/emulated/0/Download/reel/`
-- **Custom Folders**: Organize by platform or date
-- **Naming Convention**: `{platform}_{username}_{timestamp}.{ext}`
-- **Duplicate Handling**: Auto-rename with incremental numbers
+### Utilities
+- **Logger**: Structured logging for training and experiments
+- **Metrics**: Classification and regression metrics calculation
+- **Visualization**: Plot training history, confusion matrix, feature importance, predictions
 
-### **🔒 Security Configuration**
-- **Token Rotation**: Automatic security token refresh
-- **Request Headers**: Browser-like headers for anonymity
-- **SSL/TLS**: Encrypted communication channels
-- **Local Encryption**: Sensitive data encrypted at rest
+## Installation
 
-### **🎛️ Performance Tuning**
-- **Concurrent Downloads**: Up to 3 simultaneous downloads
-- **Cache Management**: Automatic cleanup of temporary files
-- **Memory Optimization**: Efficient image/video processing
-- **Battery Optimization**: Smart background processing
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-## 🤝 Contributing to GetInsta
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-We welcome contributions from developers worldwide! Here's how to get started:
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-### **🚀 Quick Start for Contributors**
-1. **🍴 Fork**: Fork the repository to your GitHub account
-2. **📥 Clone**: `git clone https://github.com/yourusername/GetInsta.git`
-3. **🌿 Branch**: `git checkout -b feature/your-amazing-feature`
-4. **💻 Code**: Implement your feature with proper documentation
-5. **✅ Test**: Ensure all tests pass and add new ones if needed
-6. **📝 Commit**: `git commit -m 'Add amazing feature'`
-7. **📤 Push**: `git push origin feature/your-amazing-feature`
-8. **🔄 PR**: Open a Pull Request with detailed description
+## Quick Start
 
-### **📋 Development Standards**
-- **Code Style**: Follow Flutter/Dart official style guide
-- **Documentation**: Comment complex logic and public APIs
-- **Testing**: Maintain test coverage above 80%
-- **Security**: Follow OWASP mobile security guidelines
-- **Performance**: Profile and optimize resource usage
+Run the example pipeline:
+```bash
+python main.py
+```
 
-### **🎯 Areas for Contribution**
-- **🌐 Localization**: Add support for more languages
-- **🎨 UI/UX**: Improve interface design and user experience
-- **⚡ Performance**: Optimize download speeds and memory usage
-- **🔧 Features**: Add support for new platforms or formats
-- **🐛 Bug Fixes**: Identify and resolve issues
-- **📚 Documentation**: Improve guides and API documentation
+## Usage Examples
 
-## 🛠️ Troubleshooting
+### Classification
+```python
+from models import Classifier
+from preprocessing import DataScaler
+from data import DataLoader
 
-### **Common Issues & Solutions**
+# Load and split data
+loader = DataLoader()
+X_train, X_test, y_train, y_test = loader.train_test_split(X, y)
 
-**❌ Download Fails**
-- ✅ Check internet connection
-- ✅ Verify URL is valid and public
-- ✅ Ensure sufficient storage space
-- ✅ Try different quality settings
+# Scale features
+scaler = DataScaler(method="standard")
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-**❌ App Crashes**
-- ✅ Update to latest version
-- ✅ Clear app cache and data
-- ✅ Restart device
-- ✅ Check available RAM
+# Train classifier
+classifier = Classifier(model_type="random_forest", n_estimators=100)
+classifier.train(X_train_scaled, y_train)
 
-**❌ Permission Denied**
-- ✅ Grant storage permissions in Settings
-- ✅ Enable "Install from Unknown Sources"
-- ✅ Check folder write permissions
+# Evaluate
+metrics = classifier.evaluate(X_test_scaled, y_test)
+classifier.save()
+```
 
-## 📄 License & Legal
+### Neural Network
+```python
+from models import NeuralNetwork
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for complete details.
+# Create neural network
+nn = NeuralNetwork(
+    input_dim=20,
+    hidden_layers=[64, 32, 16],
+    output_dim=3,
+    activation="relu"
+)
 
-### **⚖️ Important Legal Notes**
-- **Fair Use**: This app is for personal use and educational purposes
-- **Content Rights**: Users are responsible for respecting copyright laws
-- **Platform Terms**: Ensure compliance with platform terms of service
-- **No Liability**: Developers are not responsible for misuse of the application
+# Train
+nn.train(X_train, y_train, epochs=50, batch_size=32)
 
-## 🙏 Acknowledgments & Credits
+# Evaluate
+metrics = nn.evaluate(X_test, y_test)
+nn.save()
+```
 
-### **🏆 Special Thanks**
-- **Flutter Team**: For the incredible cross-platform framework
-- **Material Design**: For the beautiful and accessible design system
-- **Open Source Community**: For inspiration, libraries, and support
-- **Beta Testers**: For valuable feedback and bug reports
-- **Contributors**: For code contributions and improvements
+### Text Processing
+```python
+from preprocessing import TextProcessor
 
-### **📚 Third-Party Libraries**
-- **HTTP Package**: For network requests
-- **Path Provider**: For file system access
-- **Flutter Toast**: For user notifications
-- **Video Player**: For media playback
-- **Permission Handler**: For runtime permissions
+processor = TextProcessor()
+texts = ["Your text here", "Another text"]
 
-## 📞 Support & Community
+# Process texts
+processed = processor.process_corpus(texts, remove_stopwords=True, use_lemmatization=True)
 
-### **🆘 Get Help**
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/hiotakuofficial-cloud/GetInsta/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/hiotakuofficial-cloud/GetInsta/discussions)
-- **📧 Email Support**: [support@getinsta.app](mailto:support@getinsta.app)
-- **📖 Documentation**: [Wiki Pages](https://github.com/hiotakuofficial-cloud/GetInsta/wiki)
+# Build vocabulary
+vocab = processor.get_vocabulary(processed)
 
-### **🌟 Community Guidelines**
-- **🤝 Be Respectful**: Treat all community members with respect
-- **📝 Be Descriptive**: Provide detailed information in issues/PRs
-- **🔍 Search First**: Check existing issues before creating new ones
-- **📚 Follow Templates**: Use provided issue and PR templates
+# Convert to sequences
+sequences = processor.tokens_to_sequences(processed, vocab)
+```
 
-## 🔄 Version History & Roadmap
+### Image Processing
+```python
+from preprocessing import ImageProcessor
 
-### **📈 Current Version: v1.0.0**
-- ✅ Multi-platform support (Instagram, YouTube, Pinterest)
-- ✅ Advanced security implementation with token obfuscation
-- ✅ Background download services with notifications
-- ✅ Material Design 3 interface with dark theme
-- ✅ Comprehensive error handling and user feedback
-- ✅ Smart caching system and duplicate prevention
-- ✅ Built-in video player with full controls
-- ✅ Download history with search and management
+processor = ImageProcessor(target_size=(224, 224))
 
-### **🚀 Upcoming Features (v1.1.0)**
-- 🔄 **TikTok Support**: Download TikTok videos and audio
-- 🌐 **Multi-Language**: Support for 10+ languages
-- ☁️ **Cloud Sync**: Backup download history to cloud
-- 🎨 **Custom Themes**: Multiple theme options
-- 📱 **Tablet UI**: Optimized interface for tablets
-- 🔔 **Smart Notifications**: Advanced notification system
+# Load and preprocess image
+img = processor.load_image("path/to/image.jpg")
+img_resized = processor.resize_image(img)
+img_normalized = processor.normalize_image(img_resized)
 
-### **🎯 Long-term Roadmap**
-- **Desktop Version**: Windows, macOS, Linux support
-- **Batch URLs**: Import URLs from files
-- **Scheduled Downloads**: Download at specific times
-- **Quality Presets**: Save preferred quality settings
-- **Advanced Filters**: Filter content by type, size, date
+# Apply augmentation
+img_augmented = processor.apply_random_augmentation(img_normalized)
+```
 
----
+## Configuration
 
-<div align="center">
+Edit `config.py` to customize:
+- Data paths
+- Model hyperparameters
+- Deep learning settings
+- Computer vision settings
+- NLP settings
+- Logging configuration
 
-**🎉 Made with ❤️ by the GetInsta Development Team**
+## Environment Variables
 
-[![GitHub stars](https://img.shields.io/github/stars/hiotakuofficial-cloud/GetInsta?style=social)](https://github.com/hiotakuofficial-cloud/GetInsta/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/hiotakuofficial-cloud/GetInsta?style=social)](https://github.com/hiotakuofficial-cloud/GetInsta/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/hiotakuofficial-cloud/GetInsta?style=social)](https://github.com/hiotakuofficial-cloud/GetInsta/issues)
+Create a `.env` file with:
+```
+USE_GPU=false
+NUM_WORKERS=4
+MIXED_PRECISION=false
+LOG_LEVEL=INFO
+OPENAI_API_KEY=your_key_here
+HUGGINGFACE_API_KEY=your_key_here
+```
 
-**⭐ Star this repository if you found it helpful!**
+## Project Guidelines
 
-</div>
+- No test files are included (as per project requirements)
+- Clean project structure with modular components
+- All modules are well-documented with docstrings
+- Configuration centralized in `config.py`
+- Logging integrated throughout the pipeline
+
+## Dependencies
+
+Core libraries:
+- NumPy, Pandas, Scikit-learn
+- PyTorch, TensorFlow
+- OpenCV, Pillow
+- Transformers, NLTK, spaCy
+- Matplotlib, Seaborn, Plotly
+
+See `requirements.txt` for complete list.
+
+## License
+
+This project is open source and available for educational and commercial use.
